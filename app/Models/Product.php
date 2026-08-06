@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
 class Product extends Model
 {
     
@@ -51,13 +52,13 @@ use HasFactory, SoftDeletes;
 
 public function images(): HasMany
     {
-        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+        return $this->hasMany(Product_images::class)->orderBy('sort_order');
     }
 
     // Récupérer uniquement l'image principale
     public function primaryImage(): HasOne
     {
-        return $this->hasOne(ProductImage::class)->ofMany([
+        return $this->hasOne(Product_images::class)->ofMany([
             'is_primary' => 'max',
             'id' => 'min',
         ], function ($query) {

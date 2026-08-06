@@ -14,6 +14,16 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/store', [App\Http\Controllers\ProductController::class, 'index'])
+    ->name('store.index');
+
+Route::get('/store/cart', function () {
+    return Inertia::render('Store/Cart/Index');
+})->name('store.cart.index');
+
+Route::get('/store/products/{id}', [App\Http\Controllers\ProductController::class, 'show'])
+    ->name('store.products.show');
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

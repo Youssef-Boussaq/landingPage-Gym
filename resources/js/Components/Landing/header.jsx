@@ -1,4 +1,4 @@
-import { Dumbbell } from 'lucide-react';
+import { Dumbbell, Search, Heart, User, ShoppingBag } from 'lucide-react';
 
 export default function Header({ user }) {
     return (
@@ -37,34 +37,37 @@ export default function Header({ user }) {
                     >
                         FAQ
                     </a>
+                    <a 
+                        href="/store" 
+                        className="text-sm font-medium text-white/90 transition-colors duration-300 hover:text-[#9de500] group-hover:text-slate-700 group-hover:hover:text-[#82be00]"
+                    >
+                        Store
+                    </a>
                 </nav>
 
-                {/* Action Buttons / Auth */}
-                <div className="flex items-center gap-3">
-                    {user ? (
-                        <a
-                            href="/dashboard"
-                            className="rounded-full bg-[#9de500] px-5 py-2 text-sm font-semibold text-black transition hover:bg-[#8cd000]"
-                        >
-                            Dashboard
-                        </a>
-                    ) : (
-                        <>
-                            {/* Bouton Login — Adapte sa bordure et sa couleur au fond blanc */}
-                            <a
-                                href="/login"
-                                className="rounded-full border border-white/40 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:border-white hover:bg-white/10 group-hover:border-slate-900 group-hover:text-slate-900 group-hover:hover:bg-slate-100"
-                            >
-                                Login
-                            </a>
-                            <a
-                                href="/register"
-                                className="rounded-full bg-[#9de500] px-5 py-2 text-sm font-semibold text-black transition hover:bg-[#8cd000]"
-                            >
-                                Get Started
-                            </a>
-                        </>
-                    )}
+                <div className="flex items-center gap-3 text-white">
+                    <button type="button" className="rounded-full border border-white/30 bg-white/10 p-3 transition hover:border-white hover:bg-white/20">
+                        <Search className="h-4 w-4" />
+                        <span className="sr-only">Search</span>
+                    </button>
+                    <button type="button" className="rounded-full border border-white/30 bg-white/10 p-3 transition hover:border-white hover:bg-white/20">
+                        <Heart className="h-4 w-4" />
+                        <span className="sr-only">Favorites</span>
+                    </button>
+                    <a
+                        href={user ? '/dashboard' : '/login'}
+                        className="rounded-full border border-white/30 bg-white/10 p-3 transition hover:border-white hover:bg-white/20"
+                    >
+                        <User className="h-4 w-4" />
+                        <span className="sr-only">{user ? 'Dashboard' : 'Login'}</span>
+                    </a>
+                    <a
+                        href="/store/cart"
+                        className="rounded-full border border-white/30 bg-white/10 p-3 transition hover:border-white hover:bg-white/20"
+                    >
+                        <ShoppingBag className="h-4 w-4" />
+                        <span className="sr-only">Panier</span>
+                    </a>
                 </div>
             </div>
         </header>
