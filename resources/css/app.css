@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+
+/* Définition des variables de polices */
+:root {
+  --font-inter: "Inter", sans-serif;
+  --font-archivo: "Archivo Black", sans-serif;
+}
+
+/* Inter est la police par défaut de tout le site */
+body {
+  font-family: var(--font-inter);
+}
+
+/* Classes pour changer de famille de police */
+.font-archivo {
+  font-family: var(--font-archivo);
+}
+
+.font-inter {
+  font-family: var(--font-inter);
+}
+
+/* Classes pour les épaisseurs avec Inter (font-weight) */
+.font-light { font-weight: 300; }
+.font-regular { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-black { font-weight: 900; }
