@@ -10,10 +10,12 @@ html, body, #root {
 }
 
 
-/* Définition des variables de polices */
+/* Définition des variables de polices et couleurs */
 :root {
   --font-inter: "Inter", sans-serif;
   --font-archivo: "Archivo Black", sans-serif;
+  --color-primary: #9de500;
+  --color-primary-hover: #8cd000;
 }
 
 /* Inter est la police par défaut de tout le site */

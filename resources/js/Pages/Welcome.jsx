@@ -14,17 +14,17 @@ import Nutrition from '@/Components/Landing/Nutrition';
 // FIX: Destructured auth prop from Inertia
 export default function Welcome({ auth }) {
     return (
-        <PublicLayout>
+        <PublicLayout >
             <Head title="Accueil" />
 
             <div className="relative overflow-hidden bg-white text-black">
-                
+
 
                 {/* FIX: Removed m-0 which conflicted with mx-auto */}
                 <main className="mx-auto max-w-7xl">
                     {/* FIX: Passed auth?.user properly as a JS expression */}
-                    <Hero user={auth?.user} />
-                    
+                    <Hero />
+
                     <AboutCoach />
                     <PainPoints />
                     <Nutrition />

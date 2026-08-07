@@ -16,7 +16,7 @@ export default function PublicLayout({ children }) {
             {/* Tablet & Desktop */}
             <Header user={user} />
 
-            
+
 
             {children}
         </div>
