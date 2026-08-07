@@ -14,7 +14,7 @@ export default function StoreIndex({
     filters = {}
 }) {
     // État pour l'ouverture/fermeture des filtres (Mobile & Toggle Desktop)
-    const [isFilterOpen, setIsFilterOpen] = useState(true);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     // Regroupement des produits par identifiant de catégorie pour optimiser les performances (O(N))
     const productsByCategoryMap = useMemo(() => {
@@ -117,23 +117,22 @@ export default function StoreIndex({
 
                                         return (
                                             <section key={category.id} className="space-y-3 sm:space-y-4">
-                                                <div className="flex items-center justify-between border-b border-slate-200/80 pb-2.5 sm:pb-3">
+                                                <div className="flex flex-col items-center justify-center text-center my-6 space-y-2.5">
+                                                    {/* Titre central + Badge */}
                                                     <div className="flex items-center gap-2">
-                                                        <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
+                                                        <h2 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight">
                                                             {category.name}
                                                         </h2>
-                                                        <span className="text-[10px] sm:text-xs font-bold text-slate-500 bg-slate-200/60 px-2 py-0.5 rounded-full">
+                                                        <span className="text-[10px] sm:text-xs font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full shadow-xs">
                                                             {categoryProducts.length}
                                                         </span>
                                                     </div>
 
-                                                    <button
-                                                        onClick={() => handleCategorySelect(category.slug)}
-                                                        className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-slate-950 transition-colors"
-                                                    >
-                                                        Voir tout
-                                                        <ArrowRight className="w-3.5 h-3.5 text-primary" />
-                                                    </button>
+                                                    {/* Ligne créative avec point central */}
+                                                    <div className="relative flex items-center justify-center w-28 h-1">
+                                                        <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-slate-900 to-transparent rounded-full" />
+                                                        <div className="absolute w-1.5 h-1.5 rounded-full bg-slate-900 shadow-sm" />
+                                                    </div>
                                                 </div>
 
                                                 {/* Carrousel dédié à la catégorie */}

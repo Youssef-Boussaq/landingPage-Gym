@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Filter, X, Check } from "lucide-react";
 
 export default function MenuCategory({ categories = [], selectedCategory = null, onSelect }) {
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef(null);
 
     // Clic en dehors pour fermer le menu
@@ -24,7 +24,8 @@ export default function MenuCategory({ categories = [], selectedCategory = null,
     }, [isOpen]);
 
     const handleSelect = (category) => {
-        const slug = typeof category === "object" ? category?.slug : category;
+        // Fix : transmet correctement null pour réafficher tous les produits
+        const slug = category?.slug ?? category;
         if (onSelect) {
             onSelect(slug);
         }
@@ -72,12 +73,13 @@ export default function MenuCategory({ categories = [], selectedCategory = null,
                             {/* Option "Tous les produits" */}
                             <li>
                                 <button
+                                    type="button"
                                     role="menuitem"
                                     aria-current={!selectedCategory ? "page" : undefined}
                                     onClick={() => handleSelect(null)}
                                     className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${!selectedCategory
-                                            ? "bg-primary text-slate-950 font-bold"
-                                            : "text-slate-300 hover:bg-slate-800/80 hover:text-white"
+                                        ? "bg-primary text-slate-950 font-bold"
+                                        : "text-slate-300 hover:bg-slate-800/80 hover:text-white"
                                         }`}
                                 >
                                     <span>Tous les produits</span>
@@ -94,12 +96,13 @@ export default function MenuCategory({ categories = [], selectedCategory = null,
                                 return (
                                     <li key={cat.id || cat.slug}>
                                         <button
+                                            type="button"
                                             role="menuitem"
                                             aria-current={isActive ? "page" : undefined}
                                             onClick={() => handleSelect(cat)}
                                             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${isActive
-                                                    ? "bg-primary text-slate-950 font-bold"
-                                                    : "text-slate-300 hover:bg-slate-800/80 hover:text-white"
+                                                ? "bg-primary text-slate-950 font-bold"
+                                                : "text-slate-300 hover:bg-slate-800/80 hover:text-white"
                                                 }`}
                                         >
                                             <span className="truncate">{cat.name}</span>
