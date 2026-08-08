@@ -18,7 +18,6 @@ export default function ProductsIndex({ products = [] }) {
                             <p className="mt-4 text-gray-600 font-inter">
                                 Liste des produits disponibles dans la boutique.
                             </p>
-
                             <ul className="mt-8 space-y-4">
                                 {products.length === 0 ? (
                                     <li className="rounded-2xl border border-slate-200 bg-slate-50 p-6 text-slate-700">

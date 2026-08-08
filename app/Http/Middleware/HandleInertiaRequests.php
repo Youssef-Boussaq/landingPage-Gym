@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Middleware;
 
 use App\Models\Category;
+use Illuminate\Support\Facades\Cache;
 
 
 class HandleInertiaRequests extends Middleware
@@ -40,8 +41,14 @@ class HandleInertiaRequests extends Middleware
         'auth' => [
             'user' => $request->user(),
         ],
-
-        'categories' => Category::orderBy('name', 'asc')->get(),
+            // 1. Lazy Evaluation: 
+            // 2. Select: 
+            // 3. Cache:       
+            'categories' => fn () => Cache::remember('global_categories', 3600, function () {
+                return Category::select('id', 'name', 'slug')
+                    ->orderBy('name', 'asc')
+                    ->get();
+            }),
     ];
 }
 }
