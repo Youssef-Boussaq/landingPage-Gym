@@ -1,0 +1,35 @@
+import { router } from '@inertiajs/react';
+
+export function addToCart(
+    productId,
+    quantity = 1,
+    variant = null,
+    options = {}
+) {
+    return router.post(
+        route('cart.add'),
+        {
+            product_id: productId,
+            quantity: quantity,
+            variant_id: variant?.id ?? null,
+        },
+        {
+            preserveScroll: true,
+
+            ...options,
+
+            onSuccess: (page) => {
+                console.log('🔥 ADD CART SUCCESS');
+                console.log('NEW CART:', page.props.cart);
+
+                options.onSuccess?.(page);
+            },
+
+            onError: (errors) => {
+                console.log('❌ ADD CART ERROR:', errors);
+
+                options.onError?.(errors);
+            },
+        }
+    );
+}

@@ -1,36 +1,39 @@
-import { ShoppingBag, User, Bell } from 'lucide-react';
-import { Link, usePage, router } from '@inertiajs/react';
 
-export default function MobileHeader({ user }) {
-    const { categories = [], selectedCategory = null } = usePage().props;
+import {
+    ShoppingBag,
+    User,
+    Bell,
+} from 'lucide-react';
 
-    // Déterminer si nous sommes actuellement sur la boutique (pour afficher le filtre de catégorie)
-    const isStorePage = (typeof route !== 'undefined' && route().current('store.*')) || window.location.pathname.includes('/store');
+import {
+    Link,
+    usePage,
+} from '@inertiajs/react';
 
-    // Gestion de la sélection de catégorie avec scroll préservé et rechargement partiel
-    const handleCategorySelect = (slug) => {
-        const queryParams = (selectedCategory === slug || !slug) ? {} : { category: slug };
-        router.get(route('store.index'), queryParams, {
-            preserveState: true,
-            preserveScroll: true,
-            only: ['products', 'selectedCategory']
-        });
-    };
+import CartBadge from './CartBadge';
+
+export default function MobileHeader({ user, onOpenCart }) {
+    const { cart = {} } = usePage().props;
+
+    const cartCount = Number(cart?.count ?? 0);
 
     return (
         <header
             className="
-                fixed top-0 inset-x-0 z-40
+                fixed inset-x-0 top-0 z-40
                 flex items-center justify-between
-                px-5 py-4
                 bg-transparent
+                px-5 py-4
                 md:hidden
             "
         >
+
             {/* LEFT SIDE */}
             <div className="flex items-center gap-4">
+
+                {/* User */}
                 <Link
-                    href={user ? "/profile" : "/login"}
+                    href={user ? '/profile' : '/login'}
                     className="
                         transition-transform duration-300
                         hover:-translate-y-1
@@ -40,12 +43,12 @@ export default function MobileHeader({ user }) {
                     {user?.avatar ? (
                         <img
                             src={user.avatar}
-                            alt={user.name || "Avatar"}
+                            alt={user.name || 'Avatar'}
                             className="
                                 h-9 w-9
                                 rounded-full
-                                object-cover
                                 border border-white/30
+                                object-cover
                             "
                         />
                     ) : (
@@ -59,23 +62,28 @@ export default function MobileHeader({ user }) {
                     )}
                 </Link>
 
-                <Link
-                    href="/store/cart"
+
+                {/* Cart */}
+                <button
+                    type="button"
+                    onClick={onOpenCart}
                     className="
-                        transition-transform duration-300
-                        hover:-translate-y-1
-                        active:scale-95
-                    "
+        relative
+        rounded-full
+        border border-white/30
+        bg-white/10
+        p-3
+        transition
+        hover:border-white
+        hover:bg-white/20
+    "
                 >
-                    <ShoppingBag
-                        className="
-                            h-5 w-5
-                            text-primary
-                            drop-shadow-md
-                        "
-                    />
-                </Link>
+                    <ShoppingBag className="h-4 w-4" />
+
+                    <CartBadge count={cartCount} />
+                </button>
             </div>
+
 
             {/* RIGHT SIDE */}
             <div className="flex items-center gap-4">
@@ -97,17 +105,21 @@ export default function MobileHeader({ user }) {
                             drop-shadow-md
                         "
                     />
+
                     <span
                         className="
                             absolute
-                            top-0 right-0
+                            right-0
+                            top-0
                             h-2 w-2
                             rounded-full
                             bg-red-600
                         "
                     />
                 </button>
+
             </div>
         </header>
     );
 }
+

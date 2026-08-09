@@ -1,24 +1,69 @@
-import Navbar from "@/Components/Landing/Navbar";
-import Header from "@/Components/Landing/Header";
-import MobileHeader from "@/Components/Landing/MobileHeader";
-import { usePage } from "@inertiajs/react";
+import { usePage } from '@inertiajs/react';
 
-export default function PublicLayout({ children }) {
-    const user = usePage().props.auth?.user;
+import Navbar from '@/Components/Landing/Navbar';
+import Header from '@/Components/Landing/Header';
+import MobileHeader from '@/Components/Landing/MobileHeader';
+
+import CartDrawer from '@/Components/Store/Cart/CartDrawer';
+
+import {
+    CartProvider,
+    useCart,
+} from '@/context/CartContext';
+
+
+function PublicLayoutContent({ children }) {
+
+    const { auth } = usePage().props;
+
+    const user = auth?.user ?? null;
+
+    const {
+        isCartOpen,
+        cartItems,
+        cartCount,
+        openCart,
+        closeCart,
+    } = useCart();
 
     return (
-        <div className="min-h-screen bg-gradient-to-r from-stone-100 via-neutral-50 to-white">
-            <Navbar />
+        <div  >
 
-            {/* Mobile */}
-            <MobileHeader user={user} />
+            < Navbar />
 
-            {/* Tablet & Desktop */}
-            <Header user={user} />
+            <Header
+                user={user}
+                onOpenCart={openCart}
+            />
 
-
+            <MobileHeader
+                user={user}
+                onOpenCart={openCart}
+            />
 
             {children}
-        </div>
+
+            <CartDrawer
+                isOpen={isCartOpen}
+                items={cartItems}
+                count={cartCount}
+                onClose={closeCart}
+            />
+
+        </div >
+    );
+}
+
+
+export default function PublicLayout({ children }) {
+
+    return (
+        <CartProvider>
+
+            <PublicLayoutContent>
+                {children}
+            </PublicLayoutContent>
+
+        </CartProvider>
     );
 }

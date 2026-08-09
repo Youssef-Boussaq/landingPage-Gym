@@ -33,22 +33,27 @@ class HandleInertiaRequests extends Middleware
      */
     
 
-    public function share(Request $request): array
+ public function share(Request $request): array
 {
+    $cart = session()->get('cart', []);
+
     return [
         ...parent::share($request),
 
         'auth' => [
             'user' => $request->user(),
         ],
-            // 1. Lazy Evaluation: 
-            // 2. Select: 
-            // 3. Cache:       
-            'categories' => fn () => Cache::remember('global_categories', 3600, function () {
-                return Category::select('id', 'name', 'slug')
-                    ->orderBy('name', 'asc')
-                    ->get();
+
+        'categories' => Category::orderBy('name', 'asc')->get(),
+
+        'cart' => [
+            'items' => $cart,
+
+            'count' => collect($cart)->sum(function ($item) {
+                return (int) ($item['quantity'] ?? 0);
             }),
+        ],
     ];
 }
 }
+

@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\CartController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -17,9 +18,8 @@ Route::get('/', function () {
 Route::get('/store', [App\Http\Controllers\ProductController::class, 'index'])
     ->name('store.index');
 
-Route::get('/store/cart', function () {
-    return Inertia::render('Store/Cart/Index');
-})->name('store.cart.index');
+Route::get('/store/cart', [CartController::class, 'index'])
+    ->name('store.cart.index');
 
 Route::get('/store/products/{id}', [App\Http\Controllers\ProductController::class, 'show'])
     ->name('store.products.show');
@@ -33,5 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+Route::post('/cart/add', [CartController::class, 'add'])
+    ->name('cart.add');
+
 
 require __DIR__.'/auth.php';
