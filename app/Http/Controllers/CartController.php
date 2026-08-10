@@ -18,6 +18,10 @@ class CartController extends Controller
 
         $product = Product::findOrFail($validated['product_id']);
 
+        $primaryImage = $product->primaryImage?->path;
+
+        
+
         if (!$product->is_active) {
             return back()->withErrors([
                 'cart' => "Ce produit n'est pas disponible.",
@@ -51,10 +55,12 @@ class CartController extends Controller
                 'quantity' => $validated['quantity'],
                 'type' => $product->type->value,
                 'variant_id' => $validated['variant_id'] ?? null,
+                'image' => $primaryImage,
             ];
         }
 
         session()->put('cart', $cart);
+        
         
 
         return back()->with('success', 'Produit ajouté au panier.');

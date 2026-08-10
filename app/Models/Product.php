@@ -58,14 +58,9 @@ public function images(): HasMany
     // Récupérer uniquement l'image principale
     public function primaryImage(): HasOne
     {
-        return $this->hasOne(Product_images::class)->ofMany([
-            'is_primary' => 'max',
-            'id' => 'min',
-        ], function ($query) {
-            $query->where('is_primary', true);
-        });
+        return $this->hasOne(Product_images::class, 'product_id')
+            ->where('is_primary', true);
     }
-
 
 
     // Lignes de commande liées

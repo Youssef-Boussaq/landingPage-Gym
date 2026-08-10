@@ -37,4 +37,6 @@ Route::post('/cart/add', [CartController::class, 'add'])
     ->name('cart.add');
 
 
+
+
 require __DIR__.'/auth.php';

@@ -1,22 +1,17 @@
 import React from 'react';
 import { X, ShoppingBag } from 'lucide-react';
 
+import CartItem from './CartItem';
+import CartSummary from './CartSummary';
+
+
 export default function CartDrawer({
     isOpen,
     onClose,
     items = {},
     count = 0,
 }) {
-
     const cartItems = Object.values(items);
-
-    const subtotal = cartItems.reduce(
-        (total, item) =>
-            total +
-            Number(item.price) *
-            Number(item.quantity),
-        0
-    );
 
     return (
         <>
@@ -66,7 +61,6 @@ export default function CartDrawer({
                     }
                 `}
             >
-
                 {/* Header */}
                 <div
                     className="
@@ -80,9 +74,7 @@ export default function CartDrawer({
                         py-5
                     "
                 >
-
                     <div>
-
                         <h2
                             className="
                                 font-archivo
@@ -97,7 +89,6 @@ export default function CartDrawer({
                         <p className="mt-1 text-xs text-slate-500">
                             {count} article{count > 1 ? 's' : ''}
                         </p>
-
                     </div>
 
                     <button
@@ -117,14 +108,11 @@ export default function CartDrawer({
                     >
                         <X className="h-5 w-5" />
                     </button>
-
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto">
-
                     {count === 0 ? (
-
                         <div
                             className="
                                 flex
@@ -153,103 +141,21 @@ export default function CartDrawer({
                             >
                                 Votre panier est vide
                             </h3>
-
                         </div>
-
                     ) : (
-
                         cartItems.map((item) => (
-
-                            <div
+                            <CartItem
                                 key={`${item.id}-${item.variant_id ?? 'default'}`}
-                                className="
-                                    border-b
-                                    border-slate-100
-                                    px-6
-                                    py-5
-                                "
-                            >
-
-                                <div className="flex justify-between gap-4">
-
-                                    <div>
-
-                                        <h3 className="text-sm font-semibold">
-                                            {item.title}
-                                        </h3>
-
-                                        <p className="mt-1 text-xs text-slate-500">
-                                            Quantité : {item.quantity}
-                                        </p>
-
-                                    </div>
-
-                                    <p className="font-bold">
-                                        {(
-                                            Number(item.price) *
-                                            Number(item.quantity)
-                                        ).toFixed(2)}{' '}
-                                        DH
-                                    </p>
-
-                                </div>
-
-                            </div>
-
+                                item={item}
+                            />
                         ))
-
                     )}
-
                 </div>
 
                 {/* Footer */}
                 {count > 0 && (
-
-                    <div
-                        className="
-                            shrink-0
-                            border-t
-                            border-slate-200
-                            bg-white
-                            px-6
-                            py-5
-                        "
-                    >
-
-                        <div className="flex justify-between">
-
-                            <span className="text-sm text-slate-500">
-                                Sous-total
-                            </span>
-
-                            <span className="font-black">
-                                {subtotal.toFixed(2)} DH
-                            </span>
-
-                        </div>
-
-                        <button
-                            type="button"
-                            className="
-                                mt-5
-                                w-full
-                                rounded-full
-                                bg-black
-                                px-5
-                                py-4
-                                text-sm
-                                font-bold
-                                text-white
-                                transition
-                                hover:bg-slate-800
-                            "
-                        >
-                            PASSER LA COMMANDE
-                        </button>
-
-                    </div>
+                    <CartSummary items={cartItems} />
                 )}
-
             </aside>
         </>
     );

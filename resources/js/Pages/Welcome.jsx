@@ -24,7 +24,6 @@ export default function Welcome({ auth }) {
                 <main className="mx-auto ">
                     {/* FIX: Passed auth?.user properly as a JS expression */}
                     <Hero />
-
                     <AboutCoach />
                     <PainPoints />
                     <Nutrition />
