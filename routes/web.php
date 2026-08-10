@@ -35,6 +35,8 @@ Route::middleware('auth')->group(function () {
 });
 Route::post('/cart/add', [CartController::class, 'add'])
     ->name('cart.add');
+Route::patch('/cart/update', [CartController::class, 'update'])
+    ->name('cart.update');
 
 
 

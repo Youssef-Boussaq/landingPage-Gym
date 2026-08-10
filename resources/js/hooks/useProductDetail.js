@@ -26,6 +26,7 @@ export const useProductDetail = (product) => {
             quantity,
             selectedVariant
         );
+       
     };
 
     const handleBuyNow = () => {

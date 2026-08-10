@@ -33,3 +33,37 @@ export function addToCart(
         }
     );
 }
+
+export function updateCartQuantity(
+    productId,
+    quantity,
+    variantId = null,
+    options = {}
+) {
+    return router.patch(
+        route('cart.update'),
+        {
+            product_id: productId,
+            quantity,
+            variant_id: variantId,
+        },
+        {
+            preserveScroll: true,
+
+            ...options,
+
+            onSuccess: (page) => {
+                console.log('🔥 CART UPDATED');
+                console.log('NEW CART:', page.props.cart);
+
+                options.onSuccess?.(page);
+            },
+
+            onError: (errors) => {
+                console.error('❌ CART UPDATE ERROR:', errors);
+
+                options.onError?.(errors);
+            },
+        }
+    );
+}

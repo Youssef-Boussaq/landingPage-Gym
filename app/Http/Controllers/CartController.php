@@ -64,7 +64,41 @@ class CartController extends Controller
         
 
         return back()->with('success', 'Produit ajouté au panier.');
+    }public function update(Request $request)
+{
+    $validated = $request->validate([
+        'product_id' => ['required', 'integer', 'exists:products,id'],
+        'quantity' => ['required', 'integer', 'min:1'],
+        'variant_id' => ['nullable', 'integer'],
+    ]);
+
+    $cart = session()->get('cart', []);
+
+    $productId = $validated['product_id'];
+
+    if (!isset($cart[$productId])) {
+        return back()->withErrors([
+            'cart' => 'Produit introuvable dans le panier.',
+        ]);
     }
+
+    $product = Product::findOrFail($productId);
+
+    if (
+        $product->manage_stock &&
+        $product->stock_quantity < $validated['quantity']
+    ) {
+        return back()->withErrors([
+            'quantity' => 'Stock insuffisant.',
+        ]);
+    }
+
+    $cart[$productId]['quantity'] = $validated['quantity'];
+
+    session()->put('cart', $cart);
+
+    return back()->with('success', 'Quantité mise à jour.');
+}
 
     public function index()
     {
