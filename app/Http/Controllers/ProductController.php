@@ -27,6 +27,7 @@ class ProductController extends Controller
             });
 
         $products = $productsQuery->orderBy('title')->get();
+      
         
 
         return Inertia::render('Store/Index', [

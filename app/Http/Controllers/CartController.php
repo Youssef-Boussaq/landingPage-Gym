@@ -97,6 +97,8 @@ class CartController extends Controller
 
     session()->put('cart', $cart);
 
+
+
     return back()->with('success', 'Quantité mise à jour.');
 }
 

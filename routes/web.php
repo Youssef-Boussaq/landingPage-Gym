@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -37,6 +38,12 @@ Route::post('/cart/add', [CartController::class, 'add'])
     ->name('cart.add');
 Route::patch('/cart/update', [CartController::class, 'update'])
     ->name('cart.update');
+
+
+Route::get('/checkout', [CheckoutController::class, 'index'])
+    ->name('checkout.index');
+Route::post('/checkout', [CheckoutController::class, 'store'])
+    ->name('checkout.store');
 
 
 

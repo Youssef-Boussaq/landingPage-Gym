@@ -1,4 +1,6 @@
 import React from 'react';
+import { router } from '@inertiajs/react';
+
 
 export default function CartSummary({ items = [] }) {
 
@@ -48,6 +50,7 @@ export default function CartSummary({ items = [] }) {
                     transition
                     hover:bg-slate-800
                 "
+                 onClick={() => router.get(route('checkout.index'))}
             >
                 PASSER LA COMMANDE
             </button>
