@@ -8,31 +8,75 @@ export default function PaymentMethod({
     return (
         <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
 
-            <h2 className="mb-6 text-xl font-semibold text-slate-900">
+            <h2 className="mb-5 text-xl font-semibold text-slate-900">
                 Payment Method
             </h2>
 
-            <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 p-4">
+            <div className="space-y-3">
 
-                <input
-                    type="radio"
-                    name="payment_method"
-                    value="cash"
-                    checked={value === 'cash'}
-                    onChange={(e) => onChange(e.target.value)}
-                />
+                {/* Stripe */}
 
-                <div>
-                    <p className="font-medium text-slate-900">
-                        Cash on Delivery
-                    </p>
+                <label
+                    className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition ${value === 'stripe'
+                            ? 'border-slate-900 bg-slate-50'
+                            : 'border-slate-200'
+                        }`}
+                >
 
-                    <p className="text-sm text-slate-500">
-                        Pay when your order arrives.
-                    </p>
-                </div>
+                    <input
+                        type="radio"
+                        name="payment_method"
+                        value="stripe"
+                        checked={value === 'stripe'}
+                        onChange={(e) =>
+                            onChange(e.target.value)
+                        }
+                    />
 
-            </label>
+                    <div>
+                        <p className="font-semibold text-slate-900">
+                            Pay with Stripe
+                        </p>
+
+                        <p className="text-sm text-slate-500">
+                            Secure payment by card
+                        </p>
+                    </div>
+
+                </label>
+
+                {/* Cash */}
+
+                <label
+                    className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition ${value === 'cash'
+                            ? 'border-slate-900 bg-slate-50'
+                            : 'border-slate-200'
+                        }`}
+                >
+
+                    <input
+                        type="radio"
+                        name="payment_method"
+                        value="cash"
+                        checked={value === 'cash'}
+                        onChange={(e) =>
+                            onChange(e.target.value)
+                        }
+                    />
+
+                    <div>
+                        <p className="font-semibold text-slate-900">
+                            Cash on Delivery
+                        </p>
+
+                        <p className="text-sm text-slate-500">
+                            Pay when your order arrives
+                        </p>
+                    </div>
+
+                </label>
+
+            </div>
 
             {error && (
                 <p className="mt-2 text-sm text-red-500">

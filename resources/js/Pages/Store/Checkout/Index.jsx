@@ -18,13 +18,17 @@ export default function Index({
             <div className="grid gap-8 lg:grid-cols-3">
 
                 <div className="lg:col-span-2">
+
                     <CheckoutForm
                         isAuthenticated={isAuthenticated}
                         user={user}
                     />
+
                 </div>
 
-                <OrderSummary cart={cart} />
+                <OrderSummary
+                    cart={cart}
+                />
 
             </div>
 

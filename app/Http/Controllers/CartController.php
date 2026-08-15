@@ -28,7 +28,7 @@ class CartController extends Controller
             ]);
         }
 
-        $cart = session()->get('cart', []);
+    $cart = session()->get('cart', []);
 
         $productId = $product->id;
 

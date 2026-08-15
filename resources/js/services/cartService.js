@@ -20,13 +20,15 @@ export function addToCart(
 
             onSuccess: (page) => {
                 console.log('🔥 ADD CART SUCCESS');
-                console.log('NEW CART:', page.props.cart);
+                console.log('CART:', page.props.cart);
+                console.log('CART ITEMS:', page.props.cart?.items);
+                console.log('CART COUNT:', page.props.cart?.count);
 
                 options.onSuccess?.(page);
             },
 
             onError: (errors) => {
-                console.log('❌ ADD CART ERROR:', errors);
+                console.error('❌ ADD CART ERROR:', errors);
 
                 options.onError?.(errors);
             },
@@ -44,7 +46,7 @@ export function updateCartQuantity(
         route('cart.update'),
         {
             product_id: productId,
-            quantity,
+            quantity: quantity,
             variant_id: variantId,
         },
         {
@@ -54,7 +56,9 @@ export function updateCartQuantity(
 
             onSuccess: (page) => {
                 console.log('🔥 CART UPDATED');
-                console.log('NEW CART:', page.props.cart);
+                console.log('CART:', page.props.cart);
+                console.log('CART ITEMS:', page.props.cart?.items);
+                console.log('CART COUNT:', page.props.cart?.count);
 
                 options.onSuccess?.(page);
             },

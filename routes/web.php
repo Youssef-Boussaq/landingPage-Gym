@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\StripeWebhookController;
+
+
+use App\Http\Controllers\OrderController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -44,6 +48,24 @@ Route::get('/checkout', [CheckoutController::class, 'index'])
     ->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])
     ->name('checkout.store');
+    Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])
+    ->name('checkout.success');
+
+Route::get('/checkout/cancel/{order}', [CheckoutController::class, 'cancel'])
+    ->name('checkout.cancel');
+
+
+    
+
+Route::post(
+    '/stripe/webhook',
+    [StripeWebhookController::class, 'handle']
+)->name('stripe.webhook');
+
+    
+
+Route::get('/orders/{order}', [OrderController::class, 'show'])
+    ->name('orders.show');
 
 
 

@@ -1,73 +1,106 @@
-import React from 'react';
+export default function OrderSummary({ cart = [] }) {
+    const subtotal = cart.reduce(
+        (total, item) =>
+            total +
+            Number(item.price ?? 0) * Number(item.quantity ?? 0),
+        0
+    );
 
-export default function ShippingInformation({
-    data,
-    setData,
-    errors,
-}) {
     return (
-        <section className="mt-6 rounded-2xl border p-6">
+        <aside className="rounded-2xl border border-slate-200 bg-white p-6">
 
             <h2 className="mb-6 text-xl font-semibold">
-                Shipping Information
+                Your Order
             </h2>
 
             <div className="space-y-5">
+                {cart.map((item) => {
+                    const itemTotal =
+                        Number(item.price ?? 0) *
+                        Number(item.quantity ?? 0);
 
-                <input
-                    type="text"
-                    value={data.customer_phone}
-                    onChange={(e) =>
-                        setData(
-                            'customer_phone',
-                            e.target.value
-                        )
-                    }
-                    placeholder="Phone"
-                    className="w-full rounded-lg border p-3"
-                />
+                    return (
+                        <div
+                            key={item.key}
+                            className="flex gap-4"
+                        >
+                            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-100">
 
-                <textarea
-                    value={data.shipping_address}
-                    onChange={(e) =>
-                        setData(
-                            'shipping_address',
-                            e.target.value
-                        )
-                    }
-                    placeholder="Address"
-                    className="w-full rounded-lg border p-3"
-                />
+                                {item.image ? (
+                                    <img
+                                        src={item.image}
+                                        alt={item.name}
+                                        className="h-full w-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-full items-center justify-center text-xs text-slate-400">
+                                        No image
+                                    </div>
+                                )}
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                                <span className="absolute -right-1 -top-1 flex h-6 min-w-6 items-center justify-center rounded-full bg-slate-900 px-1.5 text-xs text-white">
+                                    {item.quantity}
+                                </span>
+                            </div>
 
-                    <input
-                        type="text"
-                        value={data.city}
-                        onChange={(e) =>
-                            setData('city', e.target.value)
-                        }
-                        placeholder="City"
-                        className="rounded-lg border p-3"
-                    />
+                            <div className="min-w-0 flex-1">
 
-                    <input
-                        type="text"
-                        value={data.postal_code}
-                        onChange={(e) =>
-                            setData(
-                                'postal_code',
-                                e.target.value
-                            )
-                        }
-                        placeholder="Postal Code"
-                        className="rounded-lg border p-3"
-                    />
+                                <div className="flex justify-between gap-3">
 
-                </div>
+                                    <div>
+                                        <h3 className="font-medium">
+                                            {item.name}
+                                        </h3>
 
+                                        {item.variant_id && (
+                                            <p className="text-sm text-slate-500">
+                                                Variant #{item.variant_id}
+                                            </p>
+                                        )}
+
+                                        <p className="mt-1 text-sm text-slate-500">
+                                            {Number(item.price).toFixed(2)} DH
+                                        </p>
+                                    </div>
+
+                                    <p className="font-semibold">
+                                        {itemTotal.toFixed(2)} DH
+                                    </p>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
 
-        </section>
+            <div className="my-6 border-t border-slate-200" />
+
+            <div className="flex justify-between text-sm">
+                <span>Subtotal</span>
+
+                <span>
+                    {subtotal.toFixed(2)} DH
+                </span>
+            </div>
+
+            <div className="mt-3 flex justify-between text-sm">
+                <span>Shipping</span>
+
+                <span>Free</span>
+            </div>
+
+            <div className="my-4 border-t border-slate-200" />
+
+            <div className="flex justify-between text-lg font-bold">
+                <span>Total</span>
+
+                <span>
+                    {subtotal.toFixed(2)} DH
+                </span>
+            </div>
+
+        </aside>
     );
 }

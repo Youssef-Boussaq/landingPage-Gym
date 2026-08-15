@@ -15,7 +15,7 @@ export default function useCheckout() {
         shipping_address: '',
         city: '',
         postal_code: '',
-        payment_method: 'cash',
+        payment_method: 'stripe',
     });
 
     const submit = (event) => {

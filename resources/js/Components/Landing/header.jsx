@@ -15,6 +15,9 @@ export default function Header({ user, onOpenCart }) {
     const { props } = usePage();
 
     const cartCount = Number(props?.cart?.count ?? 0);
+    console.log('ALL INERTIA PROPS:', props);
+    console.log('CART:', props.cart);
+
 
 
 

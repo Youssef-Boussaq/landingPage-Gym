@@ -15,13 +15,21 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'order_number',
-        'status',
-        'total_amount',
-        'payment_method',
-        'transaction_id',
-    ];
+    'user_id',
+    'order_number',
+    'status',
+    'total_amount',
+    'payment_method',
+    'transaction_id',
+
+    'customer_name',
+    'customer_email',
+    'customer_phone',
+
+    'shipping_address',
+    'city',
+    'postal_code',
+];
 
     protected function casts(): array
     {

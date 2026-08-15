@@ -3,16 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
 class Product_images extends Model
 {
-
     use HasFactory;
 
     protected $fillable = [
@@ -23,6 +20,9 @@ class Product_images extends Model
         'is_primary',
     ];
 
+    protected $appends = [
+    'url',
+];
     protected function casts(): array
     {
         return [
@@ -31,26 +31,36 @@ class Product_images extends Model
         ];
     }
 
-    // URL publique automatique du fichier
+    /**
+     * URL publique de l'image.
+     */
     protected function url(): Attribute
     {
         return Attribute::make(
-            get: fn () => Storage::disk('public')->url($this->path)
+            get: fn () => $this->path
+                ? Storage::disk('public')->url($this->path)
+                : null
         );
     }
 
+    /**
+     * Produit associé.
+     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-
-
-    protected static function booted()
+    /**
+     * Supprimer le fichier physique
+     * lorsque l'image est supprimée.
+     */
+    protected static function booted(): void
     {
-        
-        static::deleted(function ($image) {
-            Storage::disk('public')->delete($image->path);
+        static::deleted(function (Product_images $image) {
+            if ($image->path) {
+                Storage::disk('public')->delete($image->path);
+            }
         });
     }
 }
