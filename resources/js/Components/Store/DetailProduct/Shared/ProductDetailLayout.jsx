@@ -2,33 +2,26 @@ import React from 'react';
 
 export default function ProductDetailLayout({ gallery, info, details, reviews }) {
     return (
-        <div className="py-12 bg-slate-50 min-h-screen">
+        <div className="w-full min-h-screen font-inter py-6 sm:py-10 text-slate-900 dark:text-slate-100">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-                    {/* Left Column - Gallery */}
-                    <div className="space-y-6">
-                        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                            {gallery}
-                        </div>
+                {/* Disposition 2 colonnes sans cartes */}
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12 items-start">
+
+                    {/* Colonne Gauche : Galerie */}
+                    <div className="lg:col-span-7">
+                        {gallery}
                     </div>
 
-                    {/* Right Column - Info & Actions */}
-                    <div className="space-y-6">
-                        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                            {info}
-                        </div>
-
-                        {details && (
-                            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                                {details}
-                            </div>
-                        )}
+                    {/* Colonne Droite : Infos & Actions */}
+                    <div className="flex flex-col gap-6 lg:col-span-5">
+                        {info}
+                        {details}
                     </div>
                 </div>
 
-                {/* Bottom - Reviews */}
+                {/* Section Basse : Avis Clients */}
                 {reviews && (
-                    <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div className="mt-16 border-t border-slate-200/60 pt-10 dark:border-slate-800/80">
                         {reviews}
                     </div>
                 )}

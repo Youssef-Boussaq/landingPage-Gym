@@ -3,8 +3,17 @@ import { ShoppingBag, ArrowUpRight } from 'lucide-react';
 
 export default function ProductCard({ product }) {
     // Safe image fallback
-    const imageUrl = product.images?.[0]?.url || '/images/placeholder.png';
-    const imageAlt = product.images?.[0]?.alt_text || product.title;
+    const primaryImage =
+        product.images?.find((image) => image.is_primary) ??
+        product.images?.[0];
+
+    const imageUrl =
+        primaryImage?.url ??
+        '/images/placeholder.png';
+
+    const imageAlt =
+        primaryImage?.alt_text ??
+        product.title;
 
     // Format categories
     const categoriesText = Array.isArray(product.categories)
@@ -19,9 +28,8 @@ export default function ProductCard({ product }) {
             {/* FULL-WIDTH IMAGE CONTAINER (Matches card width) */}
             <div className="relative w-full aspect-square overflow-hidden bg-slate-100">
                 <img
-                    src={imageUrl}
-                    alt={imageAlt}
-                    className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                    src={primaryImage?.url ?? '/images/placeholder.png'}
+                    alt={primaryImage?.alt_text ?? product.title}
                 />
 
                 {/* Floating Action Badge */}

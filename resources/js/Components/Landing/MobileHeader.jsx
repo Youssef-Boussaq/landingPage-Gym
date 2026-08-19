@@ -1,8 +1,7 @@
+import React from 'react';
 
 import {
-    ShoppingBag,
     User,
-    Bell,
 } from 'lucide-react';
 
 import {
@@ -10,116 +9,151 @@ import {
     usePage,
 } from '@inertiajs/react';
 
-import CartBadge from './CartBadge';
+import CartButton from '../Store/Cart/CartButton';
+import NotificationBell from '../Notification/NotificationBell';
 
-export default function MobileHeader({ user, onOpenCart }) {
-    const { cart = {} } = usePage().props;
+
+export default function MobileHeader({
+    user,
+    onOpenCart,
+}) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Inertia Props
+    |--------------------------------------------------------------------------
+    */
+
+    const { props } = usePage();
+
+    const auth = props?.auth;
+    const cart = props?.cart ?? {};
+
+    /*
+    |--------------------------------------------------------------------------
+    | User
+    |--------------------------------------------------------------------------
+    */
+
+    const currentUser = auth?.user ?? user ?? null;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cart
+    |--------------------------------------------------------------------------
+    */
 
     const cartCount = Number(cart?.count ?? 0);
 
     return (
         <header
             className="
-                fixed inset-x-0 top-0 z-40
-                flex items-center justify-between
+                fixed
+                inset-x-0
+                top-0
+                z-40
+
+                flex
+                items-center
+                justify-between
+
                 bg-transparent
-                px-5 py-4
+
+                px-5
+                py-4
+
                 md:hidden
             "
         >
 
-            {/* LEFT SIDE */}
+            {/* ==========================================================
+                LEFT SIDE
+            ========================================================== */}
+
             <div className="flex items-center gap-4">
 
-                {/* User */}
+                {/* ------------------------------------------------------
+                    User
+                ------------------------------------------------------ */}
+
                 <Link
-                    href={user ? '/profile' : '/login'}
+                    href={
+                        currentUser
+                            ? '/profile'
+                            : '/login'
+                    }
+                    aria-label={
+                        currentUser
+                            ? 'Profile'
+                            : 'Login'
+                    }
                     className="
-                        transition-transform duration-300
+                        transition-transform
+                        duration-300
                         hover:-translate-y-1
                         active:scale-95
                     "
                 >
-                    {user?.avatar ? (
+
+                    {currentUser?.avatar ? (
+
                         <img
-                            src={user.avatar}
-                            alt={user.name || 'Avatar'}
+                            src={currentUser.avatar}
+                            alt={
+                                currentUser.name ||
+                                'Avatar'
+                            }
                             className="
-                                h-9 w-9
+                                h-9
+                                w-9
                                 rounded-full
-                                border border-white/30
+                                border
+                                border-white/30
                                 object-cover
                             "
                         />
+
                     ) : (
+
                         <User
                             className="
-                                h-5 w-5
+                                h-5
+                                w-5
                                 text-primary
                                 drop-shadow-md
                             "
                         />
+
                     )}
+
                 </Link>
 
 
-                {/* Cart */}
-                <button
-                    type="button"
-                    onClick={onOpenCart}
-                    className="
-        relative
-        rounded-full
-        border border-white/30
-        bg-white/10
-        p-3
-        transition
-        hover:border-white
-        hover:bg-white/20
-    "
-                >
-                    <ShoppingBag className="h-4 w-4" />
+                {/* ------------------------------------------------------
+                    Cart
+                ------------------------------------------------------ */}
 
-                    <CartBadge count={cartCount} />
-                </button>
+                <CartButton
+                    onClick={onOpenCart}
+                />
+
             </div>
 
 
-            {/* RIGHT SIDE */}
+            {/* ==========================================================
+                RIGHT SIDE
+            ========================================================== */}
+
             <div className="flex items-center gap-4">
 
-                {/* Notifications */}
-                <button
-                    type="button"
-                    className="
-                        relative
-                        transition-transform duration-300
-                        hover:-translate-y-1
-                        active:scale-95
-                    "
-                >
-                    <Bell
-                        className="
-                            h-5 w-5
-                            text-primary
-                            drop-shadow-md
-                        "
-                    />
+                {/* ------------------------------------------------------
+                    Notifications
+                ------------------------------------------------------ */}
 
-                    <span
-                        className="
-                            absolute
-                            right-0
-                            top-0
-                            h-2 w-2
-                            rounded-full
-                            bg-red-600
-                        "
-                    />
-                </button>
+                <NotificationBell variant="dark" />
 
             </div>
+
         </header>
     );
 }
-

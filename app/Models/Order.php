@@ -16,6 +16,7 @@ class Order extends Model
 
     protected $fillable = [
     'user_id',
+    'guest_token',
     'order_number',
     'status',
     'total_amount',
@@ -32,12 +33,13 @@ class Order extends Model
 ];
 
     protected function casts(): array
-    {
-        return [
-            'status' => OrderStatus::class,
-            'total_amount' => 'decimal:2',
-        ];
-    }
+{
+    return [
+        'status' => \App\Enums\OrderStatus::class,
+        'payment_status' => \App\Enums\PaymentStatus::class,
+        'total_amount' => 'decimal:2',
+    ];
+}
 
     // Client ayant passé la commande
     public function user(): BelongsTo

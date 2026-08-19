@@ -14,33 +14,221 @@ class ProductController extends Controller
     {
         $categorySlug = $request->query('category');
 
-        $categories = Category::withCount('products')
+        /*
+        |--------------------------------------------------------------------------
+        | Categories
+        |--------------------------------------------------------------------------
+        |
+        | Parent Category
+        |     ├── Media
+        |     └── Children
+        |             └── Products
+        |
+        */
+
+        $categories = Category::query()
+            ->whereNull('parent_id')
+            ->with([
+                /*
+                |--------------------------------------------------------------------------
+                | Category Media
+                |--------------------------------------------------------------------------
+                |
+                | Example:
+                |
+                | Supplements
+                |     └── video.mp4
+                |
+                | Gym Equipment
+                |     └── cover.webp
+                |
+                | Gym Accessories
+                |     ├── cover.webp
+                |     └── accessories.webp
+                |
+                */
+
+                'media',
+
+                /*
+                |--------------------------------------------------------------------------
+                | Children + Products
+                |--------------------------------------------------------------------------
+                */
+
+                'children.products' => function ($query) {
+                    $query
+                        ->where('is_active', true)
+                        ->with([
+                            'images',
+                            'categories',
+                        ])
+                        ->orderBy('title');
+                },
+            ])
             ->orderBy('name')
             ->get();
 
-        $productsQuery = Product::with(['categories', 'images'])
-            ->where('is_active', true)
-            ->when($categorySlug, function ($query, $slug) {
-                $query->whereHas('categories', function ($query) use ($slug) {
-                    $query->where('slug', $slug);
-                });
-            });
+        /*
+        |--------------------------------------------------------------------------
+        | Products
+        |--------------------------------------------------------------------------
+        |
+        | /store
+        |     → all active products
+        |
+        | /store?category=protein
+        |     → products of Protein
+        |
+        | /store?category=supplements
+        |     → products of all children of Supplements
+        |
+        */
 
-        $products = $productsQuery->orderBy('title')->get();
-      
-        
+        $productsQuery = Product::query()
+            ->where('is_active', true)
+            ->with([
+                'categories',
+                'images',
+            ]);
+
+        if ($categorySlug) {
+
+            $category = Category::query()
+                ->with('children')
+                ->where('slug', $categorySlug)
+                ->firstOrFail();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Parent Category
+            |--------------------------------------------------------------------------
+            */
+
+            if ($category->parent_id === null) {
+
+                // Example:
+                // supplements
+
+                $childIds = $category->children->pluck('id');
+
+                $productsQuery->whereHas(
+                    'categories',
+                    function ($query) use ($childIds) {
+                        $query->whereIn(
+                            'categories.id',
+                            $childIds
+                        );
+                    }
+                );
+
+            } else {
+
+                /*
+                |--------------------------------------------------------------------------
+                | Child Category
+                |--------------------------------------------------------------------------
+                */
+
+                // Example:
+                // protein
+
+                $productsQuery->whereHas(
+                    'categories',
+                    function ($query) use ($category) {
+                        $query->where(
+                            'categories.id',
+                            $category->id
+                        );
+                    }
+                );
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Main Products
+        |--------------------------------------------------------------------------
+        */
+
+        $products = $productsQuery
+            ->orderBy('title')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Offers
+        |--------------------------------------------------------------------------
+        */
+
+        $offers = Product::query()
+            ->where('is_active', true)
+            ->whereNotNull('sale_price')
+            ->whereColumn('sale_price', '<', 'price')
+            ->with([
+                'categories',
+                'images',
+            ])
+            ->orderBy('sale_price')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Best Sellers
+        |--------------------------------------------------------------------------
+        */
+
+        $bestSellers = Product::query()
+            ->where('is_active', true)
+            ->with([
+                'categories',
+                'images',
+            ])
+            ->withSum('orderItems', 'quantity')
+            ->orderByDesc('order_items_sum_quantity')
+            ->take(10)
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Trending Products
+        |--------------------------------------------------------------------------
+        */
+
+        $trendingProducts = Product::query()
+            ->where('is_active', true)
+            ->with([
+                'categories',
+                'images',
+            ])
+            ->latest()
+            ->take(10)
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Inertia
+        |--------------------------------------------------------------------------
+        */
 
         return Inertia::render('Store/Index', [
             'categories' => $categories,
-            'selectedCategory' => $categorySlug,
             'products' => $products,
+            'selectedCategory' => $categorySlug,
+
+            'trendingProducts' => $trendingProducts,
+            'bestSellers' => $bestSellers,
+            'offers' => $offers,
         ]);
     }
 
+
     public function show($id): Response
     {
-        $product = Product::with(['categories', 'images'])
-            ->findOrFail($id);
+        $product = Product::with([
+            'categories',
+            'images',
+        ])->findOrFail($id);
 
         return Inertia::render('Store/Products/Show', [
             'product' => $product,

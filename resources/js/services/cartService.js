@@ -71,3 +71,34 @@ export function updateCartQuantity(
         }
     );
 }
+
+export function removeFromCart(
+    productId,
+    variantId = null,
+    options = {}
+) {
+    return router.delete(
+        route('cart.remove'),
+        {
+            data: {
+                product_id: Number(productId),
+                variant_id: variantId ? Number(variantId) : null,
+            },
+
+            preserveScroll: true,
+
+            onSuccess: (page) => {
+                console.log('🗑️ REMOVE SUCCESS');
+                console.log('NEW CART:', page.props.cart);
+
+                options.onSuccess?.(page);
+            },
+
+            onError: (errors) => {
+                console.error('❌ REMOVE ERROR:', errors);
+
+                options.onError?.(errors);
+            },
+        }
+    );
+}

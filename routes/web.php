@@ -7,7 +7,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\StripeWebhookController;
-
+use App\Http\Controllers\NotificationController;
 
 use App\Http\Controllers\OrderController;
 
@@ -37,22 +37,26 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
 });
 Route::post('/cart/add', [CartController::class, 'add'])
     ->name('cart.add');
 Route::patch('/cart/update', [CartController::class, 'update'])
     ->name('cart.update');
+Route::delete('/cart/remove', [CartController::class, 'remove'])
+    ->name('cart.remove');
 
 
 Route::get('/checkout', [CheckoutController::class, 'index'])
     ->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])
     ->name('checkout.store');
-    Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])
+Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])
     ->name('checkout.success');
 
 Route::get('/checkout/cancel/{order}', [CheckoutController::class, 'cancel'])
     ->name('checkout.cancel');
+
 
 
     
@@ -68,6 +72,17 @@ Route::get('/orders/{order}', [OrderController::class, 'show'])
     ->name('orders.show');
 
 
+
+
+    Route::post(
+        '/notifications/{notification}/read',
+        [NotificationController::class, 'markAsRead']
+    )->name('notifications.read');
+
+    Route::post(
+        '/notifications/read-all',
+        [NotificationController::class, 'markAllAsRead']
+    )->name('notifications.read-all');
 
 
 require __DIR__.'/auth.php';

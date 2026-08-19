@@ -1,33 +1,71 @@
+import React from 'react';
 
 import {
-    Dumbbell,
     Search,
     Heart,
     User,
-    ShoppingBag,
 } from 'lucide-react';
 
-import { Link, usePage } from '@inertiajs/react';
+import {
+    Link,
+    usePage,
+} from '@inertiajs/react';
 
-import CartBadge from './CartBadge';
+import HeaderLogo from '../Logo';
+import CartButton from '../Store/Cart/CartButton';
+import NotificationBell from '@/Components/Notification/NotificationBell';
+
 
 export default function Header({ user, onOpenCart }) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Inertia Props
+    |--------------------------------------------------------------------------
+    */
+
     const { props } = usePage();
 
-    const cartCount = Number(props?.cart?.count ?? 0);
-    console.log('ALL INERTIA PROPS:', props);
-    console.log('CART:', props.cart);
+    const auth = props?.auth;
+    const cart = props?.cart ?? {};
 
+    /*
+    |--------------------------------------------------------------------------
+    | User
+    |--------------------------------------------------------------------------
+    |
+    | We use auth.user as the main source.
+    | Fallback to the user prop if needed.
+    |
+    */
 
+    const currentUser = auth?.user ?? user ?? null;
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cart
+    |--------------------------------------------------------------------------
+    */
 
-    const currentPath = String(window.location?.pathname ?? '');
+    const cartCount = Number(cart?.count ?? 0);
 
-    const isCartActive = currentPath.startsWith('/store/cart');
+    /*
+    |--------------------------------------------------------------------------
+    | Current URL
+    |--------------------------------------------------------------------------
+    */
+
+    const currentPath = String(
+        window.location?.pathname ?? ''
+    );
+
     const isStoreActive = currentPath.startsWith('/store');
-    console.log('CURRENT PATH:', currentPath);
-    console.log('CART:', props?.cart);
-    console.log('CART COUNT:', cartCount);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Navigation
+    |--------------------------------------------------------------------------
+    */
 
     const navLinks = [
         {
@@ -47,43 +85,41 @@ export default function Header({ user, onOpenCart }) {
     return (
         <header
             className="
-                group absolute inset-x-0 top-0 z-30 hidden w-full
-                bg-gradient-to-b from-black/80 via-black/40
+                group absolute inset-x-0 top-0 z-30
+                hidden w-full
+                bg-gradient-to-b
+                from-black/80
+                via-black/40
                 to-transparent
                 py-4
-                transition-all duration-300
+                transition-all
+                duration-300
                 hover:bg-white
                 md:block
             "
         >
             <div
                 className="
-                    mx-auto flex max-w-7xl
-                    items-center justify-between
-                    px-6 lg:px-8
+                    mx-auto
+                    flex max-w-7xl
+                    items-center
+                    justify-between
+                    px-6
+                    lg:px-8
                 "
             >
 
-                {/* Logo */}
-                <Link
-                    href="/"
-                    className="
-                        flex items-center gap-2
-                        text-xl font-extrabold uppercase
-                        tracking-wider text-white
-                        transition-colors duration-300
-                        group-hover:text-slate-900
-                    "
-                >
-                    <Dumbbell className="h-6 w-6 text-[#9de500]" />
+                {/* ======================================================
+                    LOGO
+                ====================================================== */}
 
-                    <span>
-                        Fit Youness
-                    </span>
-                </Link>
+                <HeaderLogo />
 
 
-                {/* Navigation */}
+                {/* ======================================================
+                    NAVIGATION
+                ====================================================== */}
+
                 <nav className="flex items-center gap-8">
 
                     {navLinks.map((link) => {
@@ -91,17 +127,17 @@ export default function Header({ user, onOpenCart }) {
                         const active =
                             link.name === 'Store'
                                 ? isStoreActive
-                                : currentPath.includes(
-                                    link.href.replace('/#', '')
-                                );
+                                : false;
 
                         return (
                             <Link
                                 key={link.name}
                                 href={link.href}
                                 className={`
-                                    text-sm font-medium
-                                    transition-colors duration-300
+                                    text-sm
+                                    font-medium
+                                    transition-colors
+                                    duration-300
 
                                     ${active
                                         ? 'text-[#9de500]'
@@ -121,76 +157,114 @@ export default function Header({ user, onOpenCart }) {
                 </nav>
 
 
-                {/* Actions */}
-                <div className="flex items-center gap-3 text-white">
+                {/* ======================================================
+                    ACTIONS
+                ====================================================== */}
 
-                    {/* Search */}
+                <div className="flex items-center gap-3">
+
+                    {/* --------------------------------------------------
+                        Search
+                    -------------------------------------------------- */}
+
                     <button
                         type="button"
+                        aria-label="Search"
                         className="
                             rounded-full
                             border border-white/30
                             bg-white/10
                             p-3
+                            text-white
                             transition
+
                             hover:border-white
                             hover:bg-white/20
+
+                            group-hover:text-slate-700
                         "
                     >
                         <Search className="h-4 w-4" />
                     </button>
 
 
-                    {/* Wishlist */}
+                    {/* --------------------------------------------------
+                        Wishlist
+                    -------------------------------------------------- */}
+
                     <button
                         type="button"
+                        aria-label="Wishlist"
                         className="
                             rounded-full
                             border border-white/30
                             bg-white/10
                             p-3
+                            text-white
                             transition
+
                             hover:border-white
                             hover:bg-white/20
+
+                            group-hover:text-slate-700
                         "
                     >
                         <Heart className="h-4 w-4" />
                     </button>
 
 
-                    {/* User */}
+                    {/* --------------------------------------------------
+                        User
+                    -------------------------------------------------- */}
+
                     <Link
-                        href={user ? '/dashboard' : '/login'}
+                        href={
+                            currentUser
+                                ? '/profile'
+                                : '/login'
+                        }
+                        aria-label={
+                            currentUser
+                                ? 'Profile'
+                                : 'Login'
+                        }
                         className="
                             rounded-full
                             border border-white/30
                             bg-white/10
                             p-3
+                            text-white
                             transition
+
                             hover:border-white
                             hover:bg-white/20
+
+                            group-hover:text-slate-700
                         "
                     >
                         <User className="h-4 w-4" />
                     </Link>
 
 
-                    <button
-                        type="button"
+                    {/* --------------------------------------------------
+                        Notifications
+                    -------------------------------------------------- */}
+
+
+
+
+
+                    {/* --------------------------------------------------
+                        Cart
+                    -------------------------------------------------- */}
+
+                    <CartButton
                         onClick={onOpenCart}
-                        className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white transition hover:border-white hover:bg-white/20"
-                    >
-                        <ShoppingBag className="h-4 w-4" />
-                        <CartBadge count={cartCount} />
-                    </button>
-
-
-
-
+                    />
+                    <NotificationBell variant="dark" />
 
                 </div>
             </div>
         </header>
     );
 }
-

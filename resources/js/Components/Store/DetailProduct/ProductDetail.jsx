@@ -32,21 +32,22 @@ export default function ProductDetail({ product }) {
     const isDigital = isProductDigital(product);
 
     const galleryComponent = (
-        <ProductGallery 
-            images={product.images} 
-            activeImage={activeImage} 
-            onImageClick={setActiveImage} 
-            title={product.title} 
+        <ProductGallery
+            images={product.images}
+            activeImage={activeImage}
+            onImageClick={setActiveImage}
+            title={product.title}
         />
     );
 
     const infoComponent = (
         <>
             <ProductBreadcrumb productName={product.title} />
-            <ProductInfo 
+            <ProductInfo
                 title={product.title}
                 categoryName={product.categories?.[0]?.name}
                 price={product.price}
+                sale_price={product.sale_price}
                 originalPrice={product.original_price}
             />
             <ProductTags tags={product.categories} />
@@ -56,12 +57,12 @@ export default function ProductDetail({ product }) {
     const detailsComponent = (
         <div className="flex flex-col gap-6">
             {isDigital ? (
-                <DigitalProductDetails 
-                    product={product} 
-                    onBuyNow={handleBuyNow} 
+                <DigitalProductDetails
+                    product={product}
+                    onBuyNow={handleBuyNow}
                 />
             ) : (
-                <PhysicalProductDetails 
+                <PhysicalProductDetails
                     product={product}
                     quantity={quantity}
                     onQuantityChange={handleQuantityChange}
@@ -71,7 +72,7 @@ export default function ProductDetail({ product }) {
                     onBuyNow={handleBuyNow}
                 />
             )}
-            
+
             <ProductDescription description={product.description} />
         </div>
     );
@@ -79,7 +80,7 @@ export default function ProductDetail({ product }) {
     const reviewsComponent = <ProductReviews />;
 
     return (
-        <ProductDetailLayout 
+        <ProductDetailLayout
             gallery={galleryComponent}
             info={infoComponent}
             details={detailsComponent}

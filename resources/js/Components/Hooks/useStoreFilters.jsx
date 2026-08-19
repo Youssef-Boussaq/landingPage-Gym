@@ -1,44 +1,31 @@
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
 
-/**
- * Regroupe les produits par identifiant de catégorie.
- * @param {Array} products 
- * @returns {Object} Map des produits indexés par ID de catégorie
- */
-export function groupProductsByCategory(products = []) {
-    return products.reduce((map, product) => {
-        // Gère le cas d'une liste de catégories (many-to-many) ou d'une catégorie unique (one-to-many)
-        const cats = product.categories || (product.category ? [product.category] : []);
-
-        cats.forEach((cat) => {
-            if (!cat?.id) return;
-            
-            if (!map[cat.id]) {
-                map[cat.id] = [];
-            }
-            map[cat.id].push(product);
-        });
-
-        return map;
-    }, {});
-}
-
-/**
- * Hook de gestion des filtres du magasin via Inertia.js (URL-driven)
- */
-export function useStoreFilters(initialFilters = {}, selectedCategory = null) {
+export function useStoreFilters(initialFilters = {}) {
     const [isPending, setIsPending] = useState(false);
 
     /**
-     * Applique de nouveaux filtres en nettoyant les valeurs vides
+     * Remove empty values from filters.
      */
-    const applyFilters = (newFilters) => {
-        const queryParams = Object.fromEntries(
-            Object.entries(newFilters).filter(
-                ([_, value]) => value !== null && value !== undefined && value !== ''
+    const cleanFilters = (filters) => {
+        return Object.fromEntries(
+            Object.entries(filters).filter(
+                ([_, value]) =>
+                    value !== null &&
+                    value !== undefined &&
+                    value !== ''
             )
         );
+    };
+
+    /**
+     * Apply filters through Inertia.
+     */
+    const applyFilters = (newFilters = {}) => {
+        const queryParams = cleanFilters({
+            ...initialFilters,
+            ...newFilters,
+        });
 
         router.get(
             route('store.index'),
@@ -46,27 +33,62 @@ export function useStoreFilters(initialFilters = {}, selectedCategory = null) {
             {
                 preserveState: true,
                 preserveScroll: true,
-                only: ['products', 'selectedCategory', 'filters'],
+
+                only: [
+                    'products',
+                    'filters',
+                ],
+
                 onStart: () => setIsPending(true),
+
                 onFinish: () => setIsPending(false),
             }
         );
     };
 
     /**
-     * Sélectionne ou désélectionne une catégorie (Toggle)
+     * Toggle Trending filter.
      */
-    const handleCategorySelect = (categorySlug) => {
-        const newCategory = selectedCategory === categorySlug ? null : categorySlug;
-
+    const toggleTrending = () => {
         applyFilters({
-            ...initialFilters,
-            category: newCategory || undefined,
+            trending: initialFilters.trending ? null : 1,
         });
     };
 
     /**
-     * Réinitialise tous les filtres
+     * Toggle Top Seller filter.
+     */
+    const toggleTopSeller = () => {
+        applyFilters({
+            top_seller: initialFilters.top_seller ? null : 1,
+        });
+    };
+
+    /**
+     * Change product type.
+     *
+     * Example:
+     * physical
+     * digital
+     * all
+     */
+    const changeType = (type) => {
+        applyFilters({
+            type: type === 'all' ? null : type,
+        });
+    };
+
+    /**
+     * Change maximum price.
+     */
+    const changeMaxPrice = (maxPrice) => {
+        applyFilters({
+            max_price: maxPrice,
+        });
+    };
+
+    /**
+     * Reset all store filters.
      */
     const resetFilters = () => {
         router.get(
@@ -75,8 +97,14 @@ export function useStoreFilters(initialFilters = {}, selectedCategory = null) {
             {
                 preserveState: true,
                 preserveScroll: true,
-                only: ['products', 'selectedCategory', 'filters'],
+
+                only: [
+                    'products',
+                    'filters',
+                ],
+
                 onStart: () => setIsPending(true),
+
                 onFinish: () => setIsPending(false),
             }
         );
@@ -84,8 +112,15 @@ export function useStoreFilters(initialFilters = {}, selectedCategory = null) {
 
     return {
         isPending,
-        handleCategorySelect,
+
         applyFilters,
+
+        toggleTrending,
+        toggleTopSeller,
+
+        changeType,
+        changeMaxPrice,
+
         resetFilters,
     };
 }

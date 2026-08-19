@@ -33,6 +33,12 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id');
     }
 
+    public function media(): HasMany
+{
+    return $this->hasMany(CategoryMedia::class)
+        ->orderBy('sort_order');
+}
+
     // Produits associés
     public function products(): BelongsToMany
     {

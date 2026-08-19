@@ -3,52 +3,66 @@ import { X, ShoppingBag } from 'lucide-react';
 
 import CartItem from './CartItem';
 import CartSummary from './CartSummary';
-import { useState ,useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
 import { updateCartQuantity } from '../../../services/cartService';
+import { removeFromCart } from '../../../services/cartService';
 
 export default function CartDrawer({ isOpen, onClose, items = {}, count = 0 }) {
-  const [cartItems, setCartItems] = useState(() => Object.values(items ?? {}));
-  useEffect(() => {
-    setCartItems(Object.values(items ?? {}));
-}, [items]);
+    const [cartItems, setCartItems] = useState(() => Object.values(items ?? {}));
+    useEffect(() => {
+        setCartItems(Object.values(items ?? {}));
+    }, [items]);
 
     const handleQuantityChange = (item, newQuantity) => {
-    setCartItems((currentItems) =>
-        currentItems.map((currentItem) =>
-            currentItem.id === item.id
-                ? {
-                      ...currentItem,
-                      quantity: newQuantity,
-                  }
-                : currentItem
-        )
-    );
+        setCartItems((currentItems) =>
+            currentItems.map((currentItem) =>
+                currentItem.id === item.id
+                    ? {
+                        ...currentItem,
+                        quantity: newQuantity,
+                    }
+                    : currentItem
+            )
+        );
 
-    updateCartQuantity(
-        item.id,
-        newQuantity,
-        item.variant_id
-    );
-};
+        updateCartQuantity(
+            item.id,
+            newQuantity,
+            item.variant_id
+        );
+    };
+    const handleDelete = (item) => {
+        removeFromCart(
+            item.id,
+            item.variant_id,
+            {
+                onSuccess: () => {
+                    setCartItems((currentItems) =>
+                        currentItems.filter(
+                            (currentItem) => currentItem.id !== item.id
+                        )
+                    );
+                },
+            }
+        );
+    };
 
     return (
         <>
             {/* Overlay */}
             <div
                 onClick={onClose}
-                className={`fixed inset-0 z-[90] bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${
-                    isOpen
-                        ? 'visible opacity-100'
-                        : 'pointer-events-none invisible opacity-0'
-                } `}
+                className={`fixed inset-0 z-[90] bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${isOpen
+                    ? 'visible opacity-100'
+                    : 'pointer-events-none invisible opacity-0'
+                    } `}
             />
 
             {/* Drawer */}
             <aside
-                className={`fixed right-0 top-0 z-[100] flex h-screen w-full max-w-md flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
-                    isOpen ? 'translate-x-0' : 'translate-x-full'
-                } `}
+                className={`fixed right-0 top-0 z-[100] flex h-screen w-full max-w-md flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
+                    } `}
             >
                 {/* Header */}
                 <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-6 py-5">
@@ -87,6 +101,7 @@ export default function CartDrawer({ isOpen, onClose, items = {}, count = 0 }) {
                                 key={item.id}
                                 item={item}
                                 onQuantityChange={handleQuantityChange}
+                                onDelete={handleDelete}
                             />
                         ))
                     )}

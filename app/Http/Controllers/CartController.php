@@ -106,4 +106,38 @@ class CartController extends Controller
     {
         return Inertia::render('Store/Cart/Index');
     }
+
+   public function remove(Request $request)
+{
+    $validated = $request->validate([
+        'product_id' => ['required', 'integer'],
+        'variant_id' => ['nullable', 'integer'],
+    ]);
+
+    $cart = session()->get('cart', []);
+
+    $productId = (int) $validated['product_id'];
+
+    \Log::info('REMOVE CART REQUEST', [
+        'product_id' => $productId,
+        'variant_id' => $validated['variant_id'] ?? null,
+        'cart_before' => $cart,
+    ]);
+
+    if (!array_key_exists($productId, $cart)) {
+        return back()->withErrors([
+            'cart' => 'Produit introuvable dans le panier.',
+        ]);
+    }
+
+    unset($cart[$productId]);
+
+    session()->put('cart', $cart);
+
+    \Log::info('REMOVE CART AFTER', [
+        'cart_after' => session()->get('cart', []),
+    ]);
+
+    return back()->with('success', 'Produit supprimé du panier.');
+}
 }

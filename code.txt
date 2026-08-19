@@ -1,0 +1,662 @@
+11. تعديل صغير مهم في OrderController
+
+عندك حاليًا:
+
+public function show(Request $request, Order $order)
+{
+    if ($request->user() && $order->user_id !== $request->user()->id) {
+        abort(403);
+    }
+
+هذا يعني أن Guest يستطيع الوصول إلى أي Order إذا عرف الـ ID، لأن:
+
+$request->user()
+
+سيكون null.
+
+⚠️ هذه مشكلة أمنية سنعالجها لاحقًا.
+
+خصوصًا أن Guest عندك مدعوم.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+
+
+use App\Enums\OrderStatus;
+use App\Models\User;
+
+use Illuminate\Http\Request;
+
+use Inertia\Inertia;
+
+use App\Models\Order;
+use App\Models\Product;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+use Stripe\Stripe;
+use Stripe\Checkout\Session as StripeSession;
+use App\Notifications\OrderCreatedNotification;
+
+class CheckoutController extends Controller
+{
+    public function index()
+{
+    $cart = session('cart', []);
+
+    if (empty($cart)) {
+        return redirect()
+            ->route('cart.index')
+            ->with('error', 'Votre panier est vide.');
+    }
+
+    $cartItems = collect($cart)
+        ->map(function ($item) {
+            return [
+                'key' => $item['id'],
+
+                'product_id' => $item['id'],
+
+                'name' => $item['title'],
+
+                'price' => $item['price'],
+
+                'quantity' => (int) $item['quantity'],
+
+                'type' => $item['type'],
+
+                'variant_id' => $item['variant_id'] ?? null,
+
+                'image' => $item['image'] ?? null,
+            ];
+        })
+        ->values();
+
+    return Inertia::render('Store/Checkout/Index', [
+        'cart' => $cartItems,
+
+        'isAuthenticated' => auth()->check(),
+
+        'user' => auth()->user(),
+    ]);
+}
+
+    public function store(Request $request)
+{
+    $isAuthenticated = $request->user() !== null;
+
+    /*
+    |--------------------------------------------------------------------------
+    | 1. Validation
+    |--------------------------------------------------------------------------
+    */
+
+    if ($isAuthenticated) {
+
+        $validated = $request->validate([
+            'customer_phone' => [
+                'required',
+                'string',
+                'max:30',
+            ],
+
+            'shipping_address' => [
+                'required',
+                'string',
+                'max:500',
+            ],
+
+            'city' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+
+            'postal_code' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
+
+            'payment_method' => [
+                'required',
+                'in:stripe,cash',
+            ],
+        ]);
+
+    } else {
+
+        $validated = $request->validate([
+            'customer_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'customer_email' => [
+                'required',
+                'email',
+                'max:255',
+            ],
+
+            'customer_phone' => [
+                'required',
+                'string',
+                'max:30',
+            ],
+
+            'shipping_address' => [
+                'required',
+                'string',
+                'max:500',
+            ],
+
+            'city' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+
+            'postal_code' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
+
+            'payment_method' => [
+                'required',
+                'in:stripe,cash',
+            ],
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | 2. Get cart from session
+    |--------------------------------------------------------------------------
+    */
+
+    $cart = session('cart', []);
+
+    if (empty($cart)) {
+        return back()->with(
+            'error',
+            'Votre panier est vide.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | 3. Customer information
+    |--------------------------------------------------------------------------
+    */
+
+    if ($isAuthenticated) {
+
+        $user = $request->user();
+
+        $customerName = $user->name;
+        $customerEmail = $user->email;
+
+    } else {
+
+        $customerName = $validated['customer_name'];
+        $customerEmail = $validated['customer_email'];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | 4. Create Order
+    |--------------------------------------------------------------------------
+    */
+
+    $order = DB::transaction(function () use (
+        $request,
+        $validated,
+        $cart,
+        $customerName,
+        $customerEmail
+    ) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Get product IDs from YOUR cart structure
+        |--------------------------------------------------------------------------
+        |
+        | Cart:
+        |
+        | [
+        |   7 => [
+        |       'id' => 7,
+        |       'title' => ...,
+        |       'price' => ...,
+        |       'quantity' => 3,
+        |   ]
+        | ]
+        |
+        */
+
+        $productIds = collect($cart)
+            ->pluck('id')
+            ->unique()
+            ->values();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Lock products
+        |--------------------------------------------------------------------------
+        */
+
+        $products = Product::whereIn('id', $productIds)
+            ->lockForUpdate()
+            ->get()
+            ->keyBy('id');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Calculate total from DATABASE
+        |--------------------------------------------------------------------------
+        */
+
+        $totalAmount = 0;
+
+        foreach ($cart as $item) {
+
+            $product = $products->get($item['id']);
+
+            if (!$product) {
+                throw new \RuntimeException(
+                    'Un produit de votre panier n\'existe plus.'
+                );
+            }
+
+            $quantity = (int) $item['quantity'];
+
+            if ($quantity < 1) {
+                throw new \RuntimeException(
+                    'Quantité invalide.'
+                );
+            }
+
+            if (!$product->is_active) {
+                throw new \RuntimeException(
+                    "Le produit {$product->title} n'est plus disponible."
+                );
+            }
+            
+
+           if ($product->stock_quantity < $quantity) {
+                throw new \RuntimeException(
+                    "Stock insuffisant pour {$product->title}."
+                );
+            }
+
+            /*
+
+            |--------------------------------------------------------------------------
+            | IMPORTANT:
+            | Never trust price from session.
+            |--------------------------------------------------------------------------
+            */
+
+            $unitPrice =
+                $product->sale_price ??
+                $product->price;
+
+            $totalAmount +=
+                (float) $unitPrice * $quantity;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Order number
+        |--------------------------------------------------------------------------
+        */
+
+        $orderNumber =
+            'ORD-' .
+            now()->format('Y') .
+            '-' .
+            strtoupper(Str::random(8));
+
+        /*
+        |--------------------------------------------------------------------------
+        | Create Order
+        |--------------------------------------------------------------------------
+        */
+
+        $order = Order::create([
+
+            'user_id' =>
+                $request->user()?->id,
+
+            'order_number' =>
+                $orderNumber,
+
+            'status' =>
+                OrderStatus::PENDING,
+
+            'total_amount' =>
+                $totalAmount,
+
+            'payment_method' =>
+                $validated['payment_method'],
+
+            'transaction_id' =>
+                null,
+
+            'customer_name' =>
+                $customerName,
+
+            'customer_email' =>
+                $customerEmail,
+
+            'customer_phone' =>
+                $validated['customer_phone'],
+
+            'shipping_address' =>
+                $validated['shipping_address'],
+
+            'city' =>
+                $validated['city'],
+
+            'postal_code' =>
+                $validated['postal_code'] ?? null,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Order Items
+        |--------------------------------------------------------------------------
+        */
+
+        foreach ($cart as $item) {
+
+            $product = $products->get(
+                $item['id']
+            );
+
+            $quantity =
+                (int) $item['quantity'];
+
+            $unitPrice =
+                $product->sale_price ??
+                $product->price;
+
+            $order->items()->create([
+
+                'product_id' =>
+                    $product->id,
+
+                'quantity' =>
+                    $quantity,
+
+                'unit_price' =>
+                    $unitPrice,
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Decrease stock
+            |--------------------------------------------------------------------------
+            */
+
+           
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Attribution
+        |--------------------------------------------------------------------------
+        */
+
+        $order->attribution()->create([
+
+            'utm_source' =>
+                $request->input('utm_source'),
+
+            'utm_medium' =>
+                $request->input('utm_medium'),
+
+            'utm_campaign' =>
+                $request->input('utm_campaign'),
+
+            'utm_content' =>
+                $request->input('utm_content'),
+
+            'fbclid' =>
+                $request->input('fbclid'),
+
+            'gclid' =>
+                $request->input('gclid'),
+
+            'referer_url' =>
+                $request->header('referer'),
+        ]);
+
+        return $order;
+    });
+
+  if ($order->user_id) {
+    $order->user->notify(
+        new OrderCreatedNotification($order)
+    );
+} else {
+  session()->put('notification', [
+    'id' => (string) Str::uuid(),
+
+    'type' => 'order_created',
+
+    'title' => 'Commande créée',
+
+    'message' =>
+        "Votre commande {$order->order_number} a été créée.",
+
+    'order_id' => $order->id,
+
+    'order_number' => $order->order_number,
+]);
+}
+User::where('role', 'admin')
+    ->get()
+    ->each(function ($admin) use ($order) {
+        $admin->notify(
+            new OrderCreatedNotification($order)
+        );
+    });
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | 5. CASH
+    |--------------------------------------------------------------------------
+    */
+
+    if ($validated['payment_method'] === 'cash') {
+
+        session()->forget('cart');
+
+        return redirect()
+            ->route('checkout.success', $order);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | 6. STRIPE
+    |--------------------------------------------------------------------------
+    */
+
+    Stripe::setApiKey(
+        config('services.stripe.secret')
+    );
+
+    $lineItems = $order->items()
+        ->with('product')
+        ->get()
+        ->map(function ($item) {
+
+            return [
+                'price_data' => [
+
+                    'currency' => 'mad',
+
+                    'product_data' => [
+                        'name' =>
+                            $item->product->title,
+                    ],
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Stripe uses smallest currency unit
+                    |--------------------------------------------------------------------------
+                    |
+                    | MAD:
+                    |
+                    | 100 MAD
+                    | ↓
+                    | 10000
+                    |
+                    */
+
+                    'unit_amount' =>
+                        (int) round(
+                            $item->unit_price * 100
+                        ),
+                ],
+
+                'quantity' =>
+                    $item->quantity,
+            ];
+        })
+        ->values()
+        ->toArray();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Create Stripe Checkout Session
+    |--------------------------------------------------------------------------
+    */
+
+    $stripeSession = StripeSession::create([
+
+        'mode' => 'payment',
+
+        'line_items' => $lineItems,
+
+        'customer_email' =>
+            $customerEmail,
+
+        'success_url' =>
+            route(
+                'checkout.success',
+                $order
+            ) .
+            '?session_id={CHECKOUT_SESSION_ID}',
+
+        'cancel_url' =>
+            route(
+                'checkout.cancel',
+                $order
+            ),
+
+        'metadata' => [
+
+            'order_id' =>
+                $order->id,
+
+            'order_number' =>
+                $order->order_number,
+        ],
+    ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Save Stripe Session ID
+    |--------------------------------------------------------------------------
+    */
+
+    $order->update([
+        'transaction_id' =>
+            $stripeSession->id,
+    ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect user to Stripe
+    |--------------------------------------------------------------------------
+    */
+
+    return Inertia::location(
+        $stripeSession->url
+    );
+}
+public function success(Request $request, Order $order)
+{
+    if (auth()->check() && $order->user_id !== auth()->id()) {
+        abort(403);
+    }
+
+    if (
+        $order->payment_method === 'stripe' &&
+        $order->status !== OrderStatus::PAID
+    ) {
+        return redirect()
+            ->route('checkout.index')
+            ->with(
+                'error',
+                'Le paiement n\'est pas encore confirmé.'
+            );
+    }
+
+    // Clear cart only after confirmed payment
+    session()->forget('cart');
+
+    return Inertia::render(
+        'Store/Checkout/Success',
+        [
+            'order' => $order->load([
+                'items.product.primaryImage',
+            ]),
+        ]
+    );
+}
+
+
+public function clearCartAfterSuccess(Order $order)
+{
+    if (auth()->check() && $order->user_id !== auth()->id()) {
+        abort(403);
+    }
+
+    if ($order->status !== OrderStatus::PAID) {
+        return response()->json([
+            'message' => 'Order is not paid.',
+        ], 422);
+    }
+
+    session()->forget('cart');
+
+    return response()->json([
+        'success' => true,
+    ]);
+}
+}

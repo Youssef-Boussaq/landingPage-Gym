@@ -1,11 +1,11 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
-import PublicLayout from '@/Layouts/PublicLayout';
+import StoreLayout from '@/Layouts/StoreLayout';
 import Footer from '@/Components/Landing/Footer';
 
 export default function ProductsIndex({ products = [] }) {
     return (
-        <PublicLayout>
+        <StoreLayout>
             <Head title="Produits" />
 
             <div className="py-12">
@@ -40,6 +40,6 @@ export default function ProductsIndex({ products = [] }) {
             </div>
 
             <Footer />
-        </PublicLayout>
+        </StoreLayout>
     );
 }

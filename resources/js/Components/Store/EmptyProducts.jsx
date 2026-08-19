@@ -11,15 +11,7 @@ export default function EmptyProducts({ selectedCategory, onReset }) {
                     ? "Il n'y a pas de produits disponibles dans cette catégorie pour le moment."
                     : "Aucun produit ne correspond à vos critères de recherche actuels."}
             </p>
-            {selectedCategory && (
-                <button
-                    type="button"
-                    onClick={onReset}
-                    className="mt-4 sm:mt-6 px-4 py-2 sm:px-5 sm:py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-full text-[11px] sm:text-xs font-bold transition-all shadow-md active:scale-95"
-                >
-                    Voir tous les produits
-                </button>
-            )}
+
         </div>
     );
 }

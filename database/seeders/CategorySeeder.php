@@ -21,91 +21,98 @@ class CategorySeeder extends Seeder
             'slug' => 'supplements',
         ]);
 
-        foreach ([
-            'Protein',
-            'Creatine',
-            'Mass Gainer',
-            'Pre-Workout',
-            'Amino Acids',
-            'Vitamins & Minerals',
-        ] as $name) {
-            Category::create([
-                'parent_id' => $supplements->id,
-                'name' => $name,
-                'slug' => Str::slug($name),
-            ]);
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Clothing
-        |--------------------------------------------------------------------------
-        */
-
-        $clothing = Category::create([
-            'name' => 'Clothing',
-            'slug' => 'clothing',
+        $protein = Category::create([
+            'parent_id' => $supplements->id,
+            'name' => 'Protein',
+            'slug' => 'protein',
         ]);
 
-        foreach ([
-            'T-Shirts',
-            'Shorts',
-            'Pants',
-            'Hoodies',
-            'Gym Accessories',
-        ] as $name) {
-            Category::create([
-                'parent_id' => $clothing->id,
-                'name' => $name,
-                'slug' => Str::slug($name),
-            ]);
-        }
+        $creatine = Category::create([
+            'parent_id' => $supplements->id,
+            'name' => 'Creatine',
+            'slug' => 'creatine',
+        ]);
+
+        $preWorkout = Category::create([
+            'parent_id' => $supplements->id,
+            'name' => 'Pre-Workout',
+            'slug' => 'pre-workout',
+        ]);
+
+        $bcaa = Category::create([
+            'parent_id' => $supplements->id,
+            'name' => 'BCAA',
+            'slug' => 'bcaa',
+        ]);
+
+        $massGainer = Category::create([
+            'parent_id' => $supplements->id,
+            'name' => 'Mass Gainer',
+            'slug' => 'mass-gainer',
+        ]);
 
         /*
         |--------------------------------------------------------------------------
-        | Equipment
+        | Gym Equipment
         |--------------------------------------------------------------------------
         */
 
         $equipment = Category::create([
-            'name' => 'Equipment',
-            'slug' => 'equipment',
+            'name' => 'Gym Equipment',
+            'slug' => 'gym-equipment',
         ]);
 
-        foreach ([
-            'Dumbbells',
-            'Resistance Bands',
-            'Benches',
-            'Gym Accessories',
-        ] as $name) {
-            Category::create([
-                'parent_id' => $equipment->id,
-                'name' => $name,
-                'slug' => Str::slug($name),
-            ]);
-        }
+        Category::create([
+            'parent_id' => $equipment->id,
+            'name' => 'Dumbbells',
+            'slug' => 'dumbbells',
+        ]);
+
+        Category::create([
+            'parent_id' => $equipment->id,
+            'name' => 'Resistance Bands',
+            'slug' => 'resistance-bands',
+        ]);
+
+        Category::create([
+            'parent_id' => $equipment->id,
+            'name' => 'Benches',
+            'slug' => 'benches',
+        ]);
 
         /*
         |--------------------------------------------------------------------------
-        | Nutrition
+        | Gym Accessories
         |--------------------------------------------------------------------------
         */
 
-        $nutrition = Category::create([
-            'name' => 'Nutrition',
-            'slug' => 'nutrition',
+        $accessories = Category::create([
+            'name' => 'Gym Accessories',
+            'slug' => 'gym-accessories',
         ]);
 
-        foreach ([
-            'Protein Bars',
-            'Healthy Snacks',
-            'Drinks',
-        ] as $name) {
-            Category::create([
-                'parent_id' => $nutrition->id,
-                'name' => $name,
-                'slug' => Str::slug($name),
-            ]);
-        }
+        Category::create([
+            'parent_id' => $accessories->id,
+            'name' => 'Straps',
+            'slug' => 'straps',
+        ]);
+
+        Category::create([
+            'parent_id' => $accessories->id,
+            'name' => 'Shaker Bottles',
+            'slug' => 'shaker-bottles',
+        ]);
+
+        Category::create([
+            'parent_id' => $accessories->id,
+            'name' => 'Gym Bags',
+            'slug' => 'gym-bags',
+        ]);
+
+        Category::create([
+            'parent_id' => $accessories->id,
+            'name' => 'Lifting Belts',
+            'slug' => 'lifting-belts',
+        ]);
     }
 }

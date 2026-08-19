@@ -1,7 +1,9 @@
 import { Link } from '@inertiajs/react';
 import { CheckCircle, Package, ArrowRight } from 'lucide-react';
 
+
 export default function Success({ order }) {
+
     return (
         <div className="min-h-screen bg-gray-50 py-12">
             <div className="mx-auto max-w-4xl px-4">
@@ -76,7 +78,11 @@ export default function Success({ order }) {
 
                                         {image ? (
                                             <img
-                                                src={image}
+                                                src={
+                                                    image?.startsWith('/storage/')
+                                                        ? image
+                                                        : `/storage/${image}`
+                                                }
                                                 alt={product?.title}
                                                 className="h-full w-full object-cover"
                                             />
@@ -150,7 +156,7 @@ export default function Success({ order }) {
                 <div className="mt-8 flex justify-center">
 
                     <Link
-                        href="/"
+                        href="/store"
                         className="inline-flex items-center gap-2 rounded-xl bg-black px-6 py-3 font-semibold text-white transition hover:bg-gray-800"
                     >
                         Continuer mes achats

@@ -12,7 +12,7 @@ export default function groupProductsByCategory(products = []) {
 
         cats.forEach((cat) => {
             if (!cat?.id) return;
-            
+
             if (!map[cat.id]) {
                 map[cat.id] = [];
             }
