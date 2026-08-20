@@ -5,7 +5,7 @@ import Header from '@/Components/Landing/Header';
 import MobileHeader from '@/Components/Landing/MobileHeader';
 
 import CartDrawer from '@/Components/Store/Cart/CartDrawer';
-import NotificationToast from '@/Components/Notification/NotificationToast';
+
 
 import {
     CartProvider,
@@ -52,7 +52,7 @@ function PublicLayoutContent({ children }) {
                 onClose={closeCart}
             />
 
-            <NotificationToast />
+
 
         </div >
     );

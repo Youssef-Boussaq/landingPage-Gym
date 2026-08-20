@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Order;
+use App\Events\PaymentSuccessful;
+use App\Events\PaymentFailed;
 
 use Illuminate\Support\Facades\DB;
 use Stripe\Exception\SignatureVerificationException;
@@ -91,6 +94,15 @@ class StripeWebhookController extends Controller
                 (int) $orderId,
                 $session->id
             );
+        } elseif ($session->payment_status === 'unpaid' && $event->type === 'checkout.session.async_payment_failed') {
+            $this->handleFailedPayment((int) $orderId);
+        }
+    } elseif ($event->type === 'payment_intent.payment_failed') {
+        $paymentIntent = $event->data->object;
+        
+        $session = \Stripe\Checkout\Session::all(['payment_intent' => $paymentIntent->id, 'limit' => 1])->data[0] ?? null;
+        if ($session && isset($session->metadata->order_id)) {
+            $this->handleFailedPayment((int) $session->metadata->order_id);
         }
     }
 
@@ -127,7 +139,7 @@ class StripeWebhookController extends Controller
             |
             */
 
-            if ($order->status === OrderStatus::PAID) {
+            if ($order->payment_status === PaymentStatus::PAID) {
                 return;
             }
 
@@ -174,7 +186,31 @@ class StripeWebhookController extends Controller
 
             $order->update([
                 'status' => OrderStatus::PAID,
+                'payment_status' => PaymentStatus::PAID,
             ]);
+
+            event(new PaymentSuccessful($order));
+        });
+    }
+
+    private function handleFailedPayment(int $orderId): void
+    {
+        DB::transaction(function () use ($orderId) {
+            $order = Order::lockForUpdate()->find($orderId);
+
+            if (!$order) {
+                return;
+            }
+
+            if ($order->payment_status === PaymentStatus::FAILED) {
+                return;
+            }
+
+            $order->update([
+                'payment_status' => PaymentStatus::FAILED,
+            ]);
+
+            event(new PaymentFailed($order));
         });
     }
 }

@@ -4,7 +4,7 @@ import { CartProvider, useCart } from '@/context/CartContext';
 
 import Header from '@/Components/Store/Header';
 import CartDrawer from '@/Components/Store/Cart/CartDrawer';
-import NotificationToast from '@/Components/Notification/NotificationToast';
+
 
 function StoreLayoutContent({ children }) {
     const { auth } = usePage().props;
@@ -37,7 +37,7 @@ function StoreLayoutContent({ children }) {
                 onClose={closeCart}
             />
 
-            <NotificationToast />
+
 
         </div>
     );

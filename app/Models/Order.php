@@ -58,4 +58,26 @@ class Order extends Model
     {
         return $this->hasOne(OrderAttribution::class);
     }
+
+    protected static function booted()
+    {
+        static::updated(function ($order) {
+            if ($order->isDirty('status')) {
+                switch ($order->status) {
+                    case \App\Enums\OrderStatus::CONFIRMED:
+                        event(new \App\Events\OrderConfirmed($order));
+                        break;
+                    case \App\Enums\OrderStatus::SHIPPED:
+                        event(new \App\Events\OrderShipped($order));
+                        break;
+                    case \App\Enums\OrderStatus::DELIVERED:
+                        event(new \App\Events\OrderDelivered($order));
+                        break;
+                    case \App\Enums\OrderStatus::CANCELLED:
+                        event(new \App\Events\OrderCancelled($order));
+                        break;
+                }
+            }
+        });
+    }
 }

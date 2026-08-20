@@ -74,15 +74,6 @@ Route::get('/orders/{order}', [OrderController::class, 'show'])
 
 
 
-    Route::post(
-        '/notifications/{notification}/read',
-        [NotificationController::class, 'markAsRead']
-    )->name('notifications.read');
-
-    Route::post(
-        '/notifications/read-all',
-        [NotificationController::class, 'markAllAsRead']
-    )->name('notifications.read-all');
-
+    
 
 require __DIR__.'/auth.php';

@@ -5,7 +5,13 @@ namespace App\Support;
 use App\Models\Order;
 use App\Notifications\OrderCreatedNotification;
 use App\Notifications\PaymentSuccessfulNotification;
+use App\Notifications\OrderConfirmedNotification;
+use App\Notifications\OrderShippedNotification;
+use App\Notifications\OrderDeliveredNotification;
+use App\Notifications\OrderCancelledNotification;
+use App\Notifications\PaymentFailedNotification;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Str;
 
 class NotificationService
 {
@@ -28,6 +34,36 @@ class NotificationService
     {
         $notification = new PaymentSuccessfulNotification($order);
 
+        self::send($order, $notification);
+    }
+
+    public static function orderConfirmed(Order $order): void
+    {
+        $notification = new OrderConfirmedNotification($order);
+        self::send($order, $notification);
+    }
+
+    public static function orderShipped(Order $order): void
+    {
+        $notification = new OrderShippedNotification($order);
+        self::send($order, $notification);
+    }
+
+    public static function orderDelivered(Order $order): void
+    {
+        $notification = new OrderDeliveredNotification($order);
+        self::send($order, $notification);
+    }
+
+    public static function orderCancelled(Order $order): void
+    {
+        $notification = new OrderCancelledNotification($order);
+        self::send($order, $notification);
+    }
+
+    public static function paymentFailed(Order $order): void
+    {
+        $notification = new PaymentFailedNotification($order);
         self::send($order, $notification);
     }
 
@@ -83,20 +119,14 @@ class NotificationService
         |--------------------------------------------------------------------------
         */
 
-        $guestNotifications = session()->get(
-            'guest_notifications',
+        if (!isset($notification['id'])) {
+            $notification['id'] = (string) Str::uuid();
+        }
+
+        $guestNotifications = \Illuminate\Support\Facades\Cache::get(
+            "guest_notifications_{$guestToken}",
             []
         );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Make sure this Guest has a notification list
-        |--------------------------------------------------------------------------
-        */
-
-        if (!isset($guestNotifications[$guestToken])) {
-            $guestNotifications[$guestToken] = [];
-        }
 
         /*
         |--------------------------------------------------------------------------
@@ -104,7 +134,7 @@ class NotificationService
         |--------------------------------------------------------------------------
         */
 
-        $guestNotifications[$guestToken][] = $notification;
+        $guestNotifications[] = $notification;
 
         /*
         |--------------------------------------------------------------------------
@@ -112,9 +142,10 @@ class NotificationService
         |--------------------------------------------------------------------------
         */
 
-        session()->put(
-            'guest_notifications',
-            $guestNotifications
+        \Illuminate\Support\Facades\Cache::put(
+            "guest_notifications_{$guestToken}",
+            $guestNotifications,
+            now()->addDays(7)
         );
     }
 }

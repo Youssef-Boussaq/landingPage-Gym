@@ -20,6 +20,9 @@ class PaymentSuccessfulNotification extends Notification
         return ['database'];
     }
 
+    /**
+     * Unified notification data.
+     */
     public function data(): array
     {
         return [
@@ -30,7 +33,7 @@ class PaymentSuccessfulNotification extends Notification
             'title' => 'Paiement réussi',
 
             'message' =>
-                "Le paiement de la commande {$this->order->order_number} a été confirmé.",
+                "Le paiement de votre commande {$this->order->order_number} a été confirmé.",
 
             'order_id' => $this->order->id,
 
@@ -40,11 +43,17 @@ class PaymentSuccessfulNotification extends Notification
         ];
     }
 
+    /**
+     * Laravel Database Notification.
+     */
     public function toDatabase(object $notifiable): array
     {
         return $this->data();
     }
 
+    /**
+     * Guest Notification.
+     */
     public function toGuestArray(): array
     {
         return $this->data();
