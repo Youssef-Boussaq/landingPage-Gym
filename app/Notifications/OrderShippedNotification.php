@@ -3,11 +3,13 @@
 namespace App\Notifications;
 
 use App\Models\Order;
+use App\Notifications\Concerns\BuildsOrderNotificationData;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
 class OrderShippedNotification extends Notification
 {
+    use BuildsOrderNotificationData;
     use Queueable;
 
     public function __construct(
@@ -20,40 +22,23 @@ class OrderShippedNotification extends Notification
         return ['database'];
     }
 
-    /**
-     * Unified notification data.
-     */
-    public function data(): array
+    public function data(?object $notifiable = null): array
     {
-        return [
-            'id' => (string) $this->order->id,
-
-            'type' => 'order_shipped',
-
-            'title' => 'Commande expédiée',
-
-            'message' =>
-                "Votre commande {$this->order->order_number} a été expédiée.",
-
-            'order_id' => $this->order->id,
-
-            'order_number' => $this->order->order_number,
-
-            'created_at' => now()->toISOString(),
-        ];
+        return $this->payload(
+            'order_shipped',
+            'Commande expédiée',
+            "Votre commande {$this->order->order_number} a été expédiée.",
+            'Commande expédiée',
+            "La commande {$this->order->order_number} a été expédiée.",
+            $notifiable
+        );
     }
 
-    /**
-     * Laravel Database Notification.
-     */
     public function toDatabase(object $notifiable): array
     {
-        return $this->data();
+        return $this->data($notifiable);
     }
 
-    /**
-     * Guest Notification.
-     */
     public function toGuestArray(): array
     {
         return $this->data();

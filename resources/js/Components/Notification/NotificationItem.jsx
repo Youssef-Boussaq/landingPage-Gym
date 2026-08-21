@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import {
     ShoppingBag,
     CheckCircle2,
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 
 export default function NotificationItem({ notification, onClose }) {
+    const user = usePage().props.auth?.user;
     const [isUnread, setIsUnread] = useState(notification.read_at === null);
 
     useEffect(() => {
@@ -19,18 +20,25 @@ export default function NotificationItem({ notification, onClose }) {
 
     const handleOrderClick = (e) => {
         e.preventDefault();
+        e.stopPropagation();
         setIsUnread(false);
 
+        const orderRoute = user?.role === 'admin'
+            ? route('admin.orders.show', { order: notification.order_id })
+            : route('orders.show', { order: notification.order_id });
+
+        const readRoute = user?.role === 'admin'
+            ? route('admin.notifications.read', notification.id)
+            : route('notifications.read', notification.id);
+
         router.post(
-            route('notifications.read', notification.id),
+            readRoute,
             {},
             {
                 preserveScroll: true,
                 preserveState: true,
                 onSuccess: () => {
-                    router.visit(
-                        route('orders.show', { order: notification.order_id })
-                    );
+                    router.visit(orderRoute);
                 },
             }
         );

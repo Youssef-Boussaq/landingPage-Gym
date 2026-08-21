@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryMedia extends Model
 {
@@ -48,5 +49,27 @@ class CategoryMedia extends Model
     public function getUrlAttribute(): string
     {
         return asset('storage/' . $this->path);
+    }
+
+    protected static function booted(): void
+    {
+        static::deleted(function (CategoryMedia $media) {
+            if (!$media->path) {
+                return;
+            }
+
+            $stillReferenced = static::query()
+                ->where('path', $media->path)
+                ->where('id', '!=', $media->id)
+                ->exists();
+
+            if ($stillReferenced) {
+                return;
+            }
+
+            if (Storage::disk('public')->exists($media->path)) {
+                Storage::disk('public')->delete($media->path);
+            }
+        });
     }
 }

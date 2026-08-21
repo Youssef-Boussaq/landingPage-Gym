@@ -3,11 +3,13 @@
 namespace App\Notifications;
 
 use App\Models\Order;
+use App\Notifications\Concerns\BuildsOrderNotificationData;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
 class OrderCancelledNotification extends Notification
 {
+    use BuildsOrderNotificationData;
     use Queueable;
 
     public function __construct(
@@ -20,40 +22,23 @@ class OrderCancelledNotification extends Notification
         return ['database'];
     }
 
-    /**
-     * Unified notification data.
-     */
-    public function data(): array
+    public function data(?object $notifiable = null): array
     {
-        return [
-            'id' => (string) $this->order->id,
-
-            'type' => 'order_cancelled',
-
-            'title' => 'Commande annulée',
-
-            'message' =>
-                "Votre commande {$this->order->order_number} a été annulée.",
-
-            'order_id' => $this->order->id,
-
-            'order_number' => $this->order->order_number,
-
-            'created_at' => now()->toISOString(),
-        ];
+        return $this->payload(
+            'order_cancelled',
+            'Commande annulée',
+            "Votre commande {$this->order->order_number} a été annulée.",
+            'Commande annulée',
+            "La commande {$this->order->order_number} a été annulée.",
+            $notifiable
+        );
     }
 
-    /**
-     * Laravel Database Notification.
-     */
     public function toDatabase(object $notifiable): array
     {
-        return $this->data();
+        return $this->data($notifiable);
     }
 
-    /**
-     * Guest Notification.
-     */
     public function toGuestArray(): array
     {
         return $this->data();

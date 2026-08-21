@@ -19,6 +19,7 @@ class Order extends Model
     'guest_token',
     'order_number',
     'status',
+    'payment_status',
     'total_amount',
     'payment_method',
     'transaction_id',
@@ -62,7 +63,7 @@ class Order extends Model
     protected static function booted()
     {
         static::updated(function ($order) {
-            if ($order->isDirty('status')) {
+            if ($order->wasChanged('status')) {
                 switch ($order->status) {
                     case \App\Enums\OrderStatus::CONFIRMED:
                         event(new \App\Events\OrderConfirmed($order));

@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Order;
+use App\Models\User;
 use App\Notifications\OrderCreatedNotification;
 use App\Notifications\PaymentSuccessfulNotification;
 use App\Notifications\OrderConfirmedNotification;
@@ -87,23 +88,28 @@ class NotificationService
             if ($user) {
                 $user->notify($notification);
             }
-
-            return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Guest
-        |--------------------------------------------------------------------------
-        */
-
-        if ($order->guest_token !== null) {
-
+        } elseif ($order->guest_token !== null) {
             self::storeGuestNotification(
                 $order->guest_token,
                 $notification->toGuestArray()
             );
         }
+
+        self::notifyAdmins($order, $notification);
+    }
+
+    private static function notifyAdmins(Order $order, Notification $notification): void
+    {
+        User::query()
+            ->where('role', 'admin')
+            ->get()
+            ->each(function (User $admin) use ($order, $notification) {
+                if ($order->user_id !== null && $admin->id === $order->user_id) {
+                    return;
+                }
+
+                $admin->notify(clone $notification);
+            });
     }
 
     /**

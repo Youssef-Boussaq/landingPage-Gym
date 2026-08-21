@@ -5,7 +5,10 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
+use App\Enums\OrderStatus;
 use App\Models\Category;
+use App\Models\Order;
+use App\Models\Product;
 use App\Support\CustomerIdentity;
 use Illuminate\Support\Facades\Cache;
 
@@ -45,6 +48,31 @@ public function share(Request $request): array
         'auth' => [
             'user' => $user,
         ],
+
+        'flash' => [
+            'success' => $request->session()->get('success'),
+            'error' => $request->session()->get('error'),
+        ],
+
+        'adminNav' => function () use ($user) {
+            if (!$user || $user->role !== 'admin') {
+                return null;
+            }
+
+            $threshold = (int) config('store.low_stock_threshold', 10);
+
+            return [
+                'pendingOrdersCount' => Order::query()
+                    ->where('status', OrderStatus::PENDING)
+                    ->count(),
+                'unreadNotificationsCount' => $user->unreadNotifications()->count(),
+                'lowStockCount' => Product::query()
+                    ->where('manage_stock', true)
+                    ->whereNotNull('stock_quantity')
+                    ->where('stock_quantity', '<', $threshold)
+                    ->count(),
+            ];
+        },
 
        'categories' => Category::with('children.children')
             ->whereNull('parent_id')

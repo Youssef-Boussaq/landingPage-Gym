@@ -1,7 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { ShoppingBag, ArrowUpRight } from 'lucide-react';
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, preview = false }) {
     // Safe image fallback
     const primaryImage =
         product.images?.find((image) => image.is_primary) ??
@@ -20,16 +20,14 @@ export default function ProductCard({ product }) {
         ? product.categories.map((c) => c.name).join(' • ')
         : 'Store';
 
-    return (
-        <Link
-            href={route('store.products.show', product.id)}
-            className="group flex flex-col w-full overflow-hidden rounded-2xl bg-white border border-slate-200/80 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-slate-200/60 hover:border-primary/60"
-        >
+    const inner = (
+        <>
             {/* FULL-WIDTH IMAGE CONTAINER (Matches card width) */}
             <div className="relative w-full aspect-square overflow-hidden bg-slate-100">
                 <img
-                    src={primaryImage?.url ?? '/images/placeholder.png'}
-                    alt={primaryImage?.alt_text ?? product.title}
+                    src={imageUrl}
+                    alt={imageAlt}
+                    className="h-full w-full object-cover"
                 />
 
                 {/* Floating Action Badge */}
@@ -57,8 +55,13 @@ export default function ProductCard({ product }) {
                     <div>
                         <span className="text-[11px] text-slate-400 block font-medium uppercase tracking-wider">Prix</span>
                         <span className="text-lg font-extrabold text-slate-900">
-                            {product.price} <span className="text-sm font-semibold text-slate-600">€</span>
+                            {product.sale_price ?? product.price} <span className="text-sm font-semibold text-slate-600">MAD</span>
                         </span>
+                        {product.sale_price && (
+                            <span className="ml-2 text-sm text-slate-400 line-through">
+                                {product.price} MAD
+                            </span>
+                        )}
                     </div>
 
                     {/* Icon CTA Button */}
@@ -67,6 +70,22 @@ export default function ProductCard({ product }) {
                     </div>
                 </div>
             </div>
+        </>
+    );
+
+    const cardClassName =
+        'group flex flex-col w-full overflow-hidden rounded-2xl bg-white border border-slate-200/80 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-slate-200/60 hover:border-primary/60';
+
+    if (preview) {
+        return <div className={cardClassName}>{inner}</div>;
+    }
+
+    return (
+        <Link
+            href={route('store.products.show', product.id)}
+            className={cardClassName}
+        >
+            {inner}
         </Link>
     );
 }

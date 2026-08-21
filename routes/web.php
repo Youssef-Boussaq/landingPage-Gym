@@ -84,4 +84,66 @@ Route::post(
 )->name('notifications.read-all');
     
 
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
+            ->name('dashboard');
+
+        Route::get('/orders', [App\Http\Controllers\Admin\OrderController::class, 'index'])
+            ->name('orders.index');
+        Route::get('/orders/{order}', [App\Http\Controllers\Admin\OrderController::class, 'show'])
+            ->name('orders.show');
+        Route::patch('/orders/{order}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])
+            ->name('orders.status');
+
+        Route::get('/products', [App\Http\Controllers\Admin\ProductController::class, 'index'])
+            ->name('products.index');
+        Route::get('/products/create', [App\Http\Controllers\Admin\ProductController::class, 'create'])
+            ->name('products.create');
+        Route::post('/products', [App\Http\Controllers\Admin\ProductController::class, 'store'])
+            ->name('products.store');
+        Route::get('/products/{product}', [App\Http\Controllers\Admin\ProductController::class, 'show'])
+            ->name('products.show');
+        Route::get('/products/{product}/edit', [App\Http\Controllers\Admin\ProductController::class, 'edit'])
+            ->name('products.edit');
+        Route::put('/products/{product}', [App\Http\Controllers\Admin\ProductController::class, 'update'])
+            ->name('products.update');
+        Route::delete('/products/{product}', [App\Http\Controllers\Admin\ProductController::class, 'destroy'])
+            ->name('products.destroy');
+        Route::post('/products/{id}/restore', [App\Http\Controllers\Admin\ProductController::class, 'restore'])
+            ->name('products.restore');
+        Route::patch('/products/{product}/deactivate', [App\Http\Controllers\Admin\ProductController::class, 'deactivate'])
+            ->name('products.deactivate');
+
+        Route::get('/categories', [App\Http\Controllers\Admin\CategoryController::class, 'index'])
+            ->name('categories.index');
+        Route::get('/categories/create', [App\Http\Controllers\Admin\CategoryController::class, 'create'])
+            ->name('categories.create');
+        Route::post('/categories', [App\Http\Controllers\Admin\CategoryController::class, 'store'])
+            ->name('categories.store');
+        Route::get('/categories/{category}', [App\Http\Controllers\Admin\CategoryController::class, 'show'])
+            ->name('categories.show');
+        Route::get('/categories/{category}/edit', [App\Http\Controllers\Admin\CategoryController::class, 'edit'])
+            ->name('categories.edit');
+        Route::put('/categories/{category}', [App\Http\Controllers\Admin\CategoryController::class, 'update'])
+            ->name('categories.update');
+        Route::delete('/categories/{category}', [App\Http\Controllers\Admin\CategoryController::class, 'destroy'])
+            ->name('categories.destroy');
+
+        Route::get('/customers', [App\Http\Controllers\Admin\CustomerController::class, 'index'])
+            ->name('customers.index');
+        Route::get('/customers/{user}', [App\Http\Controllers\Admin\CustomerController::class, 'show'])
+            ->name('customers.show');
+
+        Route::get('/notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])
+            ->name('notifications.index');
+        Route::post('/notifications/{notification}/read', [App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])
+            ->name('notifications.read');
+
+        Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])
+            ->name('settings');
+    });
+
 require __DIR__.'/auth.php';
