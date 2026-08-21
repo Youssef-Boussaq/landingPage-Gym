@@ -60,7 +60,7 @@ public function share(Request $request): array
                 return (int) ($item['quantity'] ?? 0);
             }),
         ],
-       'notifications' => function () use ($request, $user) {
+        'notifications' => function () use ($request, $user) {
             // Client
             if ($user) {
                 return $user->notifications()
@@ -70,18 +70,13 @@ public function share(Request $request): array
                     ->map(function ($notification) {
                         return [
                             'id' => $notification->id,
-
                             'type' => $notification->data['type'] ?? null,
-
                             'title' => $notification->data['title'] ?? null,
-
                             'message' => $notification->data['message'] ?? null,
-
                             'order_id' => $notification->data['order_id'] ?? null,
-
                             'order_number' => $notification->data['order_number'] ?? null,
-
                             'created_at' => $notification->created_at,
+                            'read_at' => $notification->read_at,
                         ];
                     })
                     ->values();
@@ -105,6 +100,7 @@ public function share(Request $request): array
                         'order_id' => $notification['order_id'] ?? null,
                         'order_number' => $notification['order_number'] ?? null,
                         'created_at' => $notification['created_at'] ?? null,
+                        'read_at' => $notification['read_at'] ?? null,
                     ];
                 })
                 ->sortByDesc('created_at')

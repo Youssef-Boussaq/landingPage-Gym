@@ -27,7 +27,7 @@ export default function NotificationBell({ variant = 'light' }) {
         ? 'text-white hover:bg-white/10 group-hover:text-slate-700'
         : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950';
 
-    const unreadCount = notifications.length;
+    const unreadCount = notifications.filter(n => n.read_at === null).length;
 
     return (
         <div className="relative" ref={dropdownRef}>

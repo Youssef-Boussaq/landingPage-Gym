@@ -8,8 +8,8 @@ class NotificationController extends Controller
 {
     public function markAsRead(Request $request, string $notification)
     {
+        // Client
         if ($request->user()) {
-
             $request->user()
                 ->notifications()
                 ->where('id', $notification)
@@ -19,19 +19,31 @@ class NotificationController extends Controller
             return back();
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Guest
-        |--------------------------------------------------------------------------
-        */
+        // Guest
+        $identity = \App\Support\CustomerIdentity::resolve($request);
+        $guestToken = $identity->guestToken();
 
-        $sessionNotification = $request->session()->get('notification');
+        if ($guestToken) {
+            $notifications = \Illuminate\Support\Facades\Cache::get(
+                "guest_notifications_{$guestToken}",
+                []
+            );
 
-        if (
-            $sessionNotification &&
-            ($sessionNotification['id'] ?? null) === $notification
-        ) {
-            $request->session()->forget('notification');
+            $notifications = collect($notifications)
+                ->map(function (array $item) use ($notification) {
+                    if (($item['id'] ?? null) === $notification) {
+                        $item['read_at'] = now()->toISOString();
+                    }
+                    return $item;
+                })
+                ->values()
+                ->all();
+
+            \Illuminate\Support\Facades\Cache::put(
+                "guest_notifications_{$guestToken}",
+                $notifications,
+                now()->addDays(7)
+            );
         }
 
         return back();
@@ -39,8 +51,8 @@ class NotificationController extends Controller
 
     public function markAllAsRead(Request $request)
     {
+        // Client
         if ($request->user()) {
-
             $request->user()
                 ->unreadNotifications
                 ->markAsRead();
@@ -48,13 +60,30 @@ class NotificationController extends Controller
             return back();
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Guest
-        |--------------------------------------------------------------------------
-        */
+        // Guest
+        $identity = \App\Support\CustomerIdentity::resolve($request);
+        $guestToken = $identity->guestToken();
 
-        $request->session()->forget('notification');
+        if ($guestToken) {
+            $notifications = \Illuminate\Support\Facades\Cache::get(
+                "guest_notifications_{$guestToken}",
+                []
+            );
+
+            $notifications = collect($notifications)
+                ->map(function (array $item) {
+                    $item['read_at'] = now()->toISOString();
+                    return $item;
+                })
+                ->values()
+                ->all();
+
+            \Illuminate\Support\Facades\Cache::put(
+                "guest_notifications_{$guestToken}",
+                $notifications,
+                now()->addDays(7)
+            );
+        }
 
         return back();
     }
