@@ -120,6 +120,7 @@ class ProductController extends Controller
                 'stock_quantity' => $validated['stock_quantity'] ?? null,
                 'manage_stock' => $validated['manage_stock'],
                 'is_active' => $validated['is_active'],
+                ''
             ]);
 
             $product->categories()->sync($validated['category_ids']);
