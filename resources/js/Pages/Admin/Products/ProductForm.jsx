@@ -1,25 +1,42 @@
 import AdminProductPreview from '@/Components/Admin/AdminProductPreview';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
-import { useEffect, useMemo, useState } from 'react';
+import RichTextEditor from '@/Components/Admin/RichTextEditor';
+import { useMemo, useState } from 'react';
 
+/**
+ * ProductForm
+ *
+ * File objects are stored in `filesRef` (a React ref passed from the parent),
+ * NOT in Inertia's form.data. This is critical because Inertia's useForm
+ * calls lodash.cloneDeep on form.data on every setData() call, and
+ * cloneDeep turns File objects into empty plain objects {}, causing
+ * PHP to report "The images.N failed to upload." errors.
+ *
+ * At submit time, the parent uses form.transform() to inject filesRef.current
+ * into the request data right before Inertia builds the HTTP request —
+ * after any cloneDeep operations have already run.
+ */
 export default function ProductForm({
     form,
+    filesRef,
+    submitting = false,   // tracks router.post() lifecycle (form.processing not used)
     categories,
     types,
     existingImages = [],
+    uploadToken = null,
     submitLabel,
     onSubmit,
 }) {
     const [previews, setPreviews] = useState([]);
 
-    useEffect(() => {
-        const files = form.data.images || [];
-        const urls = files.map((file) => URL.createObjectURL(file));
-        setPreviews(urls);
-
-        return () => urls.forEach((url) => URL.revokeObjectURL(url));
-    }, [form.data.images]);
+    const rebuildPreviews = (files) => {
+        // Revoke old object URLs to avoid memory leaks
+        setPreviews((prev) => {
+            prev.forEach((url) => URL.revokeObjectURL(url));
+            return files.map((file) => URL.createObjectURL(file));
+        });
+    };
 
     const selectedCategories = categories.filter((category) =>
         (form.data.category_ids || []).map(String).includes(String(category.id))
@@ -53,6 +70,7 @@ export default function ProductForm({
 
     const previewProduct = {
         title: form.data.title || 'Titre du produit',
+        description: form.data.description || 'Description du produit',
         price: form.data.price || 0,
         sale_price: form.data.sale_price || null,
         type: form.data.type,
@@ -64,17 +82,22 @@ export default function ProductForm({
     };
 
     const onFiles = (event) => {
-        form.setData('images', Array.from(event.target.files || []));
+        const files = Array.from(event.target.files || []);
+        // Store in the ref (safe from cloneDeep), not in form.data
+        filesRef.current = files;
+        rebuildPreviews(files);
         form.setData('primary_index', 0);
     };
 
     const removeNewImage = (index) => {
-        const next = [...(form.data.images || [])];
+        const next = [...filesRef.current];
         next.splice(index, 1);
-        form.setData('images', next);
-        if (form.data.primary_index >= next.length) {
-            form.setData('primary_index', 0);
-        }
+        filesRef.current = next;
+        rebuildPreviews(next);
+        form.setData(
+            'primary_index',
+            form.data.primary_index >= next.length ? 0 : form.data.primary_index
+        );
     };
 
     return (
@@ -88,6 +111,23 @@ export default function ProductForm({
                         onChange={(event) => form.setData('title', event.target.value)}
                     />
                     <InputError message={form.errors.title} className="mt-1" />
+                </div>
+                <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Description
+                    </label>
+
+                    <RichTextEditor
+                        value={form.data.description}
+                        onChange={(value) => form.setData('description', value)}
+                        uploadToken={uploadToken}
+                    />
+
+                    {form.errors.description && (
+                        <p className="mt-1 text-sm text-red-600">
+                            {form.errors.description}
+                        </p>
+                    )}
                 </div>
                 <div>
                     <InputLabel value="Slug" />
@@ -219,7 +259,14 @@ export default function ProductForm({
 
                 <div>
                     <InputLabel value="Nouvelles images" />
-                    <input type="file" multiple accept="image/*" className="mt-1 block w-full text-sm" onChange={onFiles} />
+                    <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        className="mt-1 block w-full text-sm"
+                        onChange={onFiles}
+                    />
+                    {/* General array-level error (required, min:1) */}
                     <InputError message={form.errors.images} className="mt-1" />
                     {previews.length > 0 && (
                         <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
@@ -243,18 +290,34 @@ export default function ProductForm({
                                     >
                                         Remove
                                     </button>
+                                    {/* Per-image error (images.0, images.1, …) */}
+                                    {form.errors[`images.${index}`] && (
+                                        <p className="mt-1 text-[10px] text-rose-600">
+                                            {form.errors[`images.${index}`]}
+                                        </p>
+                                    )}
                                 </div>
                             ))}
+                        </div>
+                    )}
+                    {/* Show per-image errors even when there are no previews (edge case) */}
+                    {previews.length === 0 && Object.keys(form.errors).some((k) => k.startsWith('images.')) && (
+                        <div className="mt-1 space-y-0.5">
+                            {Object.entries(form.errors)
+                                .filter(([k]) => k.startsWith('images.'))
+                                .map(([k, msg]) => (
+                                    <InputError key={k} message={msg} />
+                                ))}
                         </div>
                     )}
                 </div>
 
                 <button
                     type="submit"
-                    disabled={form.processing}
-                    className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-[#9de500]"
+                    disabled={form.processing || submitting}
+                    className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-[#9de500] disabled:opacity-60"
                 >
-                    {submitLabel}
+                    {submitting ? 'Envoi en cours…' : submitLabel}
                 </button>
             </div>
 

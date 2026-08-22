@@ -21,36 +21,68 @@ class ProductController extends Controller
 {
     use AuthorizesRequests;
 
+    /*
+    |--------------------------------------------------------------------------
+    | INDEX
+    |--------------------------------------------------------------------------
+    */
+
     public function index(Request $request): Response
     {
         $this->authorize('viewAny', Product::class);
 
-        $threshold = (int) config('store.low_stock_threshold', 10);
+        $threshold = (int) config(
+            'store.low_stock_threshold',
+            10
+        );
 
         $query = Product::query()
-            ->with(['categories', 'primaryImage'])
+            ->with([
+                'categories',
+                'primaryImage',
+            ])
             ->withTrashed();
 
-        if ($search = trim((string) $request->query('search', ''))) {
+        if ($search = trim(
+            (string) $request->query('search', '')
+        )) {
             $query->where(function ($builder) use ($search) {
                 $builder
-                    ->where('title', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%");
+                    ->where(
+                        'title',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'slug',
+                        'like',
+                        "%{$search}%"
+                    );
             });
         }
 
         if ($categoryId = $request->query('category')) {
-            $query->whereHas('categories', function ($builder) use ($categoryId) {
-                $builder->where('categories.id', $categoryId);
-            });
+            $query->whereHas(
+                'categories',
+                function ($builder) use ($categoryId) {
+                    $builder->where(
+                        'categories.id',
+                        $categoryId
+                    );
+                }
+            );
         }
 
         $status = $request->query('status');
 
         if ($status === 'active') {
-            $query->where('is_active', true)->whereNull('deleted_at');
+            $query
+                ->where('is_active', true)
+                ->whereNull('deleted_at');
         } elseif ($status === 'inactive') {
-            $query->where('is_active', false)->whereNull('deleted_at');
+            $query
+                ->where('is_active', false)
+                ->whereNull('deleted_at');
         } elseif ($status === 'deleted') {
             $query->whereNotNull('deleted_at');
         } else {
@@ -60,21 +92,40 @@ class ProductController extends Controller
         $stock = $request->query('stock');
 
         if ($stock === 'low') {
-            $query->where('manage_stock', true)
+            $query
+                ->where('manage_stock', true)
                 ->whereNotNull('stock_quantity')
-                ->where('stock_quantity', '<', $threshold);
+                ->where(
+                    'stock_quantity',
+                    '<',
+                    $threshold
+                );
         } elseif ($stock === 'out') {
-            $query->where('manage_stock', true)
+            $query
+                ->where('manage_stock', true)
                 ->where(function ($builder) {
                     $builder
-                        ->where('stock_quantity', '<=', 0)
-                        ->orWhereNull('stock_quantity');
+                        ->where(
+                            'stock_quantity',
+                            '<=',
+                            0
+                        )
+                        ->orWhereNull(
+                            'stock_quantity'
+                        );
                 });
         } elseif ($stock === 'in') {
             $query->where(function ($builder) {
                 $builder
-                    ->where('manage_stock', false)
-                    ->orWhere('stock_quantity', '>', 0);
+                    ->where(
+                        'manage_stock',
+                        false
+                    )
+                    ->orWhere(
+                        'stock_quantity',
+                        '>',
+                        0
+                    );
             });
         }
 
@@ -83,241 +134,1011 @@ class ProductController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return Inertia::render('Admin/Products/Index', [
-            'products' => $products,
-            'filters' => [
-                'search' => $request->query('search', ''),
-                'category' => $request->query('category', ''),
-                'status' => $request->query('status', ''),
-                'stock' => $request->query('stock', ''),
-            ],
-            'categories' => Category::query()->orderBy('name')->get(['id', 'name', 'parent_id']),
-            'lowStockThreshold' => $threshold,
-        ]);
+        return Inertia::render(
+            'Admin/Products/Index',
+            [
+                'products' => $products,
+
+                'filters' => [
+                    'search' => $request->query(
+                        'search',
+                        ''
+                    ),
+
+                    'category' => $request->query(
+                        'category',
+                        ''
+                    ),
+
+                    'status' => $request->query(
+                        'status',
+                        ''
+                    ),
+
+                    'stock' => $request->query(
+                        'stock',
+                        ''
+                    ),
+                ],
+
+                'categories' => Category::query()
+                    ->orderBy('name')
+                    ->get([
+                        'id',
+                        'name',
+                        'parent_id',
+                    ]),
+
+                'lowStockThreshold' => $threshold,
+            ]
+        );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CREATE
+    |--------------------------------------------------------------------------
+    */
 
     public function create(): Response
     {
-        $this->authorize('create', Product::class);
+        $this->authorize(
+            'create',
+            Product::class
+        );
 
-        return Inertia::render('Admin/Products/Create', [
-            'categories' => $this->categoryOptions(),
-            'types' => collect(ProductType::cases())->map(fn ($type) => $type->value),
-        ]);
+        return Inertia::render(
+            'Admin/Products/Create',
+            [
+                'categories' =>
+                    $this->categoryOptions(),
+
+                'types' =>
+                    collect(ProductType::cases())
+                        ->map(
+                            fn ($type) =>
+                                $type->value
+                        ),
+            ]
+        );
     }
 
-    public function store(AdminProductRequest $request): RedirectResponse
-    {
-        $product = DB::transaction(function () use ($request) {
-            $validated = $request->validated();
+    /*
+    |--------------------------------------------------------------------------
+    | STORE
+    |--------------------------------------------------------------------------
+    */
 
-            $product = Product::create([
-                'title' => $validated['title'],
-                'slug' => $this->uniqueSlug($validated['slug'] ?? null, $validated['title']),
-                'type' => $validated['type'],
-                'price' => $validated['price'],
-                'sale_price' => $validated['sale_price'] ?? null,
-                'stock_quantity' => $validated['stock_quantity'] ?? null,
-                'manage_stock' => $validated['manage_stock'],
-                'is_active' => $validated['is_active'],
-                ''
-            ]);
+    public function store(
+        AdminProductRequest $request
+    ): RedirectResponse {
+        $product = DB::transaction(
+            function () use ($request) {
 
-            $product->categories()->sync($validated['category_ids']);
-            $this->storeImages($product, $request->file('images', []), (int) $request->input('primary_index', 0));
+                $validated =
+                    $request->validated();
 
-            return $product;
-        });
+                $product = Product::create([
+                    'title' =>
+                        $validated['title'],
 
-        return redirect()
-            ->route('admin.products.show', $product)
-            ->with('success', 'Produit créé.');
-    }
+                    'description' =>
+                        $validated['description']
+                        ?? null,
 
-    public function show(Product $product): Response
-    {
-        $this->authorize('view', $product);
+                    'slug' =>
+                        $this->uniqueSlug(
+                            $validated['slug']
+                                ?? null,
+                            $validated['title']
+                        ),
 
-        $product->load(['categories', 'images']);
+                    'type' =>
+                        $validated['type'],
 
-        return Inertia::render('Admin/Products/Show', [
-            'product' => $product,
-        ]);
-    }
+                    'price' =>
+                        $validated['price'],
 
-    public function edit(Product $product): Response
-    {
-        $this->authorize('update', $product);
+                    'sale_price' =>
+                        $validated['sale_price']
+                        ?? null,
 
-        $product->load(['categories', 'images']);
+                    'stock_quantity' =>
+                        $validated['stock_quantity']
+                        ?? null,
 
-        return Inertia::render('Admin/Products/Edit', [
-            'product' => $product,
-            'categories' => $this->categoryOptions(),
-            'types' => collect(ProductType::cases())->map(fn ($type) => $type->value),
-        ]);
-    }
+                    'manage_stock' =>
+                        $validated['manage_stock'],
 
-    public function update(AdminProductRequest $request, Product $product): RedirectResponse
-    {
-        DB::transaction(function () use ($request, $product) {
-            $validated = $request->validated();
+                    'is_active' =>
+                        $validated['is_active'],
+                ]);
 
-            $product->update([
-                'title' => $validated['title'],
-                'slug' => $this->uniqueSlug($validated['slug'] ?? null, $validated['title'], $product->id),
-                'type' => $validated['type'],
-                'price' => $validated['price'],
-                'sale_price' => $validated['sale_price'] ?? null,
-                'stock_quantity' => $validated['stock_quantity'] ?? null,
-                'manage_stock' => $validated['manage_stock'],
-                'is_active' => $validated['is_active'],
-            ]);
+                $product->categories()->sync(
+                    $validated['category_ids']
+                );
 
-            $product->categories()->sync($validated['category_ids']);
+                $this->storeImages(
+                    $product,
+                    $request->file('images', []),
+                    (int) (
+                        $request->input(
+                            'primary_index',
+                            0
+                        )
+                    )
+                );
 
-            $removedIds = $validated['removed_image_ids'] ?? [];
+                $this->finalizeDescriptionImages(
+                    $product,
+                    $request->input(
+                        'upload_token'
+                    )
+                );
 
-            if ($removedIds !== []) {
-                $product->images()
-                    ->whereIn('id', $removedIds)
-                    ->get()
-                    ->each
-                    ->delete();
+                return $product;
             }
-
-            $newFiles = $request->file('images', []) ?? [];
-            $this->storeImages(
-                $product->fresh('images'),
-                $newFiles,
-                (int) $request->input('primary_index', 0),
-                $request->integer('existing_primary_id') ?: null
-            );
-        });
+        );
 
         return redirect()
-            ->route('admin.products.show', $product)
-            ->with('success', 'Produit mis à jour.');
+            ->route(
+                'admin.products.show',
+                $product
+            )
+            ->with(
+                'success',
+                'Produit créé.'
+            );
     }
 
-    public function destroy(Product $product): RedirectResponse
-    {
-        $this->authorize('delete', $product);
+    /*
+    |--------------------------------------------------------------------------
+    | SHOW
+    |--------------------------------------------------------------------------
+    */
+
+    public function show(
+        Product $product
+    ): Response {
+        $this->authorize(
+            'view',
+            $product
+        );
+
+        $product->load([
+            'categories',
+            'images',
+        ]);
+
+        return Inertia::render(
+            'Admin/Products/Show',
+            [
+                'product' => $product,
+            ]
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | EDIT
+    |--------------------------------------------------------------------------
+    */
+
+    public function edit(
+        Product $product
+    ): Response {
+        $this->authorize(
+            'update',
+            $product
+        );
+
+        $product->load([
+            'categories',
+            'images',
+        ]);
+
+        return Inertia::render(
+            'Admin/Products/Edit',
+            [
+                'product' => $product,
+
+                'categories' =>
+                    $this->categoryOptions(),
+
+                'types' =>
+                    collect(ProductType::cases())
+                        ->map(
+                            fn ($type) =>
+                                $type->value
+                        ),
+            ]
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE
+    |--------------------------------------------------------------------------
+    */
+
+    public function update(
+        AdminProductRequest $request,
+        Product $product
+    ): RedirectResponse {
+        DB::transaction(
+            function () use (
+                $request,
+                $product
+            ) {
+
+                $validated =
+                    $request->validated();
+
+                /*
+                |--------------------------------------------------------------------------
+                | Product
+                |--------------------------------------------------------------------------
+                */
+
+                $product->update([
+                    'title' =>
+                        $validated['title'],
+
+                    'slug' =>
+                        $this->uniqueSlug(
+                            $validated['slug']
+                                ?? null,
+                            $validated['title'],
+                            $product->getKey()
+                        ),
+
+                    'description' =>
+                        $validated['description']
+                        ?? null,
+
+                    'type' =>
+                        $validated['type'],
+
+                    'price' =>
+                        $validated['price'],
+
+                    'sale_price' =>
+                        $validated['sale_price']
+                        ?? null,
+
+                    'stock_quantity' =>
+                        $validated['stock_quantity']
+                        ?? null,
+
+                    'manage_stock' =>
+                        $validated['manage_stock'],
+
+                    'is_active' =>
+                        $validated['is_active'],
+                ]);
+
+                /*
+                |--------------------------------------------------------------------------
+                | Categories
+                |--------------------------------------------------------------------------
+                */
+
+                $product->categories()->sync(
+                    $validated['category_ids']
+                );
+
+                /*
+                |--------------------------------------------------------------------------
+                | Remove existing images
+                |--------------------------------------------------------------------------
+                */
+
+                $removedPaths =
+                    $validated[
+                        'removed_image_paths'
+                    ] ?? [];
+
+                if ($removedPaths !== []) {
+
+                    $imagesToDelete =
+                        $product
+                            ->images()
+                            ->whereIn(
+                                'path',
+                                $removedPaths
+                            )
+                            ->get();
+
+                    foreach (
+                        $imagesToDelete
+                        as $image
+                    ) {
+
+                        Storage::disk('public')
+                            ->delete(
+                                $image->path
+                            );
+
+                        ProductImage::query()
+                            ->where(
+                                'product_id',
+                                $product->getKey()
+                            )
+                            ->where(
+                                'path',
+                                $image->path
+                            )
+                            ->delete();
+                    }
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | New images
+                |--------------------------------------------------------------------------
+                */
+
+                $newFiles =
+                    $request->file(
+                        'images',
+                        []
+                    ) ?? [];
+
+                /*
+                |--------------------------------------------------------------------------
+                | Store images
+                |--------------------------------------------------------------------------
+                */
+
+                $this->storeImages(
+                    $product->fresh('images'),
+                    $newFiles,
+                    (int) (
+                        $request->input(
+                            'primary_index',
+                            0
+                        )
+                    ),
+                    $request->input(
+                        'existing_primary_path'
+                    )
+                );
+
+                /*
+                |--------------------------------------------------------------------------
+                | Description images
+                |--------------------------------------------------------------------------
+                */
+
+                $this->finalizeDescriptionImages(
+                    $product->fresh(),
+                    $request->input(
+                        'upload_token'
+                    )
+                );
+            }
+        );
+
+        return redirect()
+            ->route(
+                'admin.products.show',
+                $product
+            )
+            ->with(
+                'success',
+                'Produit mis à jour.'
+            );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DESTROY
+    |--------------------------------------------------------------------------
+    */
+
+    public function destroy(
+        Product $product
+    ): RedirectResponse {
+        $this->authorize(
+            'delete',
+            $product
+        );
 
         $product->delete();
 
         return redirect()
-            ->route('admin.products.index')
-            ->with('success', 'Produit désactivé (corbeille).');
+            ->route(
+                'admin.products.index'
+            )
+            ->with(
+                'success',
+                'Produit désactivé (corbeille).'
+            );
     }
 
-    public function restore(int $id): RedirectResponse
-    {
-        $model = Product::withTrashed()->findOrFail($id);
+    /*
+    |--------------------------------------------------------------------------
+    | RESTORE
+    |--------------------------------------------------------------------------
+    */
 
-        $this->authorize('restore', $model);
+    public function restore(
+        int $id
+    ): RedirectResponse {
+        $model =
+            Product::withTrashed()
+                ->findOrFail($id);
+
+        $this->authorize(
+            'restore',
+            $model
+        );
 
         $model->restore();
 
-        return back()->with('success', 'Produit restauré.');
+        return back()->with(
+            'success',
+            'Produit restauré.'
+        );
     }
 
-    public function deactivate(Product $product): RedirectResponse
-    {
-        $this->authorize('update', $product);
+    /*
+    |--------------------------------------------------------------------------
+    | DEACTIVATE
+    |--------------------------------------------------------------------------
+    */
 
-        $product->update(['is_active' => false]);
+    public function deactivate(
+        Product $product
+    ): RedirectResponse {
+        $this->authorize(
+            'update',
+            $product
+        );
 
-        return back()->with('success', 'Produit désactivé.');
+        $product->update([
+            'is_active' => false,
+        ]);
+
+        return back()->with(
+            'success',
+            'Produit désactivé.'
+        );
     }
 
-    /**
-     * @return \Illuminate\Support\Collection<int, array<string, mixed>>
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | CATEGORY OPTIONS
+    |--------------------------------------------------------------------------
+    */
+
     private function categoryOptions()
     {
         return Category::query()
             ->with('parent:id,name')
             ->orderBy('name')
-            ->get(['id', 'name', 'parent_id'])
-            ->map(fn (Category $category) => [
-                'id' => $category->id,
-                'name' => $category->name,
-                'parent_id' => $category->parent_id,
-                'label' => $category->parent
-                    ? $category->parent->name.' / '.$category->name
-                    : $category->name,
-            ]);
+            ->get([
+                'id',
+                'name',
+                'parent_id',
+            ])
+            ->map(
+                fn (Category $category) => [
+                    'id' =>
+                        $category->id,
+
+                    'name' =>
+                        $category->name,
+
+                    'parent_id' =>
+                        $category->parent_id,
+
+                    'label' =>
+                        $category->parent
+                            ? $category->parent->name
+                                . ' / '
+                                . $category->name
+                            : $category->name,
+                ]
+            );
     }
 
-    private function uniqueSlug(?string $slug, string $title, ?int $ignoreId = null): string
-    {
-        $base = Str::slug($slug ?: $title) ?: 'product';
+    /*
+    |--------------------------------------------------------------------------
+    | UNIQUE SLUG
+    |--------------------------------------------------------------------------
+    */
+
+    private function uniqueSlug(
+        ?string $slug,
+        string $title,
+        ?int $ignoreId = null
+    ): string {
+        $base =
+            Str::slug(
+                $slug ?: $title
+            ) ?: 'product';
+
         $candidate = $base;
+
         $i = 1;
 
         while (
             Product::withTrashed()
-                ->where('slug', $candidate)
-                ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+                ->where(
+                    'slug',
+                    $candidate
+                )
+                ->when(
+                    $ignoreId,
+                    fn ($query) =>
+                        $query->where(
+                            'id',
+                            '!=',
+                            $ignoreId
+                        )
+                )
                 ->exists()
         ) {
-            $candidate = $base.'-'.$i;
+            $candidate =
+                $base . '-' . $i;
+
             $i++;
         }
 
         return $candidate;
     }
 
-    /**
-     * @param  array<int, \Illuminate\Http\UploadedFile>|null  $files
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | STORE PRODUCT IMAGES
+    |--------------------------------------------------------------------------
+    */
+
     private function storeImages(
         Product $product,
         ?array $files,
         int $newPrimaryIndex = 0,
-        ?int $existingPrimaryId = null
+        ?string $existingPrimaryPath = null
     ): void {
-        $files = array_values(array_filter($files ?? []));
-        $startOrder = (int) $product->images()->max('sort_order') + 1;
 
-        foreach ($files as $index => $file) {
-            $path = $file->store('products/'.$product->slug, 'public');
+        $files = array_values(
+            array_filter(
+                $files ?? [],
+                fn ($file) =>
+                    $file !== null
+            )
+        );
+
+        $disk =
+            Storage::disk('public');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Directory
+        |--------------------------------------------------------------------------
+        */
+
+        $directory =
+            'products/' . $product->slug;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Existing images
+        |--------------------------------------------------------------------------
+        */
+
+        $existingImages =
+            $product
+                ->images()
+                ->orderBy('sort_order')
+                ->get();
+
+        $startOrder =
+            ((int) $existingImages->max(
+                'sort_order'
+            )) + 1;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Upload new images
+        |--------------------------------------------------------------------------
+        */
+
+        foreach (
+            $files as $index => $file
+        ) {
+
+            if (!$file->isValid()) {
+                continue;
+            }
+
+            $extension =
+                strtolower(
+                    $file->getClientOriginalExtension()
+                );
+
+            $originalName =
+                pathinfo(
+                    $file->getClientOriginalName(),
+                    PATHINFO_FILENAME
+                );
+
+            $safeName =
+                Str::slug(
+                    $originalName
+                ) ?: 'image';
+
+            /*
+            |--------------------------------------------------------------------------
+            | Filename
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                $index === 0
+                && $existingImages->isEmpty()
+            ) {
+
+                $filename =
+                    'cover.' . $extension;
+
+            } elseif (
+                $index === 1
+                && $existingImages->isEmpty()
+            ) {
+
+                $filename =
+                    'front.' . $extension;
+
+            } else {
+
+                $filename =
+                    $safeName
+                    . '-'
+                    . Str::uuid()
+                    . '.'
+                    . $extension;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Store file
+            |--------------------------------------------------------------------------
+            */
+
+            $path =
+                $file->storeAs(
+                    $directory,
+                    $filename,
+                    'public'
+                );
+
+            /*
+            |--------------------------------------------------------------------------
+            | Insert database row
+            |--------------------------------------------------------------------------
+            */
 
             $product->images()->create([
-                'path' => $path,
-                'alt_text' => $product->title,
-                'sort_order' => $startOrder + $index,
-                'is_primary' => false,
+                'path' =>
+                    $path,
+
+                'alt_text' =>
+                    $product->title,
+
+                'sort_order' =>
+                    $startOrder + $index,
+
+                'is_primary' =>
+                    false,
             ]);
         }
 
-        $product->unsetRelation('images');
-        $images = $product->images()->orderBy('sort_order')->get();
+        /*
+        |--------------------------------------------------------------------------
+        | Reload
+        |--------------------------------------------------------------------------
+        */
+
+        $images =
+            $product
+                ->images()
+                ->orderBy('sort_order')
+                ->get();
 
         if ($images->isEmpty()) {
             return;
         }
 
-        $product->images()->update(['is_primary' => false]);
+        /*
+        |--------------------------------------------------------------------------
+        | Reset all primary images
+        |--------------------------------------------------------------------------
+        |
+        | IMPORTANT:
+        | No model update() here because ProductImage
+        | has no primary key.
+        |
+        */
 
-        if ($existingPrimaryId && $images->contains('id', $existingPrimaryId)) {
-            ProductImage::query()
-                ->where('id', $existingPrimaryId)
-                ->update(['is_primary' => true]);
+        DB::table('product_images')
+            ->where(
+                'product_id',
+                $product->getKey()
+            )
+            ->update([
+                'is_primary' => false,
+                'updated_at' => now(),
+            ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Existing primary
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $existingPrimaryPath
+            && $images->contains(
+                fn ($image) =>
+                    $image->path ===
+                    $existingPrimaryPath
+            )
+        ) {
+
+            DB::table('product_images')
+                ->where(
+                    'product_id',
+                    $product->getKey()
+                )
+                ->where(
+                    'path',
+                    $existingPrimaryPath
+                )
+                ->update([
+                    'is_primary' => true,
+                    'updated_at' => now(),
+                ]);
 
             return;
         }
 
-        if ($files !== [] && isset($files[$newPrimaryIndex])) {
-            $created = $images->slice(-count($files))->values();
-            $primary = $created->get($newPrimaryIndex) ?? $created->first();
-            $primary?->update(['is_primary' => true]);
+        /*
+        |--------------------------------------------------------------------------
+        | New primary
+        |--------------------------------------------------------------------------
+        */
+
+        if ($files !== []) {
+
+            /*
+             * New images are the last uploaded images.
+             */
+
+            $newImages =
+                $images
+                    ->slice(
+                        -count($files)
+                    )
+                    ->values();
+
+            $primary =
+                $newImages->get(
+                    $newPrimaryIndex
+                ) ?? $newImages->first();
+
+            if ($primary) {
+
+                DB::table('product_images')
+                    ->where(
+                        'product_id',
+                        $product->getKey()
+                    )
+                    ->where(
+                        'path',
+                        $primary->path
+                    )
+                    ->update([
+                        'is_primary' => true,
+                        'updated_at' => now(),
+                    ]);
+            }
 
             return;
         }
 
-        $current = $images->firstWhere('is_primary', true) ?? $images->first();
-        $current->update(['is_primary' => true]);
+        /*
+        |--------------------------------------------------------------------------
+        | Fallback
+        |--------------------------------------------------------------------------
+        */
+
+        $first =
+            $images->first();
+
+        if ($first) {
+
+            DB::table('product_images')
+                ->where(
+                    'product_id',
+                    $product->getKey()
+                )
+                ->where(
+                    'path',
+                    $first->path
+                )
+                ->update([
+                    'is_primary' => true,
+                    'updated_at' => now(),
+                ]);
+        }
     }
-}
+
+    /*
+    |--------------------------------------------------------------------------
+    | DESCRIPTION IMAGE UPLOAD
+    |--------------------------------------------------------------------------
+    */
+
+    public function uploadDescriptionImage(
+        Request $request
+    ) {
+        $request->validate([
+            'image' => [
+                'required',
+                'image',
+                'mimes:jpeg,png,webp,gif',
+                'max:5120',
+            ],
+
+            'upload_token' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+        ]);
+
+        $token =
+            $request->input(
+                'upload_token'
+            );
+
+        if (
+            !preg_match(
+                '/^[a-zA-Z0-9_-]+$/',
+                $token
+            )
+        ) {
+            abort(
+                422,
+                'Upload token invalide.'
+            );
+        }
+
+        $directory =
+            "products/tmp/{$token}/description";
+
+        $filename =
+            'image-'
+            . Str::uuid()
+            . '.'
+            . $request
+                ->file('image')
+                ->extension();
+
+        $path =
+            $request
+                ->file('image')
+                ->storeAs(
+                    $directory,
+                    $filename,
+                    'public'
+                );
+
+        return response()->json([
+            'url' =>
+                Storage::disk('public')
+                    ->url($path),
+
+            'path' =>
+                $path,
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | FINALIZE DESCRIPTION IMAGES
+    |--------------------------------------------------------------------------
+    */
+
+    private function finalizeDescriptionImages(
+        Product $product,
+        ?string $uploadToken
+    ): void {
+
+        if (!$uploadToken) {
+            return;
+        }
+
+        if (
+            !preg_match(
+                '/^[a-zA-Z0-9_-]+$/',
+                $uploadToken
+            )
+        ) {
+            return;
+        }
+
+        $disk =
+            Storage::disk('public');
+
+        $temporaryDirectory =
+            "products/tmp/{$uploadToken}/description";
+
+        if (
+            !$disk->exists(
+                $temporaryDirectory
+            )
+        ) {
+            return;
+        }
+
+        $finalDirectory =
+            "products/{$product->slug}/description";
+
+        $disk->makeDirectory(
+            $finalDirectory
+        );
+
+        $files =
+            $disk->files(
+                $temporaryDirectory
+            );
+
+        if ($files === []) {
+            return;
+        }
+
+        $description =
+            $product->description;
+
+        foreach ($files as $file) {
+
+            $filename =
+                basename($file);
+
+            $newPath =
+                $finalDirectory
+                . '/'
+                . $filename;
+
+            $oldUrl =
+                $disk->url($file);
+
+            $disk->move(
+                $file,
+                $newPath
+            );
+
+            $newUrl =
+                $disk->url($newPath);
+
+            $description =
+                str_replace(
+                    $oldUrl,
+                    $newUrl,
+                    $description
+                );
+        }
+
+        $product->update([
+            'description' =>
+                $description,
+        ]);
+
+        $disk->deleteDirectory(
+            "products/tmp/{$uploadToken}"
+        );
+    }
+} 

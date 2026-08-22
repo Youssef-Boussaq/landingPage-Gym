@@ -24,6 +24,7 @@ use HasFactory, SoftDeletes;
     protected $fillable = [
         'title',
         'slug',
+        'description',
         'type',
         'price',
         'sale_price',
