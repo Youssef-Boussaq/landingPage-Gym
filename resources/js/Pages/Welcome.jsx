@@ -21,7 +21,7 @@ export default function Welcome({ auth }) {
 
 
                 {/* FIX: Removed m-0 which conflicted with mx-auto */}
-                <main className="mx-auto ">
+                <main className="">
                     {/* FIX: Passed auth?.user properly as a JS expression */}
                     <Hero />
                     <AboutCoach />
