@@ -21,6 +21,23 @@ export default function Hero() {
         },
     };
 
+    // Animation ZOOM IN progressive pour l'image 2.png
+    const imageZoomIn = {
+        hidden: {
+            opacity: 0,
+            scale: 0.3 // Part d'une petite taille
+        },
+        visible: {
+            opacity: 1,
+            scale: 1, // Zoom jusqu'à la taille réelle
+            transition: {
+                duration: 1.3,
+                delay: 0.2,
+                ease: [0.215, 0.61, 0.355, 1] // Easing très fluide pour l'effet Zoom
+            },
+        },
+    };
+
     return (
         <section className="relative w-full h-auto min-h-[480px] lg:min-h-screen flex items-center bg-white lg:bg-slate-950 text-slate-900 p-0 m-0 pt-4 lg:pt-20 overflow-hidden select-none">
 
@@ -121,12 +138,12 @@ export default function Hero() {
                 </motion.div>
             </div>
 
-            {/* Image 2.png Container (Positioned at right-0 on mobile) */}
+            {/* Container Image 2.png - Zoom In Animation */}
             <div className="absolute inset-0 right-0 z-30 flex items-center justify-end lg:justify-center pointer-events-none">
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 1, delay: 0.2, ease: customEase }}
+                    variants={imageZoomIn}
+                    initial="hidden"
+                    animate="visible"
                 >
                     <motion.div
                         animate={{ y: [0, -12, 0] }}
@@ -142,11 +159,7 @@ export default function Hero() {
                 </motion.div>
             </div>
 
-            {/* -----------------------------------------------------------------
-                LIME GREEN SLASHES (Desktop Only)
-                ----------------------------------------------------------------- */}
-
-            {/* Leftmost Thin Line — Top */}
+            {/* LIME GREEN SLASHES (Desktop Only) */}
             <motion.div
                 initial={{ y: '-100%', opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -161,7 +174,6 @@ export default function Hero() {
                 }}
             />
 
-            {/* Leftmost Thin Line — Bottom */}
             <motion.div
                 initial={{ y: '100%', opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -176,7 +188,6 @@ export default function Hero() {
                 }}
             />
 
-            {/* Center Thick Line — Main Slash */}
             <motion.div
                 initial={{ scaleY: 0, opacity: 0 }}
                 animate={{ scaleY: 1, opacity: 1 }}
@@ -191,7 +202,6 @@ export default function Hero() {
                 }}
             />
 
-            {/* Rightmost Thin Line — Top */}
             <motion.div
                 initial={{ y: '-100%', opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
