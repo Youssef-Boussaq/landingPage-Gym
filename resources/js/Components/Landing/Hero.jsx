@@ -39,7 +39,7 @@ export default function Hero() {
     };
 
     return (
-        <section className="relative w-full h-auto min-h-[480px] lg:min-h-screen flex items-center bg-white lg:bg-slate-950 text-slate-900 p-0 m-0 pt-4 lg:pt-20 overflow-hidden select-none">
+        <section className="relative w-full h-auto min-h-[450px] lg:min-h-screen flex items-center bg-white lg:bg-slate-950 text-slate-900 p-0 m-0 pt-4 lg:pt-20 overflow-hidden select-none">
 
             {/* Background Image (Desktop Only) */}
             <motion.img
