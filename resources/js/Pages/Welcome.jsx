@@ -1,15 +1,14 @@
 import { Head } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
-
 import Hero from '@/Components/Landing/Hero';
-import AboutCoachGSAP from '@/Components/Landing/AboutCoach';
-import PainPoints from '@/Components/Landing/PainPoints';
-import Nutrition from '@/Components/Landing/Nutrition';
-import Programs from '@/Components/Landing/Programs';
-import Testimonials from '@/Components/Landing/Testimonials';
-import LeadCapture from '@/Components/Landing/LeadCapture';
-import FAQ from '@/Components/Landing/FAQ';
 import Footer from '@/Components/Landing/Footer';
+import AboutCoachGSAP from '@/Components/Landing/AboutCoach/AboutCoachGSAP';
+import FitYounessStudio from '@/Components/Landing/PainPoints';
+// import Programs from '@/Components/Landing/Programs';
+
+// import FitYounessStudio from '@/Components/Landing/PainPoints';
+// import Contact from '@/Components/Landing/Contact';
+
 
 export default function Welcome({ auth }) {
     return (
@@ -20,20 +19,9 @@ export default function Welcome({ auth }) {
 
                 <main>
                     <Hero />
-
                     <AboutCoachGSAP />
+                    <FitYounessStudio />
 
-                    <PainPoints />
-
-                    <Nutrition />
-
-                    <Programs />
-
-                    <Testimonials />
-
-                    <LeadCapture />
-
-                    <FAQ />
                 </main>
 
                 <Footer />

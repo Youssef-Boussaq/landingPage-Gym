@@ -2,42 +2,538 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================================================
+   DESIGN SYSTEM — FIT YOUNESS
+========================================================= */
 
-html, body, #root {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-}
-
-
-/* Définition des variables de polices et couleurs */
 :root {
-  --font-inter: "Inter", sans-serif;
-  --font-archivo: "Archivo Black", sans-serif;
-  --color-primary: #9de500;
-  --color-primary-hover: #8cd000;
+    /* -----------------------------------------------------
+       COLORS
+    ----------------------------------------------------- */
+
+    --color-primary: #9de500;
+    --color-primary-hover: #8cd000;
+    --color-primary-dark: #7ec000;
+    --color-primary-light: #b8f526;
+
+    --color-black: #0b0c0e;
+    --color-surface: #141619;
+    --color-white: #ffffff;
+
+    --color-slate-950: #020617;
+    --color-slate-900: #0f172a;
+    --color-slate-800: #1e293b;
+    --color-slate-700: #334155;
+
+    /* -----------------------------------------------------
+       FONTS
+    ----------------------------------------------------- */
+
+    --font-inter: "Inter", sans-serif;
+    --font-archivo: "Archivo Black", sans-serif;
+    --font-marker: "Permanent Marker", cursive, sans-serif;
+    --font-signature: "Caveat", cursive, sans-serif;
+    --font-outfit: "Outfit", sans-serif;
+
+    /* -----------------------------------------------------
+       EFFECTS
+    ----------------------------------------------------- */
+
+    --shadow-glow:
+        0 0 25px rgba(157, 229, 0, 0.6);
+
+    --shadow-glow-strong:
+        0 0 45px rgba(157, 229, 0, 0.85);
+
+    --shadow-card:
+        0 4px 20px -2px rgba(0, 0, 0, 0.5);
+
+    /* -----------------------------------------------------
+       MOTION
+    ----------------------------------------------------- */
+
+    --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+
+    --transition-fast: 0.2s var(--ease-premium);
+    --transition-base: 0.3s var(--ease-premium);
+    --transition-slow: 0.4s var(--ease-premium);
 }
 
-/* Inter est la police par défaut de tout le site */
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+html,
+body,
+#root {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
 body {
-  font-family: var(--font-inter);
+    font-family: var(--font-inter);
 }
 
-/* Classes pour changer de famille de police */
-.font-archivo {
-  font-family: var(--font-archivo);
-}
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
 
 .font-inter {
-  font-family: var(--font-inter);
+    font-family: var(--font-inter);
 }
 
-/* Classes pour les épaisseurs avec Inter (font-weight) */
-.font-light { font-weight: 300; }
-.font-regular { font-weight: 400; }
-.font-medium { font-weight: 500; }
-.font-semibold { font-weight: 600; }
-.font-bold { font-weight: 700; }
-.font-black { font-weight: 900; }
+.font-archivo {
+    font-family: var(--font-archivo);
+}
+
+.font-marker {
+    font-family: var(--font-marker);
+}
+
+.font-signature {
+    font-family: var(--font-signature);
+}
+
+.font-outfit {
+    font-family: var(--font-outfit);
+}
+
+/* =========================================================
+   UTILITIES
+========================================================= */
+
+.perspective-1000 {
+    perspective: 1000px;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* =========================================================
+   GLOW
+========================================================= */
+
+.glow-effect {
+    box-shadow: var(--shadow-card);
+    transition:
+        transform var(--transition-slow),
+        box-shadow var(--transition-slow);
+}
+
+.glow-effect:hover {
+    transform: translateY(-6px) scale(1.02);
+
+    box-shadow:
+        0 20px 45px -10px rgba(157, 229, 0, 0.35),
+        0 0 0 1px rgba(157, 229, 0, 0.4);
+}
+
+.morphed-glow {
+    box-shadow:
+        0 0 35px rgba(157, 229, 0, 0.5),
+        0 0 0 1px rgba(157, 229, 0, 0.4);
+}
+
+.docked-active {
+    border-color: rgba(157, 229, 0, 0.8) !important;
+}
+
+/* =========================================================
+   CARD BACKGROUNDS
+========================================================= */
+
+.card-bg-0 {
+    background:
+        radial-gradient(
+            circle at 30% 20%,
+            rgba(157, 229, 0, 0.16),
+            transparent 50%
+        ),
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f5f7f2 55%,
+            #eef2e8 100%
+        );
+}
+
+.card-bg-1 {
+    background:
+        radial-gradient(
+            circle at 70% 20%,
+            rgba(157, 229, 0, 0.18),
+            transparent 50%
+        ),
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f4f7ef 60%,
+            #eaf0df 100%
+        );
+}
+
+.card-bg-2 {
+    background:
+        radial-gradient(
+            circle at 50% 15%,
+            rgba(157, 229, 0, 0.14),
+            transparent 50%
+        ),
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f1f5f0 60%,
+            #e8eee5 100%
+        );
+}
+
+.card-bg-3 {
+    background:
+        radial-gradient(
+            circle at 35% 20%,
+            rgba(157, 229, 0, 0.18),
+            transparent 50%
+        ),
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f5f7ef 60%,
+            #e9eedf 100%
+        );
+}
+/* =========================================================
+   FIT YOUNESS — PREMIUM PERFORMANCE SHOWCASE
+   LIGHT / HIGH CONTRAST / SIGNATURE GREEN
+========================================================= */
+
+.fy-showcase {
+    background: #f1f4ec;
+    color: var(--color-black);
+}
 
 
+/* =========================================================
+   MAIN SHOWCASE BACKGROUND
+========================================================= */
+
+.fy-showcase-bg {
+    position: relative;
+
+    background:
+        radial-gradient(
+            circle at 50% -15%,
+            rgba(157, 229, 0, 0.28),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 0% 70%,
+            rgba(157, 229, 0, 0.14),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #eef2e9 0%,
+            #f7f8f4 48%,
+            #e7ece1 100%
+        );
+}
+
+
+/* =========================================================
+   PREMIUM ATMOSPHERE
+========================================================= */
+
+.fy-showcase-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            115deg,
+            transparent 20%,
+            rgba(157, 229, 0, 0.08) 50%,
+            transparent 80%
+        );
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   SHOWCASE OVERLAY
+========================================================= */
+
+.fy-showcase-overlay {
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(157, 229, 0, 0.12) 0%,
+            rgba(241, 244, 236, 0.25) 38%,
+            rgba(241, 244, 236, 0.86) 100%
+        );
+}
+
+
+/* =========================================================
+   PREMIUM PILL
+========================================================= */
+
+.fy-pill {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(157, 229, 0, 0.20),
+            rgba(157, 229, 0, 0.07)
+        );
+
+    color: #547900;
+
+    border: 1px solid rgba(126, 192, 0, 0.45);
+
+    box-shadow:
+        0 8px 25px rgba(126, 192, 0, 0.12);
+
+    backdrop-filter: blur(12px);
+}
+
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+.fy-title {
+    color: #11140f;
+    font-family: var(--font-archivo);
+
+    letter-spacing: -0.04em;
+}
+
+.fy-description {
+    color: #566052;
+}
+
+.fy-accent {
+    color: #6fa900;
+}
+
+
+/* =========================================================
+   GREEN ACTION
+========================================================= */
+
+.fy-accent-bg {
+    background:
+        linear-gradient(
+            135deg,
+            #b8f526 0%,
+            #9de500 55%,
+            #83c400 100%
+        );
+
+    color: #10130c;
+
+    box-shadow:
+        0 12px 35px rgba(126, 192, 0, 0.30),
+        0 2px 0 rgba(255, 255, 255, 0.45) inset;
+}
+
+.fy-accent-border {
+    border-color: rgba(126, 192, 0, 0.48);
+}
+
+
+/* =========================================================
+   PREMIUM CARDS
+========================================================= */
+
+.fy-card {
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff 0%,
+            #f5f7f1 55%,
+            #e8ede3 100%
+        );
+
+    border: 1px solid rgba(11, 12, 14, 0.09);
+
+    box-shadow:
+        0 18px 55px rgba(11, 12, 14, 0.12),
+        0 4px 12px rgba(11, 12, 14, 0.05);
+
+    backdrop-filter: blur(18px);
+}
+
+
+/* =========================================================
+   CENTER DOCK
+========================================================= */
+
+.fy-card-dock {
+    position: relative;
+
+    background:
+        linear-gradient(
+            145deg,
+            #f9fbf6 0%,
+            #edf2e8 55%,
+            #e0e8d9 100%
+        );
+
+    border: 1px dashed rgba(126, 192, 0, 0.62);
+
+    box-shadow:
+        inset 0 0 45px rgba(157, 229, 0, 0.08),
+        0 20px 50px rgba(11, 12, 14, 0.10);
+
+    backdrop-filter: blur(18px);
+}
+
+
+/* =========================================================
+   CARD DRAWER
+========================================================= */
+
+.fy-card-drawer {
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f1f5eb 55%,
+            #e4ebdc 100%
+        );
+
+    border-right: 1px solid rgba(126, 192, 0, 0.45);
+
+    box-shadow:
+        18px 0 45px rgba(11, 12, 14, 0.12);
+
+    backdrop-filter: blur(24px);
+}
+
+
+/* =========================================================
+   CARD META
+========================================================= */
+
+.fy-card-meta {
+    color: #596254;
+
+    border-color: rgba(11, 12, 14, 0.09);
+}
+
+
+/* =========================================================
+   HERO MORPH
+========================================================= */
+
+.fy-hero {
+    background:
+        #eef2e9;
+}
+
+
+/* =========================================================
+   HERO PREMIUM
+========================================================= */
+
+.fy-hero-overlay {
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(157, 229, 0, 0.26) 0%,
+            rgba(157, 229, 0, 0.10) 28%,
+            rgba(238, 242, 233, 0.55) 58%,
+            rgba(238, 242, 233, 0.94) 100%
+        );
+}
+
+
+/* =========================================================
+   HERO GRID
+========================================================= */
+
+.fy-hero-grid {
+    opacity: 0.14;
+
+    background-image:
+        linear-gradient(
+            to right,
+            rgba(126, 192, 0, 0.55) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            to bottom,
+            rgba(126, 192, 0, 0.55) 1px,
+            transparent 1px
+        );
+
+    background-size: 40px 40px;
+}
+
+
+/* =========================================================
+   HERO TYPOGRAPHY
+========================================================= */
+
+.fy-hero-title {
+    color: #11140f;
+
+    font-family: var(--font-signature);
+
+    text-shadow:
+        0 8px 30px rgba(11, 12, 14, 0.10);
+}
+
+.fy-hero-subtitle {
+    color: #566052;
+}
+
+.fy-main-heading {
+    color: #11140f;
+
+    font-family: var(--font-marker);
+
+    text-shadow:
+        0 8px 25px rgba(11, 12, 14, 0.10);
+}
+
+.fy-main-description {
+    color: #566052;
+}
+
+
+/* =========================================================
+   SIGNATURE GREEN LINE
+========================================================= */
+
+.fy-showcase::after {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    height: 3px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent 0%,
+            #9de500 25%,
+            #b8f526 50%,
+            #9de500 75%,
+            transparent 100%
+        );
+
+    opacity: 0.85;
+}

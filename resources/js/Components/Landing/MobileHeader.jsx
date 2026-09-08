@@ -1,49 +1,17 @@
-import React from 'react';
 
-import {
-    User,
-} from 'lucide-react';
-
-import {
-    Link,
-    usePage,
-} from '@inertiajs/react';
+import { User } from 'lucide-react';
+import { Link } from '@inertiajs/react';
 
 import CartButton from '../Store/Cart/CartButton';
 import NotificationBell from '../Notification/NotificationBell';
 
-
 export default function MobileHeader({
     user,
+    cartCount = 0,
     onOpenCart,
 }) {
-
-    /*
-    |--------------------------------------------------------------------------
-    | Inertia Props
-    |--------------------------------------------------------------------------
-    */
-
-    const { props } = usePage();
-
-    const auth = props?.auth;
-    const cart = props?.cart ?? {};
-
-    /*
-    |--------------------------------------------------------------------------
-    | User
-    |--------------------------------------------------------------------------
-    */
-
-    const currentUser = auth?.user ?? user ?? null;
-
-    /*
-    |--------------------------------------------------------------------------
-    | Cart
-    |--------------------------------------------------------------------------
-    */
-
-    const cartCount = Number(cart?.count ?? 0);
+    const profileHref = user ? '/profile' : '/login';
+    const profileLabel = user ? 'Profile' : 'Login';
 
     return (
         <header
@@ -52,41 +20,20 @@ export default function MobileHeader({
                 inset-x-0
                 top-0
                 z-40
-
                 flex
                 items-center
                 justify-between
-
                 bg-transparent
-
                 px-5
                 py-4
-
                 md:hidden
             "
         >
-
-            {/* ==========================================================
-                LEFT SIDE
-            ========================================================== */}
-
+            {/* LEFT */}
             <div className="flex items-center gap-4">
-
-                {/* ------------------------------------------------------
-                    User
-                ------------------------------------------------------ */}
-
                 <Link
-                    href={
-                        currentUser
-                            ? '/profile'
-                            : '/login'
-                    }
-                    aria-label={
-                        currentUser
-                            ? 'Profile'
-                            : 'Login'
-                    }
+                    href={profileHref}
+                    aria-label={profileLabel}
                     className="
                         transition-transform
                         duration-300
@@ -94,15 +41,13 @@ export default function MobileHeader({
                         active:scale-95
                     "
                 >
-
-                    {currentUser?.avatar ? (
-
+                    {user?.avatar ? (
                         <img
-                            src={currentUser.avatar}
-                            alt={
-                                currentUser.name ||
-                                'Avatar'
-                            }
+                            src={user.avatar}
+                            alt={user.name || 'Avatar'}
+                            width="36"
+                            height="36"
+                            decoding="async"
                             className="
                                 h-9
                                 w-9
@@ -112,10 +57,9 @@ export default function MobileHeader({
                                 object-cover
                             "
                         />
-
                     ) : (
-
                         <User
+                            aria-hidden="true"
                             className="
                                 h-5
                                 w-5
@@ -123,37 +67,19 @@ export default function MobileHeader({
                                 drop-shadow-md
                             "
                         />
-
                     )}
-
                 </Link>
-
-
-                {/* ------------------------------------------------------
-                    Cart
-                ------------------------------------------------------ */}
 
                 <CartButton
                     onClick={onOpenCart}
+                    count={cartCount}
                 />
-
             </div>
 
-
-            {/* ==========================================================
-                RIGHT SIDE
-            ========================================================== */}
-
+            {/* RIGHT */}
             <div className="flex items-center gap-4">
-
-                {/* ------------------------------------------------------
-                    Notifications
-                ------------------------------------------------------ */}
-
                 <NotificationBell variant="dark" />
-
             </div>
-
         </header>
     );
 }

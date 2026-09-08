@@ -1,17 +1,21 @@
-import React from 'react';
 import { ShoppingBag } from 'lucide-react';
-import { usePage } from '@inertiajs/react';
+
 import CartBadge from './CartBadge';
 
-export default function CartButton({ onClick, variant = 'glass', className = '' }) {
-    const { cart } = usePage().props;
-    const count = Number(cart?.count ?? 0);
-
-    const baseStyles = "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition";
+export default function CartButton({
+    onClick,
+    count = 0,
+    variant = 'light',
+    className = '',
+}) {
+    const baseStyles =
+        'relative flex shrink-0 items-center justify-center rounded-full p-2.5 active:scale-95 transition-transform duration-200';
 
     const variants = {
-        glass: "border border-white/30 bg-white/10 text-white hover:border-white hover:bg-white/20",
-        light: "text-slate-600 hover:bg-slate-100 hover:text-slate-950 border border-transparent",
+        light:
+            'text-slate-700 hover:text-lime-600 hover:bg-lime-400/10',
+        glass:
+            'border border-white/30 bg-white/10 text-white hover:border-white hover:bg-white/20',
     };
 
     return (
@@ -19,9 +23,13 @@ export default function CartButton({ onClick, variant = 'glass', className = '' 
             type="button"
             onClick={onClick}
             aria-label="Panier"
-            className={`${baseStyles} ${variants[variant]} ${className}`}
+            className={`${baseStyles} ${variants[variant] ?? variants.light} ${className}`}
         >
-            <ShoppingBag className="h-4 w-4" />
+            <ShoppingBag
+                aria-hidden="true"
+                className="h-5 w-5"
+            />
+
             <CartBadge count={count} />
         </button>
     );
