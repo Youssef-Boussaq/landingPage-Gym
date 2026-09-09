@@ -17,10 +17,42 @@ export default {
                 archivo: ['var(--font-archivo)', ...defaultTheme.fontFamily.sans],
             },
             colors: {
+                border: 'var(--border)',
+                input: 'var(--input)',
+                ring: 'var(--ring)',
+                background: 'var(--background)',
+                foreground: 'var(--foreground)',
                 primary: {
                     DEFAULT: 'var(--color-primary)',
-                    hover: 'var(--color-primary-hover)'
-                }
+                    foreground: 'var(--primary-foreground)',
+                    hover: 'var(--color-primary-hover)',
+                    dark: 'var(--color-primary-dark)',
+                    light: 'var(--color-primary-light)'
+                },
+                secondary: {
+                    DEFAULT: 'var(--secondary)',
+                    foreground: 'var(--secondary-foreground)',
+                },
+                destructive: {
+                    DEFAULT: 'var(--destructive)',
+                    foreground: 'var(--destructive-foreground)',
+                },
+                muted: {
+                    DEFAULT: 'var(--muted)',
+                    foreground: 'var(--muted-foreground)',
+                },
+                accent: {
+                    DEFAULT: 'var(--accent)',
+                    foreground: 'var(--accent-foreground)',
+                },
+                popover: {
+                    DEFAULT: 'var(--popover)',
+                    foreground: 'var(--popover-foreground)',
+                },
+                card: {
+                    DEFAULT: 'var(--card)',
+                    foreground: 'var(--card-foreground)',
+                },
             }
         },
     },

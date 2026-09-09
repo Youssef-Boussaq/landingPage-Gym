@@ -1,31 +1,31 @@
 import { Head } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import Hero from '@/Components/Landing/Hero';
+import AboutCoach from '@/Components/Landing/AboutCoach';
+import Services from '@/Components/Landing/Services';
+import Transformations from '@/Components/Landing/Transformations';
+import Reviews from '@/Components/Landing/Reviews';
+import Programs from '@/Components/Landing/Programs';
+import Contact from '@/Components/Landing/Contact';
 import Footer from '@/Components/Landing/Footer';
-import AboutCoachGSAP from '@/Components/Landing/AboutCoach/AboutCoachGSAP';
-import FitYounessStudio from '@/Components/Landing/PainPoints';
-// import Programs from '@/Components/Landing/Programs';
-
-// import FitYounessStudio from '@/Components/Landing/PainPoints';
-// import Contact from '@/Components/Landing/Contact';
-
 
 export default function Welcome({ auth }) {
     return (
         <PublicLayout>
             <Head title="Accueil" />
 
-            <div className="relative overflow-x-clip bg-slate-950 text-white">
-
+            {/* Changed from dark mode background to match light theme */}
+            <div className="relative overflow-x-clip bg-white text-slate-900 font-sans selection:bg-[var(--color-primary)] selection:text-slate-900">
                 <main>
                     <Hero />
-                    <AboutCoachGSAP />
-                    <FitYounessStudio />
-
+                    <AboutCoach />
+                    <Services />
+                    <Transformations />
+                    <Reviews />
+                    <Programs />
+                    <Contact />
                 </main>
-
                 <Footer />
-
             </div>
         </PublicLayout>
     );

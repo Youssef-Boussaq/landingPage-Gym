@@ -1,3 +1,6 @@
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/figtree";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -218,7 +221,6 @@ body {
     color: var(--color-black);
 }
 
-
 /* =========================================================
    MAIN SHOWCASE BACKGROUND
 ========================================================= */
@@ -245,7 +247,6 @@ body {
         );
 }
 
-
 /* =========================================================
    PREMIUM ATMOSPHERE
 ========================================================= */
@@ -266,7 +267,6 @@ body {
     pointer-events: none;
 }
 
-
 /* =========================================================
    SHOWCASE OVERLAY
 ========================================================= */
@@ -280,7 +280,6 @@ body {
             rgba(241, 244, 236, 0.86) 100%
         );
 }
-
 
 /* =========================================================
    PREMIUM PILL
@@ -304,7 +303,6 @@ body {
     backdrop-filter: blur(12px);
 }
 
-
 /* =========================================================
    TYPOGRAPHY
 ========================================================= */
@@ -323,7 +321,6 @@ body {
 .fy-accent {
     color: #6fa900;
 }
-
 
 /* =========================================================
    GREEN ACTION
@@ -349,7 +346,6 @@ body {
     border-color: rgba(126, 192, 0, 0.48);
 }
 
-
 /* =========================================================
    PREMIUM CARDS
 ========================================================= */
@@ -371,7 +367,6 @@ body {
 
     backdrop-filter: blur(18px);
 }
-
 
 /* =========================================================
    CENTER DOCK
@@ -397,7 +392,6 @@ body {
     backdrop-filter: blur(18px);
 }
 
-
 /* =========================================================
    CARD DRAWER
 ========================================================= */
@@ -419,7 +413,6 @@ body {
     backdrop-filter: blur(24px);
 }
 
-
 /* =========================================================
    CARD META
 ========================================================= */
@@ -430,7 +423,6 @@ body {
     border-color: rgba(11, 12, 14, 0.09);
 }
 
-
 /* =========================================================
    HERO MORPH
 ========================================================= */
@@ -439,7 +431,6 @@ body {
     background:
         #eef2e9;
 }
-
 
 /* =========================================================
    HERO PREMIUM
@@ -455,7 +446,6 @@ body {
             rgba(238, 242, 233, 0.94) 100%
         );
 }
-
 
 /* =========================================================
    HERO GRID
@@ -478,7 +468,6 @@ body {
 
     background-size: 40px 40px;
 }
-
 
 /* =========================================================
    HERO TYPOGRAPHY
@@ -510,7 +499,6 @@ body {
     color: #566052;
 }
 
-
 /* =========================================================
    SIGNATURE GREEN LINE
 ========================================================= */
@@ -537,3 +525,340 @@ body {
 
     opacity: 0.85;
 }
+
+/* =========================================================
+   AboutCoachGSAP — layout & motion
+   Mobile-first grid: stacked (image → text → hint) by default,
+   two columns (image | text) from the md breakpoint up.
+   Kept in a dedicated stylesheet because named grid-template-areas
+   have no ergonomic Tailwind equivalent — everything else stays
+   in utility classes.
+========================================================= */
+
+.about-coach-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+        'nav'
+        'image'
+        'text'
+        'hint';
+    row-gap: clamp(1.25rem, 4vw, 2rem);
+    align-items: center;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .about-coach-grid {
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        grid-template-areas:
+            'nav  nav'
+            'image text'
+            'hint hint';
+        column-gap: clamp(2rem, 5vw, 5rem);
+        height: 100%;
+    }
+}
+
+.about-coach-nav {
+    grid-area: nav;
+}
+
+.about-coach-image {
+    grid-area: image;
+    position: relative;
+    width: 100%;
+}
+
+.about-coach-text {
+    grid-area: text;
+    position: relative;
+    width: 100%;
+}
+
+.about-coach-hint {
+    grid-area: hint;
+}
+
+/* =========================================================
+   Reserve space for the crossfading phase copy so switching
+   phases never changes the height of the text column
+   (prevents layout shift while GSAP toggles opacity/y).
+========================================================= */
+.about-coach-text {
+    min-height: 260px;
+}
+
+@media (min-width: 640px) {
+    .about-coach-text {
+        min-height: 340px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .about-coach-text {
+        min-height: 400px;
+    }
+}
+
+/* =========================================================
+   Image frame: fixed aspect ratio so nothing distorts and
+   nothing shifts while the two photos crossfade inside it.
+========================================================= */
+.about-coach-image__frame {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    margin-inline: auto;
+    aspect-ratio: 3 / 4;
+}
+
+@media (min-width: 768px) {
+    .about-coach-image__frame {
+        max-width: 460px;
+        aspect-ratio: 9 / 14;
+    }
+}
+
+@media (min-width: 1024px) {
+    .about-coach-image__frame {
+        max-width: 560px;
+    }
+}
+
+@media (min-width: 1280px) {
+    .about-coach-image__frame {
+        max-width: 620px;
+    }
+}
+
+/* =========================================================
+   Stats strip — simple, dependency-free entrance. The counter
+   value itself is animated by GSAP; this only fades the card in.
+========================================================= */
+@keyframes about-coach-fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.about-coach-stats {
+    animation: about-coach-fade-up 0.6s ease-out both;
+    animation-play-state: paused;
+    animation-timeline: view();
+    animation-range: entry 0% cover 20%;
+}
+
+/* Fallback / explicit trigger for browsers without animation-timeline
+   support — toggled by the component once the stats scroll into view. */
+.about-coach-stats.is-visible {
+    animation-play-state: running;
+}
+
+.about-coach-stat__value {
+    font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================
+   Accessibility
+========================================================= */
+.about-coach-nav button:focus-visible,
+.about-coach-hero a:focus-visible,
+.about-coach-hero button:focus-visible {
+    outline: 2px solid var(--color-primary-dark, #0f172a);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .about-coach-stats {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@layer base {
+  .theme {
+
+        --font-heading: var(--font-sans);
+
+        --font-sans: 'Figtree Variable', sans-serif;
+    }
+  :root {
+
+        --background: oklch(1 0 0);
+
+        --foreground: oklch(0.145 0 0);
+
+        --card: oklch(1 0 0);
+
+        --card-foreground: oklch(0.145 0 0);
+
+        --popover: oklch(1 0 0);
+
+        --popover-foreground: oklch(0.145 0 0);
+
+        --primary: oklch(0.205 0 0);
+
+        --primary-foreground: oklch(0.985 0 0);
+
+        --secondary: oklch(0.97 0 0);
+
+        --secondary-foreground: oklch(0.205 0 0);
+
+        --muted: oklch(0.97 0 0);
+
+        --muted-foreground: oklch(0.556 0 0);
+
+        --accent: oklch(0.97 0 0);
+
+        --accent-foreground: oklch(0.205 0 0);
+
+        --destructive: oklch(0.577 0.245 27.325);
+
+        --border: oklch(0.922 0 0);
+
+        --input: oklch(0.922 0 0);
+
+        --ring: oklch(0.708 0 0);
+
+        --chart-1: oklch(0.87 0 0);
+
+        --chart-2: oklch(0.556 0 0);
+
+        --chart-3: oklch(0.439 0 0);
+
+        --chart-4: oklch(0.371 0 0);
+
+        --chart-5: oklch(0.269 0 0);
+
+        --radius: 0.625rem;
+
+        --sidebar: oklch(0.985 0 0);
+
+        --sidebar-foreground: oklch(0.145 0 0);
+
+        --sidebar-primary: oklch(0.205 0 0);
+
+        --sidebar-primary-foreground: oklch(0.985 0 0);
+
+        --sidebar-accent: oklch(0.97 0 0);
+
+        --sidebar-accent-foreground: oklch(0.205 0 0);
+
+        --sidebar-border: oklch(0.922 0 0);
+
+        --sidebar-ring: oklch(0.708 0 0);
+    }
+  .dark {
+
+        --background: oklch(0.145 0 0);
+
+        --foreground: oklch(0.985 0 0);
+
+        --card: oklch(0.205 0 0);
+
+        --card-foreground: oklch(0.985 0 0);
+
+        --popover: oklch(0.205 0 0);
+
+        --popover-foreground: oklch(0.985 0 0);
+
+        --primary: oklch(0.922 0 0);
+
+        --primary-foreground: oklch(0.205 0 0);
+
+        --secondary: oklch(0.269 0 0);
+
+        --secondary-foreground: oklch(0.985 0 0);
+
+        --muted: oklch(0.269 0 0);
+
+        --muted-foreground: oklch(0.708 0 0);
+
+        --accent: oklch(0.269 0 0);
+
+        --accent-foreground: oklch(0.985 0 0);
+
+        --destructive: oklch(0.704 0.191 22.216);
+
+        --border: oklch(1 0 0 / 10%);
+
+        --input: oklch(1 0 0 / 15%);
+
+        --ring: oklch(0.556 0 0);
+
+        --chart-1: oklch(0.87 0 0);
+
+        --chart-2: oklch(0.556 0 0);
+
+        --chart-3: oklch(0.439 0 0);
+
+        --chart-4: oklch(0.371 0 0);
+
+        --chart-5: oklch(0.269 0 0);
+
+        --sidebar: oklch(0.205 0 0);
+
+        --sidebar-foreground: oklch(0.985 0 0);
+
+        --sidebar-primary: oklch(0.488 0.243 264.376);
+
+        --sidebar-primary-foreground: oklch(0.985 0 0);
+
+        --sidebar-accent: oklch(0.269 0 0);
+
+        --sidebar-accent-foreground: oklch(0.985 0 0);
+
+        --sidebar-border: oklch(1 0 0 / 10%);
+
+        --sidebar-ring: oklch(0.556 0 0);
+    }
+  * {
+    @apply border-border;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+}
+
+/* =========================================================
+   SCROLL REVEAL ANIMATIONS
+========================================================= */
+
+.reveal-up {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s var(--ease-premium), transform 0.6s var(--ease-premium);
+}
+
+.reveal-up.is-visible,
+.reveal-group.is-visible .reveal-item {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reveal-zoom {
+    opacity: 0;
+    transform: scale(0.96);
+    transition: opacity 0.6s var(--ease-premium), transform 0.6s var(--ease-premium);
+}
+
+.reveal-zoom.is-visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Delay modifiers */
+.delay-100 { transition-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
+.delay-400 { transition-delay: 400ms; }

@@ -1,97 +1,13 @@
-import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Flame } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 /* =========================================================
-   ANIMATION CONSTANTS
-========================================================= */
-
-const CUSTOM_EASE = [0.16, 1, 0.3, 1];
-const IMAGE_ZOOM_EASE = [0.215, 0.61, 0.355, 1];
-
-/* =========================================================
-   FRAMER MOTION VARIANTS
-========================================================= */
-
-const containerVariants = {
-    hidden: {
-        opacity: 0,
-    },
-
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.1,
-            delayChildren: 0.1,
-        },
-    },
-};
-
-const fadeSlideLeft = {
-    hidden: {
-        opacity: 0,
-        x: -20,
-    },
-
-    visible: {
-        opacity: 1,
-        x: 0,
-        transition: {
-            duration: 0.7,
-            ease: CUSTOM_EASE,
-        },
-    },
-};
-
-const imageZoomIn = {
-    hidden: {
-        opacity: 0,
-        scale: 0.3,
-    },
-
-    visible: {
-        opacity: 1,
-        scale: 1,
-        transition: {
-            duration: 1.3,
-            delay: 0.2,
-            ease: IMAGE_ZOOM_EASE,
-        },
-    },
-};
-
-/* =========================================================
-   DEVICE / PREFERENCE DETECTION
+   DEVICE DETECTION
    ---------------------------------------------------------
-   - useIsAndroid: disables the infinite floating animation on
-     Android specifically (kept from the original behavior).
-   - useIsDesktop: drives ACTUAL conditional mounting (not just
-     CSS `hidden`) of the desktop-only decoration (background
-     image, diagonal cut, lime slashes). CSS `hidden` still lets
-     the browser fetch the image and still lets Framer Motion
-     run its infinite loops in the background on mobile - both
-     were happening before despite the comments saying otherwise.
-     Mounting conditionally fixes that for real.
-   - useReducedMotion (from framer-motion): respects the user's
-     OS-level motion preference, which also meaningfully helps
-     battery/perf on mobile.
+   - useIsDesktop: drives conditional mounting of the 
+     desktop-only decoration (background image, diagonal cut, 
+     lime slashes).
 ========================================================= */
-
-function useIsAndroid() {
-    const [isAndroid, setIsAndroid] = useState(false);
-
-    useEffect(() => {
-        const ua = navigator.userAgent || '';
-        const platform = navigator.userAgentData?.platform || '';
-
-        setIsAndroid(
-            /Android/i.test(ua) ||
-            /Android/i.test(platform)
-        );
-    }, []);
-
-    return isAndroid;
-}
 
 function useIsDesktop() {
     // Matches the Tailwind `lg` breakpoint used elsewhere in this file.
@@ -111,20 +27,15 @@ function useIsDesktop() {
 }
 
 /* =========================================================
-   COMPONENT
+   COMPONENT (NO ANIMATION - PURE STATIC LAYOUT)
 ========================================================= */
 
 export default function Hero() {
-    const isAndroid = useIsAndroid();
     const isDesktop = useIsDesktop();
-    const prefersReducedMotion = useReducedMotion();
-
-    // Android keeps its own quirk from before; reduced-motion now
-    // also turns off the infinite float, for anyone (any device).
-    const disableFloat = isAndroid || prefersReducedMotion;
 
     return (
         <section
+            id="hero"
             className="
                 relative
                 w-full
@@ -144,11 +55,7 @@ export default function Hero() {
             "
         >
             {/* =====================================================
-                BACKGROUND IMAGE — DESKTOP ONLY
-
-                Actually unmounted on mobile now (not just CSS-hidden),
-                so the image is never fetched and the infinite y-loop
-                never runs on phones.
+                BACKGROUND IMAGE — DESKTOP ONLY (STATIC)
             ===================================================== */}
 
             {isDesktop && (
@@ -159,37 +66,13 @@ export default function Hero() {
                         pointer-events-none
                     "
                 >
-                    <motion.img
-                        initial={{
-                            opacity: 0,
-                            scale: 1.05,
-                        }}
-                        animate={{
-                            opacity: 0.12,
-                            scale: 1,
-                            y: prefersReducedMotion ? 0 : [0, 8, 0],
-                        }}
-                        transition={{
-                            scale: {
-                                duration: 1.5,
-                            },
-                            opacity: {
-                                duration: 1.5,
-                            },
-                            y: prefersReducedMotion
-                                ? { duration: 0 }
-                                : {
-                                    duration: 4,
-                                    repeat: Infinity,
-                                    repeatType: 'reverse',
-                                    ease: 'easeInOut',
-                                },
-                        }}
+                    <img
                         src="/images/1.jpg"
                         alt=""
                         aria-hidden="true"
                         fetchPriority="low"
                         decoding="async"
+                        referrerPolicy="no-referrer"
                         className="
                             absolute
                             inset-0
@@ -197,6 +80,7 @@ export default function Hero() {
                             h-full
                             object-cover
                             object-center
+                            opacity-15
                             pointer-events-none
                         "
                     />
@@ -204,17 +88,11 @@ export default function Hero() {
             )}
 
             {/* =====================================================
-                WHITE DIAGONAL CUT — DESKTOP ONLY
+                WHITE DIAGONAL CUT — DESKTOP ONLY (STATIC)
             ===================================================== */}
 
             {isDesktop && (
-                <motion.div
-                    initial={{ x: '-100%' }}
-                    animate={{ x: 0 }}
-                    transition={{
-                        duration: 1,
-                        ease: CUSTOM_EASE,
-                    }}
+                <div
                     className="
                         absolute
                         inset-0
@@ -231,7 +109,7 @@ export default function Hero() {
             )}
 
             {/* =====================================================
-                CONTENT
+                CONTENT (STATIC)
             ===================================================== */}
 
             <div
@@ -252,10 +130,7 @@ export default function Hero() {
                     lg:py-0
                 "
             >
-                <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
+                <div
                     className="
                         w-7/12
                         sm:w-1/2
@@ -272,8 +147,7 @@ export default function Hero() {
                         BADGE
                     ================================================= */}
 
-                    <motion.div
-                        variants={fadeSlideLeft}
+                    <div
                         className="
                             mb-2
                             sm:mb-4
@@ -304,14 +178,13 @@ export default function Hero() {
                         />
 
                         <span>FIT YOUNESS</span>
-                    </motion.div>
+                    </div>
 
                     {/* =================================================
                         TITLE
                     ================================================= */}
 
-                    <motion.h1
-                        variants={fadeSlideLeft}
+                    <h1
                         className="
                             text-2xl
                             sm:text-4xl
@@ -344,14 +217,13 @@ export default function Hero() {
                         <br />
 
                         RÉUSSIS.
-                    </motion.h1>
+                    </h1>
 
                     {/* =================================================
                         KEYWORDS
                     ================================================= */}
 
-                    <motion.p
-                        variants={fadeSlideLeft}
+                    <p
                         className="
                             text-[var(--color-slate-700)]
                             font-extrabold
@@ -365,20 +237,15 @@ export default function Hero() {
                         "
                     >
                         Coaching Sur-Mesure • Nutrition • Suivi 24/7
-                    </motion.p>
+                    </p>
 
                     {/* =================================================
                         CTA
                     ================================================= */}
 
-                    <motion.div
-                        variants={fadeSlideLeft}
-                        className="w-full sm:w-auto"
-                    >
-                        <motion.a
+                    <div className="w-full sm:w-auto">
+                        <a
                             href="#contact"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
                             className="
                                 relative
                                 inline-flex
@@ -401,11 +268,7 @@ export default function Hero() {
                                 rounded-xl
                                 sm:rounded-2xl
                                 shadow-[var(--shadow-glow)]
-                                hover:shadow-[var(--shadow-glow-strong)]
-                                transition-[box-shadow,transform]
-                                duration-300
                                 cursor-pointer
-                                group
                                 overflow-hidden
                             "
                         >
@@ -422,40 +285,15 @@ export default function Hero() {
                                     h-4
                                     sm:w-5
                                     sm:h-5
-                                    group-hover:translate-x-1.5
-                                    transition-transform
-                                    duration-300
                                 "
                             />
-
-                            <span
-                                aria-hidden="true"
-                                className="
-                                    absolute
-                                    inset-0
-                                    bg-white/30
-                                    translate-y-full
-                                    group-hover:translate-y-0
-                                    transition-transform
-                                    duration-300
-                                "
-                            />
-                        </motion.a>
-                    </motion.div>
-                </motion.div>
+                        </a>
+                    </div>
+                </div>
             </div>
 
             {/* =====================================================
-                COACH IMAGE
-
-                Single element tree for every device now (no more
-                Android vs. iPhone/Desktop branches). Only the
-                `animate`/`transition` props on the inner wrapper
-                change based on device/preference, so React reuses
-                the same <img> instead of unmounting and remounting
-                it - that remount was forcing an extra image
-                decode/paint (and on some browsers a re-fetch) every
-                time the Android check resolved after first paint.
+                COACH IMAGE (STATIC)
             ===================================================== */}
 
             <div
@@ -471,62 +309,38 @@ export default function Hero() {
                     pointer-events-none
                 "
             >
-                <motion.div
-                    variants={imageZoomIn}
-                    initial="hidden"
-                    animate="visible"
+                <div
+                    className="
+                        relative
+                        w-[75vw]
+                        sm:w-[60vw]
+                        md:w-[48vw]
+                        max-w-[550px]
+                        aspect-square
+                        drop-shadow-2xl
+                    "
                 >
-                    <motion.div
-                        animate={
-                            disableFloat
-                                ? { y: 0 }
-                                : { y: [0, -12, 0] }
-                        }
-                        transition={
-                            disableFloat
-                                ? { duration: 0 }
-                                : {
-                                    duration: 4,
-                                    repeat: Infinity,
-                                    repeatType: 'reverse',
-                                    ease: 'easeInOut',
-                                }
-                        }
+                    <img
+                        src="/images/2.png"
+                        alt="Coach Fit Youness"
+                        width="550"
+                        height="550"
+                        fetchPriority="high"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
                         className="
-                            relative
-                            w-[75vw]
-                            sm:w-[60vw]
-                            md:w-[48vw]
-                            max-w-[550px]
-                            aspect-square
-                            drop-shadow-2xl
+                            w-full
+                            h-full
+                            object-contain
+                            object-bottom
+                            select-none
                         "
-                    >
-                        <img
-                            src="/images/2.png"
-                            alt="Coach"
-                            width="550"
-                            height="550"
-                            fetchPriority="high"
-                            decoding="async"
-                            className="
-                                w-full
-                                h-full
-                                object-cover
-                                object-center
-                                select-none
-                            "
-                        />
-                    </motion.div>
-                </motion.div>
+                    />
+                </div>
             </div>
 
             {/* =====================================================
-                LIME SLASHES — DESKTOP ONLY
-
-                Now genuinely unmounted on mobile instead of just
-                CSS-hidden, matching what the original comments said
-                was already happening.
+                LIME SLASHES — DESKTOP ONLY (STATIC)
             ===================================================== */}
 
             {isDesktop && (
@@ -539,21 +353,7 @@ export default function Hero() {
                     "
                 >
                     {/* Slash 1 */}
-
-                    <motion.div
-                        initial={{
-                            y: '-100%',
-                            opacity: 0,
-                        }}
-                        animate={{
-                            y: 0,
-                            opacity: 1,
-                        }}
-                        transition={{
-                            duration: 0.8,
-                            delay: 0.5,
-                            ease: 'easeOut',
-                        }}
+                    <div
                         className="
                             absolute
                             inset-0
@@ -570,21 +370,7 @@ export default function Hero() {
                     />
 
                     {/* Slash 2 */}
-
-                    <motion.div
-                        initial={{
-                            y: '100%',
-                            opacity: 0,
-                        }}
-                        animate={{
-                            y: 0,
-                            opacity: 1,
-                        }}
-                        transition={{
-                            duration: 0.8,
-                            delay: 0.6,
-                            ease: 'easeOut',
-                        }}
+                    <div
                         className="
                             absolute
                             inset-0
@@ -601,26 +387,11 @@ export default function Hero() {
                     />
 
                     {/* Slash 3 */}
-
-                    <motion.div
-                        initial={{
-                            scaleY: 0,
-                            opacity: 0,
-                        }}
-                        animate={{
-                            scaleY: 1,
-                            opacity: 1,
-                        }}
-                        transition={{
-                            duration: 0.9,
-                            delay: 0.4,
-                            ease: CUSTOM_EASE,
-                        }}
+                    <div
                         className="
                             absolute
                             inset-0
                             bg-[var(--color-primary)]
-                            origin-top
                         "
                         style={{
                             clipPath:
@@ -633,21 +404,7 @@ export default function Hero() {
                     />
 
                     {/* Slash 4 */}
-
-                    <motion.div
-                        initial={{
-                            y: '-100%',
-                            opacity: 0,
-                        }}
-                        animate={{
-                            y: 0,
-                            opacity: 1,
-                        }}
-                        transition={{
-                            duration: 0.8,
-                            delay: 0.7,
-                            ease: 'easeOut',
-                        }}
+                    <div
                         className="
                             absolute
                             inset-0
