@@ -862,3 +862,46 @@ body {
 .delay-200 { transition-delay: 200ms; }
 .delay-300 { transition-delay: 300ms; }
 .delay-400 { transition-delay: 400ms; }
+
+
+
+
+
+
+/* =========================================================
+   FIT YOUNESS — EDITORIAL CARD SHAPES
+========================================================= */
+
+.fashion-card-shape-1 {
+    border-radius: 28px 12px 24px 24px;
+}
+
+.fashion-card-shape-2 {
+    border-radius: 40px 16px 28px 28px;
+}
+
+.fashion-card-shape-3 {
+    border-radius: 28px 28px 28px 28px;
+}
+
+.fashion-card-shape-sub {
+    border-radius: 24px;
+}
+
+
+/* =========================================================
+   REVEAL
+========================================================= */
+
+.reveal-up {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+        opacity 0.6s var(--ease-premium),
+        transform 0.6s var(--ease-premium);
+}
+
+.reveal-up.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
