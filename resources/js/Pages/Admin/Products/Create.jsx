@@ -3,30 +3,34 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import ProductForm from '@/Pages/Admin/Products/ProductForm';
 import { router, useForm } from '@inertiajs/react';
 import { useMemo, useRef, useState } from 'react';
+import { Link } from '@inertiajs/react';
+import { Loader2 } from 'lucide-react';
 
 export default function ProductCreate({ categories, types }) {
     const uploadToken = useMemo(() => crypto.randomUUID(), []);
-    const filesRef   = useRef([]);
+    const filesRef = useRef([]);
+    console.log(categories);
+
 
     // Separate processing flag because router.post() bypasses useForm's internal
     // processing state (form.processing would stay false if we use router.post directly).
     const [submitting, setSubmitting] = useState(false);
 
     const form = useForm({
-        title:              '',
-        description:        '',
-        slug:               '',
-        type:               types[0] || 'physical',
-        price:              '',
-        sale_price:         '',
-        stock_quantity:     '',
-        manage_stock:       true,
-        is_active:          true,
-        category_ids:       [],
-        primary_index:      0,
+        title: '',
+        description: '',
+        slug: '',
+        type: types[0] || 'physical',
+        price: '',
+        sale_price: '',
+        stock_quantity: '',
+        manage_stock: true,
+        is_active: true,
+        category_ids: [],
+        primary_index: 0,
         existing_primary_id: null,
-        removed_image_ids:  [],
-        upload_token:       uploadToken,
+        removed_image_ids: [],
+        upload_token: uploadToken,
     });
 
     const handleSubmit = (event) => {
@@ -39,17 +43,17 @@ export default function ProductCreate({ categories, types }) {
         // so the browser's multipart boundary is set correctly by Axios.
         const body = new FormData();
 
-        body.append('title',          form.data.title          ?? '');
-        body.append('description',    form.data.description    ?? '');
-        body.append('slug',           form.data.slug           ?? '');
-        body.append('type',           form.data.type           ?? '');
-        body.append('price',          String(form.data.price   ?? ''));
-        body.append('sale_price',     String(form.data.sale_price ?? ''));
+        body.append('title', form.data.title ?? '');
+        body.append('description', form.data.description ?? '');
+        body.append('slug', form.data.slug ?? '');
+        body.append('type', form.data.type ?? '');
+        body.append('price', String(form.data.price ?? ''));
+        body.append('sale_price', String(form.data.sale_price ?? ''));
         body.append('stock_quantity', String(form.data.stock_quantity ?? ''));
-        body.append('manage_stock',   form.data.manage_stock ? '1' : '0');
-        body.append('is_active',      form.data.is_active      ? '1' : '0');
-        body.append('primary_index',  String(form.data.primary_index ?? 0));
-        body.append('upload_token',   form.data.upload_token   ?? '');
+        body.append('manage_stock', form.data.manage_stock ? '1' : '0');
+        body.append('is_active', form.data.is_active ? '1' : '0');
+        body.append('primary_index', String(form.data.primary_index ?? 0));
+        body.append('upload_token', form.data.upload_token ?? '');
 
         (form.data.category_ids ?? []).forEach((id) =>
             body.append('category_ids[]', String(id))
@@ -64,9 +68,9 @@ export default function ProductCreate({ categories, types }) {
         form.clearErrors();
 
         router.post(route('admin.products.store'), body, {
-            onError:  (errors) => { form.setError(errors); setSubmitting(false); },
-            onSuccess: ()      => setSubmitting(false),
-            onFinish:  ()      => setSubmitting(false),
+            onError: (errors) => { form.setError(errors); setSubmitting(false); },
+            onSuccess: () => setSubmitting(false),
+            onFinish: () => setSubmitting(false),
         });
     };
 
@@ -74,8 +78,8 @@ export default function ProductCreate({ categories, types }) {
         <AdminLayout title="Nouveau produit">
             <AdminBreadcrumbs
                 items={[
-                    { label: 'Admin',     href: route('admin.dashboard') },
-                    { label: 'Products',  href: route('admin.products.index') },
+                    { label: 'Admin', href: route('admin.dashboard') },
+                    { label: 'Products', href: route('admin.products.index') },
                     { label: 'Create' },
                 ]}
             />
@@ -84,16 +88,40 @@ export default function ProductCreate({ categories, types }) {
                 Create product
             </h1>
 
-            <ProductForm
-                filesRef={filesRef}
-                form={form}
-                submitting={submitting}
-                categories={categories}
-                types={types}
-                uploadToken={uploadToken}
-                submitLabel="Créer le produit"
-                onSubmit={handleSubmit}
-            />
+            <form onSubmit={handleSubmit}>
+                <ProductForm
+                    filesRef={filesRef}
+                    form={form}
+                    submitting={submitting}
+                    categories={categories}
+                    types={types}
+                    uploadToken={uploadToken}
+                />
+
+                <div className="mt-8 flex items-center justify-end gap-3">
+                    <Link
+                        href={route('admin.products.index')}
+                        className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                    >
+                        Annuler
+                    </Link>
+
+                    <button
+                        type="submit"
+                        disabled={submitting}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#9de500] px-6 py-3 text-sm font-bold text-slate-950 shadow-sm transition hover:bg-[#8cd000] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        {submitting ? (
+                            <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Création...
+                            </>
+                        ) : (
+                            'Créer le produit'
+                        )}
+                    </button>
+                </div>
+            </form>
         </AdminLayout>
     );
 }

@@ -1,4 +1,5 @@
 
+
 import { User } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 
@@ -23,7 +24,10 @@ export default function MobileHeader({
                 flex
                 items-center
                 justify-between
-                bg-transparent
+                bg-white/90
+                backdrop-blur-md
+                border-b
+                border-black/5
                 px-5
                 py-4
                 md:hidden
@@ -53,7 +57,7 @@ export default function MobileHeader({
                                 w-9
                                 rounded-full
                                 border
-                                border-white/30
+                                border-black/10
                                 object-cover
                             "
                         />
@@ -82,4 +86,5 @@ export default function MobileHeader({
             </div>
         </header>
     );
+
 }

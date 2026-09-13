@@ -8,21 +8,21 @@ const REVIEWS = [
         name: "Amine B.",
         role: "Weight Loss Program",
         rating: 5,
-        text: "Incredible coach! I lost 15kg in 3 months. The nutrition plan was easy to follow, and the workouts were perfectly tailored to my level.",
+        text: "مدرب محترف، متمكن وملتزم. ساعدني على تجاوز مراحل الثبات في تطوري بطريقة آمنة وفعالة.",
     },
     {
         id: 2,
         name: "Sarah M.",
         role: "Muscle Building",
         rating: 5,
-        text: "I've never felt stronger. The attention to detail in my form and the constant motivation kept me going when I wanted to quit. Highly recommended!",
+        text: "لم أشعر بالقوة بهذا الشكل من قبل. اهتمامه بأدق تفاصيل أدائي وتحفيزه المستمر ساعداني على الاستمرار حتى عندما كنت أفكر في الاستسلام. أنصح به بشدة! ",
     },
     {
         id: 3,
         name: "Youssef T.",
-        role: "Powerlifting prep",
+        role: "Weight Loss Program",
         rating: 5,
-        text: "Professional, knowledgeable, and dedicated. He helped me break through my plateaus safely and effectively.",
+        text: "مدرب رائع! خسرت 15 كيلوغرامًا خلال 3 أشهر. كانت الخطة الغذائية سهلة التطبيق، والتمارين مصممة بشكل مثالي لتناسب مستواي.",
     }
 ];
 

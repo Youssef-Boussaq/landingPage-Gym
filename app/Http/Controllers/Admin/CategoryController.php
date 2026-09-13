@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class CategoryController extends Controller
 {
@@ -53,6 +55,44 @@ class CategoryController extends Controller
             'parentOptions' => $this->parentOptions(),
         ]);
     }
+
+    public function quickStore(Request $request): JsonResponse
+{
+    $this->authorize('create', Category::class);
+
+    $validated = $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'parent_id' => [
+            'required',
+            'integer',
+            'exists:categories,id',
+        ],
+    ]);
+
+    $parent = Category::query()
+        ->whereNull('parent_id')
+        ->findOrFail($validated['parent_id']);
+
+    $category = DB::transaction(function () use ($validated) {
+        return Category::create([
+            'name' => $validated['name'],
+            'slug' => $this->uniqueSlug(
+                null,
+                $validated['name']
+            ),
+            'parent_id' => $validated['parent_id'],
+        ]);
+    });
+
+    return response()->json([
+        'category' => [
+            'id' => $category->id,
+            'name' => $category->name,
+            'parent_id' => $category->parent_id,
+            'label' => $parent->name . ' / ' . $category->name,
+        ],
+    ], 201);
+}
 
     public function store(AdminCategoryRequest $request): RedirectResponse
     {

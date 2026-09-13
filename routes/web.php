@@ -131,6 +131,8 @@ Route::middleware(['auth', 'admin'])
             ->name('categories.update');
         Route::delete('/categories/{category}', [App\Http\Controllers\Admin\CategoryController::class, 'destroy'])
             ->name('categories.destroy');
+        Route::post('/categories/quick-store', [App\Http\Controllers\Admin\CategoryController::class, 'quickStore'])
+    ->name('categories.quick-store');
 
         Route::get('/customers', [App\Http\Controllers\Admin\CustomerController::class, 'index'])
             ->name('customers.index');

@@ -7,28 +7,28 @@ const SERVICES = [
         id: "powerlifting",
         title: "Powerlifting",
         description: "Master the big three lifts with proper form, programming, and safety. Build raw strength.",
-        image: "/images/4.png",
+        image: "/images/8.png",
         icon: Dumbbell,
     },
     {
         id: "weight-loss",
         title: "Weight Loss",
         description: "Sustainable fat loss through customized nutrition plans and high-intensity training.",
-        image: "/images/5.png",
+        image: "/images/7.png",
         icon: Flame,
     },
     {
         id: "muscle-building",
         title: "Muscle Building",
         description: "Hypertrophy-focused training designed to maximize muscle growth and aesthetic proportions.",
-        image: "/images/8.png",
+        image: "/images/5.png",
         icon: Activity,
     },
     {
         id: "stretching",
         title: "Stretching & Mobility",
         description: "Improve flexibility, prevent injuries, and enhance overall functional movement.",
-        image: "/images/7.png",
+        image: "/images/6.png",
         icon: PersonStanding,
     }
 ];

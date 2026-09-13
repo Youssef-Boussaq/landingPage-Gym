@@ -7,26 +7,26 @@ const TRANSFORMATIONS = [
         id: 1,
         title: '12 Weeks Transformation',
         program: 'Weight Loss',
-        beforeImg: '/images/user1.jpg',
-        afterImg: '/images/user2.jpg',
+        beforeImg: '/images/tran1.jpeg',
+        afterImg: '/images/tran1after.jpeg',
         shape: 'fashion-card-shape-1',
         offset: '',
     },
     {
         id: 2,
-        title: '6 Months Progress',
+        title: '3 Months Progress',
         program: 'Muscle Building',
-        beforeImg: '/images/user3.jpg',
-        afterImg: '/images/user1.jpg',
+        afterImg: '/images/after_fog.jpg',
+        beforeImg: '/images/before_fog.jpg',
         shape: 'fashion-card-shape-2',
         offset: 'lg:translate-y-8',
     },
     {
         id: 3,
-        title: '8 Weeks Prep',
+        title: '1 year Progress',
         program: 'Strength & Power',
-        beforeImg: '/images/user2.jpg',
-        afterImg: '/images/user3.jpg',
+        afterImg: '/images/man_right_fog.jpg',
+        beforeImg: '/images/man_left_fog.jpg',
         shape: 'fashion-card-shape-3',
         offset: '',
     },
@@ -57,7 +57,8 @@ function TransformationCard({ data, className }) {
                         'bg-slate-100',
                         'shadow-lg',
                         'fashion-card-shape-sub',
-                        'transition-transform duration-700 ease-out',
+                        'transition-[transform,z-index] duration-700 ease-out',
+                        'group-hover:z-30',
                         'group-hover:-translate-y-2'
                     )}
                 >
@@ -342,7 +343,7 @@ export default function Transformations() {
                             lg:text-7xl
                         "
                     >
-                        Real
+                        Clients
                         <br />
                         <span className="text-slate-300">
                             Transformations

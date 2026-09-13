@@ -156,55 +156,58 @@ class AdminProductRequest extends FormRequest
 ],
 
             /*
-            |--------------------------------------------------------------------------
-            | Primary image
-            |--------------------------------------------------------------------------
-            */
+|--------------------------------------------------------------------------
+| Product images
+|--------------------------------------------------------------------------
+*/
 
-            'primary_index' => [
-                'nullable',
-                'integer',
-                'min:0',
-            ],
+'images' => [
+    $isUpdate ? 'nullable' : 'required',
+    'array',
+    $isUpdate ? 'min:0' : 'min:1',
+],
 
-            'existing_primary_id' => [
-                'nullable',
-                'integer',
+'images.*' => [
+    'image',
+    'mimes:jpg,jpeg,png,webp,gif',
+    'max:20480',
+],
 
-                Rule::exists('product_images', 'id')
-                    ->when(
-                        $productId,
-                        fn ($rule) => $rule->where(
-                            'product_id',
-                            $productId
-                        )
-                    ),
-            ],
+/*
+|--------------------------------------------------------------------------
+| Primary image
+|--------------------------------------------------------------------------
+*/
 
-            /*
-            |--------------------------------------------------------------------------
-            | Removed images
-            |--------------------------------------------------------------------------
-            */
+'primary_index' => [
+    'nullable',
+    'integer',
+    'min:0',
+],
 
-            'removed_image_ids' => [
-                'nullable',
-                'array',
-            ],
+'existing_primary_id' => [
+    'nullable',
+    'integer',
+    Rule::exists('product_images', 'id')
+        ->when(
+            $productId,
+            fn ($rule) => $rule->where('product_id', $productId)
+        ),
+],
 
-            'removed_image_ids.*' => [
-                'integer',
+'removed_image_ids' => [
+    'nullable',
+    'array',
+],
 
-                Rule::exists('product_images', 'id')
-                    ->when(
-                        $productId,
-                        fn ($rule) => $rule->where(
-                            'product_id',
-                            $productId
-                        )
-                    ),
-            ],
-
+'removed_image_ids.*' => [
+    'integer',
+    Rule::exists('product_images', 'id')
+        ->when(
+            $productId,
+            fn ($rule) => $rule->where('product_id', $productId)
+        ),
+],
             /*
             |--------------------------------------------------------------------------
             | Optional upload token

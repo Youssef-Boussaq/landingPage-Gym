@@ -187,6 +187,8 @@ class ProductController extends Controller
             Product::class
         );
 
+
+
         return Inertia::render(
             'Admin/Products/Create',
             [
@@ -260,13 +262,11 @@ class ProductController extends Controller
 
                 $this->storeImages(
                     $product,
-                    $request->file('images', []),
-                    (int) (
-                        $request->input(
-                            'primary_index',
-                            0
-                        )
-                    )
+                    $request->file('images', []) ?? [],
+                    null,
+                    $request->input('primary_index') !== null
+                        ? (int) $request->input('primary_index')
+                        : null
                 );
 
                 $this->finalizeDescriptionImages(
@@ -493,15 +493,12 @@ class ProductController extends Controller
                 $this->storeImages(
                     $product->fresh('images'),
                     $newFiles,
-                    (int) (
-                        $request->input(
-                            'primary_index',
-                            0
-                        )
-                    ),
-                    $request->input(
-                        'existing_primary_path'
-                    )
+                    $request->input('existing_primary_id') !== null
+                        ? (int) $request->input('existing_primary_id')
+                        : null,
+                    $request->input('primary_index') !== null
+                        ? (int) $request->input('primary_index')
+                        : null
                 );
 
                 /*
@@ -689,6 +686,25 @@ class ProductController extends Controller
         return $candidate;
     }
 
+
+private function storeProductImage(
+    Product $product,
+    $file
+): string {
+    $directory = "products/{$product->slug}";
+
+    $filename =
+        Str::uuid()
+        . '.'
+        . $file->extension();
+
+    return $file->storeAs(
+        $directory,
+        $filename,
+        'public'
+    );
+}
+
     /*
     |--------------------------------------------------------------------------
     | STORE PRODUCT IMAGES
@@ -696,285 +712,102 @@ class ProductController extends Controller
     */
 
     private function storeImages(
-        Product $product,
-        ?array $files,
-        int $newPrimaryIndex = 0,
-        ?string $existingPrimaryPath = null
-    ): void {
+    Product $product,
+    array $files,
+    ?int $primaryImageId = null,
+    ?int $primaryIndex = null
+): void {
+    $existingImages = $product
+        ->images()
+        ->orderBy('sort_order')
+        ->get();
 
-        $files = array_values(
-            array_filter(
-                $files ?? [],
-                fn ($file) =>
-                    $file !== null
-            )
+    $newImages = collect();
+
+    foreach ($files as $file) {
+        $path = $file->store(
+            "products/{$product->slug}",
+            'public'
         );
 
-        $disk =
-            Storage::disk('public');
-
-        /*
-        |--------------------------------------------------------------------------
-        | Directory
-        |--------------------------------------------------------------------------
-        */
-
-        $directory =
-            'products/' . $product->slug;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Existing images
-        |--------------------------------------------------------------------------
-        */
-
-        $existingImages =
-            $product
-                ->images()
-                ->orderBy('sort_order')
-                ->get();
-
-        $startOrder =
-            ((int) $existingImages->max(
-                'sort_order'
-            )) + 1;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Upload new images
-        |--------------------------------------------------------------------------
-        */
-
-        foreach (
-            $files as $index => $file
-        ) {
-
-            if (!$file->isValid()) {
-                continue;
-            }
-
-            $extension =
-                strtolower(
-                    $file->getClientOriginalExtension()
-                );
-
-            $originalName =
-                pathinfo(
-                    $file->getClientOriginalName(),
-                    PATHINFO_FILENAME
-                );
-
-            $safeName =
-                Str::slug(
-                    $originalName
-                ) ?: 'image';
-
-            /*
-            |--------------------------------------------------------------------------
-            | Filename
-            |--------------------------------------------------------------------------
-            */
-
-            if (
-                $index === 0
-                && $existingImages->isEmpty()
-            ) {
-
-                $filename =
-                    'cover.' . $extension;
-
-            } elseif (
-                $index === 1
-                && $existingImages->isEmpty()
-            ) {
-
-                $filename =
-                    'front.' . $extension;
-
-            } else {
-
-                $filename =
-                    $safeName
-                    . '-'
-                    . Str::uuid()
-                    . '.'
-                    . $extension;
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | Store file
-            |--------------------------------------------------------------------------
-            */
-
-            $path =
-                $file->storeAs(
-                    $directory,
-                    $filename,
-                    'public'
-                );
-
-            /*
-            |--------------------------------------------------------------------------
-            | Insert database row
-            |--------------------------------------------------------------------------
-            */
-
+        $newImages->push(
             $product->images()->create([
-                'path' =>
-                    $path,
-
-                'alt_text' =>
-                    $product->title,
-
-                'sort_order' =>
-                    $startOrder + $index,
-
-                'is_primary' =>
-                    false,
-            ]);
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Reload
-        |--------------------------------------------------------------------------
-        */
-
-        $images =
-            $product
-                ->images()
-                ->orderBy('sort_order')
-                ->get();
-
-        if ($images->isEmpty()) {
-            return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Reset all primary images
-        |--------------------------------------------------------------------------
-        |
-        | IMPORTANT:
-        | No model update() here because ProductImage
-        | has no primary key.
-        |
-        */
-
-        DB::table('product_images')
-            ->where(
-                'product_id',
-                $product->getKey()
-            )
-            ->update([
+                'path' => $path,
+                'alt_text' => $product->title,
+                'sort_order' => $existingImages->count()
+                    + $newImages->count()
+                    + 1,
                 'is_primary' => false,
-                'updated_at' => now(),
-            ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Existing primary
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $existingPrimaryPath
-            && $images->contains(
-                fn ($image) =>
-                    $image->path ===
-                    $existingPrimaryPath
-            )
-        ) {
-
-            DB::table('product_images')
-                ->where(
-                    'product_id',
-                    $product->getKey()
-                )
-                ->where(
-                    'path',
-                    $existingPrimaryPath
-                )
-                ->update([
-                    'is_primary' => true,
-                    'updated_at' => now(),
-                ]);
-
-            return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | New primary
-        |--------------------------------------------------------------------------
-        */
-
-        if ($files !== []) {
-
-            /*
-             * New images are the last uploaded images.
-             */
-
-            $newImages =
-                $images
-                    ->slice(
-                        -count($files)
-                    )
-                    ->values();
-
-            $primary =
-                $newImages->get(
-                    $newPrimaryIndex
-                ) ?? $newImages->first();
-
-            if ($primary) {
-
-                DB::table('product_images')
-                    ->where(
-                        'product_id',
-                        $product->getKey()
-                    )
-                    ->where(
-                        'path',
-                        $primary->path
-                    )
-                    ->update([
-                        'is_primary' => true,
-                        'updated_at' => now(),
-                    ]);
-            }
-
-            return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Fallback
-        |--------------------------------------------------------------------------
-        */
-
-        $first =
-            $images->first();
-
-        if ($first) {
-
-            DB::table('product_images')
-                ->where(
-                    'product_id',
-                    $product->getKey()
-                )
-                ->where(
-                    'path',
-                    $first->path
-                )
-                ->update([
-                    'is_primary' => true,
-                    'updated_at' => now(),
-                ]);
-        }
+            ])
+        );
     }
 
+    $primaryImage = null;
+
+    /*
+    |--------------------------------------------------------------------------
+    | 1. Existing image explicitly selected
+    |--------------------------------------------------------------------------
+    */
+    if ($primaryImageId !== null) {
+        $primaryImage = $product
+            ->images()
+            ->whereKey($primaryImageId)
+            ->first();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | 2. Newly uploaded image explicitly selected
+    |--------------------------------------------------------------------------
+    */
+    if (
+        !$primaryImage &&
+        $primaryIndex !== null &&
+        $newImages->has($primaryIndex)
+    ) {
+        $primaryImage = $newImages->get($primaryIndex);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | 3. Preserve existing primary
+    |--------------------------------------------------------------------------
+    */
+    if (!$primaryImage) {
+        $primaryImage = $existingImages
+            ->firstWhere('is_primary', true);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | 4. Fallback to first image
+    |--------------------------------------------------------------------------
+    */
+    if (!$primaryImage) {
+        $primaryImage = $product
+            ->images()
+            ->orderBy('sort_order')
+            ->first();
+    }
+
+    if (!$primaryImage) {
+        return;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ensure only ONE primary image
+    |--------------------------------------------------------------------------
+    */
+    $product->images()->update([
+        'is_primary' => false,
+    ]);
+
+    $primaryImage->update([
+        'is_primary' => true,
+    ]);
+}
     /*
     |--------------------------------------------------------------------------
     | DESCRIPTION IMAGE UPLOAD

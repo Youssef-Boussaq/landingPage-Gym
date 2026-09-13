@@ -24,8 +24,8 @@ export default function NotificationBell({ variant = 'light' }) {
     }, [isOpen]);
 
     const bellClass = variant === 'dark'
-        ? 'text-white hover:bg-white/10 group-hover:text-slate-700'
-        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950';
+        ? 'text-black hover:bg-white/10 group-hover:text-slate-700'
+        : 'text-black hover:bg-slate-100 hover:text-slate-950';
 
     const unreadCount = notifications.filter(n => n.read_at === null).length;
 
@@ -47,9 +47,9 @@ export default function NotificationBell({ variant = 'light' }) {
             </button>
 
             {isOpen && (
-                <NotificationDropdown 
-                    notifications={notifications} 
-                    onClose={() => setIsOpen(false)} 
+                <NotificationDropdown
+                    notifications={notifications}
+                    onClose={() => setIsOpen(false)}
                 />
             )}
         </div>

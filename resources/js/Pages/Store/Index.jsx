@@ -73,6 +73,7 @@ export default function StoreIndex({
     offers = [],
 }) {
     const isCategoryPage = Boolean(selectedCategory);
+    console.log("categories", categories);
 
     return (
         <StoreLayout>
