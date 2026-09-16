@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ArrowRight, Play } from 'lucide-react';
 
@@ -27,6 +26,7 @@ export default function CategoryShowcase({
 
     return (
         <section className="relative w-full overflow-hidden bg-white">
+
             {/* =====================================================
                 FULL WIDTH VIDEO
             ====================================================== */}
@@ -35,6 +35,7 @@ export default function CategoryShowcase({
                     className="
                         group
                         relative
+                        isolate
                         w-full
                         overflow-hidden
 
@@ -48,57 +49,65 @@ export default function CategoryShowcase({
 
                         sm:rounded-[22px]
                         lg:rounded-[28px]
+
+                        transform-gpu
                     "
                 >
+
+                    {/* =================================================
+                        VIDEO
+                    ================================================== */}
                     {videoUrl ? (
-                        <video
-                            src={videoUrl}
-                            autoPlay
-                            muted
-                            loop
-                            playsInline
-                            preload="metadata"
-                            aria-label={category.name}
+                        <div
                             className="
-                                block
+                                relative
+                                aspect-video
                                 w-full
+                                overflow-hidden
 
-                                h-[68svh]
-                                min-h-[500px]
-                                max-h-[950px]
-
-                                sm:h-[72svh]
-                                sm:min-h-[560px]
-
-                                lg:h-[78svh]
-                                lg:min-h-[620px]
-
-                                object-cover
-                                object-center
-
-                                transition-transform
-                                duration-[1400ms]
-                                ease-out
-
-                                group-hover:scale-[1.015]
+                                transform-gpu
                             "
-                        />
+                        >
+                            <video
+                                src={videoUrl}
+                                autoPlay
+                                muted
+                                loop
+                                playsInline
+                                preload="metadata"
+                                aria-label={category.name}
+                                className="
+                                    absolute
+                                    inset-0
+
+                                    block
+                                    h-full
+                                    w-full
+
+                                    object-cover
+                                    object-center
+
+                                    transform-gpu
+                                    backface-hidden
+
+                                    will-change-transform
+
+                                    transition-transform
+                                    duration-700
+                                    ease-[cubic-bezier(0.22,1,0.36,1)]
+
+                                    group-hover:scale-[1.015]
+                                "
+                            />
+                        </div>
                     ) : (
                         <div
                             className="
                                 flex
-                                h-[68svh]
-                                min-h-[500px]
+                                aspect-video
                                 w-full
                                 items-center
                                 justify-center
-
-                                sm:h-[72svh]
-                                sm:min-h-[560px]
-
-                                lg:h-[78svh]
-                                lg:min-h-[620px]
-
                                 bg-neutral-100
                             "
                         >
@@ -136,6 +145,7 @@ export default function CategoryShowcase({
                             pointer-events-none
                             absolute
                             inset-0
+                            z-[1]
 
                             bg-gradient-to-t
                             from-black/75
@@ -144,12 +154,15 @@ export default function CategoryShowcase({
                         "
                     />
 
-                    {/* Side atmosphere */}
+                    {/* =================================================
+                        SIDE ATMOSPHERE
+                    ================================================== */}
                     <div
                         className="
                             pointer-events-none
                             absolute
                             inset-0
+                            z-[1]
 
                             bg-gradient-to-r
                             from-black/25
@@ -220,6 +233,7 @@ export default function CategoryShowcase({
                                     md:justify-between
                                 "
                             >
+
                                 {/* =================================================
                                     CATEGORY TITLE
                                 ================================================== */}
@@ -269,6 +283,7 @@ export default function CategoryShowcase({
                                     href={`/store/category/${category.slug}`}
                                     className="
                                         group/cta
+
                                         inline-flex
                                         w-fit
                                         shrink-0
@@ -278,6 +293,7 @@ export default function CategoryShowcase({
                                         rounded-full
 
                                         bg-[var(--color-primary)]
+
                                         px-5
                                         py-3
 
@@ -287,8 +303,10 @@ export default function CategoryShowcase({
                                         tracking-[0.12em]
                                         text-black
 
-                                        transition-all
-                                        duration-500
+                                        transform-gpu
+
+                                        transition-transform
+                                        duration-300
                                         ease-out
 
                                         hover:scale-105
@@ -310,8 +328,10 @@ export default function CategoryShowcase({
                                             bg-black
                                             text-white
 
+                                            transform-gpu
+
                                             transition-transform
-                                            duration-500
+                                            duration-300
 
                                             group-hover/cta:translate-x-1
                                         "
@@ -350,7 +370,10 @@ export default function CategoryShowcase({
                         xl:px-20
                     "
                 >
-                    {/* Products header */}
+
+                    {/* =================================================
+                        PRODUCTS HEADER
+                    ================================================== */}
                     <div
                         className="
                             mb-8
@@ -418,6 +441,8 @@ export default function CategoryShowcase({
                                     h-4
                                     w-4
 
+                                    transform-gpu
+
                                     transition-transform
                                     duration-300
 
@@ -427,6 +452,9 @@ export default function CategoryShowcase({
                         </a>
                     </div>
 
+                    {/* =================================================
+                        PRODUCT CAROUSEL
+                    ================================================== */}
                     <ProductCarousel products={products} />
                 </div>
             )}
