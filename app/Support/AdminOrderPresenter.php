@@ -40,6 +40,7 @@ class AdminOrderPresenter
             'payment_method' => $order->payment_method,
             'transaction_id' => $order->transaction_id,
             'total_amount' => $order->total_amount,
+            'shipping_fee' => $order->shipping_fee,
             'customer' => [
                 'name' => $order->customer_name,
                 'email' => $order->customer_email,

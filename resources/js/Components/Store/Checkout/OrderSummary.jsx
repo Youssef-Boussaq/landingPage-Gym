@@ -6,6 +6,10 @@ export default function OrderSummary({ cart = [] }) {
         0
     );
 
+    const shipping = subtotal > 250 ? 0 : 35;
+    const totalAmount = subtotal + shipping;
+    const amountForFreeShipping = 250 - subtotal;
+
     return (
         <aside className="rounded-2xl border border-slate-200 bg-white p-6">
 
@@ -77,27 +81,59 @@ export default function OrderSummary({ cart = [] }) {
 
             <div className="my-6 border-t border-slate-200" />
 
-            <div className="flex justify-between text-sm">
-                <span>Subtotal</span>
+            {/* Free Shipping UI */}
+            <div className="mb-6 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-xl shadow-sm">
+                        {subtotal > 250 ? '🎉' : '🚚'}
+                    </div>
+                    <div className="flex-1">
+                        {subtotal > 250 ? (
+                            <p className="font-bold text-green-600">
+                                Livraison gratuite offerte !
+                            </p>
+                        ) : (
+                            <>
+                                <p className="font-bold text-slate-900">
+                                    Livraison 35 DH
+                                </p>
+                                <p className="mt-0.5 text-xs text-orange-500">
+                                    Ajoutez encore {amountForFreeShipping.toFixed(2)} DH pour profiter de la livraison gratuite.
+                                </p>
+                            </>
+                        )}
+                    </div>
+                </div>
+                {subtotal <= 250 && (
+                    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                        <div 
+                            className="h-full bg-slate-900 transition-all duration-500"
+                            style={{ width: `${Math.min((subtotal / 250) * 100, 100)}%` }}
+                        />
+                    </div>
+                )}
+            </div>
 
-                <span>
+            <div className="flex justify-between text-sm">
+                <span className="text-slate-500">Sous-total</span>
+                <span className="font-medium text-slate-900">
                     {subtotal.toFixed(2)} DH
                 </span>
             </div>
 
             <div className="mt-3 flex justify-between text-sm">
-                <span>Shipping</span>
-
-                <span>Free</span>
+                <span className="text-slate-500">Livraison</span>
+                <span className="font-medium text-slate-900">
+                    {shipping === 0 ? 'Offerte' : `${shipping.toFixed(2)} DH`}
+                </span>
             </div>
 
             <div className="my-4 border-t border-slate-200" />
 
             <div className="flex justify-between text-lg font-bold">
-                <span>Total</span>
-
-                <span>
-                    {subtotal.toFixed(2)} DH
+                <span className="text-slate-900">Total</span>
+                <span className="text-slate-900">
+                    {totalAmount.toFixed(2)} DH
                 </span>
             </div>
 

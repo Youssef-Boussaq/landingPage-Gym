@@ -225,7 +225,7 @@ class CheckoutController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            $totalAmount = 0;
+            $subtotal = 0;
 
             foreach ($cart as $item) {
                 $product = $products->get($item['id']);
@@ -264,8 +264,11 @@ class CheckoutController extends Controller
 
                 $unitPrice = $product->sale_price ?? $product->price;
 
-                $totalAmount += (float) $unitPrice * $quantity;
+                $subtotal += (float) $unitPrice * $quantity;
             }
+
+            $shippingFee = $subtotal > 250 ? 0 : 35;
+            $totalAmount = $subtotal + $shippingFee;
 
             /*
             |--------------------------------------------------------------------------
@@ -297,6 +300,8 @@ class CheckoutController extends Controller
                 'payment_status' => PaymentStatus::PENDING,
 
                 'total_amount' => $totalAmount,
+
+                'shipping_fee' => $shippingFee,
 
                 'payment_method' => $validated['payment_method'],
 
@@ -451,6 +456,19 @@ class CheckoutController extends Controller
             })
             ->values()
             ->toArray();
+
+        if ($order->shipping_fee > 0) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => 'mad',
+                    'product_data' => [
+                        'name' => 'Frais de livraison',
+                    ],
+                    'unit_amount' => (int) round($order->shipping_fee * 100),
+                ],
+                'quantity' => 1,
+            ];
+        }
 
         /*
         |--------------------------------------------------------------------------
