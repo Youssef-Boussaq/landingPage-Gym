@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\StorePromotion;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -207,6 +208,17 @@ class ProductController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | Store Promotion
+        |--------------------------------------------------------------------------
+        */
+
+        $storePromotion = StorePromotion::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->first();
+
+        /*
+        |--------------------------------------------------------------------------
         | Inertia
         |--------------------------------------------------------------------------
         */
@@ -219,6 +231,7 @@ class ProductController extends Controller
             'trendingProducts' => $trendingProducts,
             'bestSellers' => $bestSellers,
             'offers' => $offers,
+            'storePromotion' => $storePromotion,
         ]);
     }
 

@@ -16,7 +16,6 @@ class StorePromotionRequest extends FormRequest
     {
         return [
             'type' => [
-                'required',
                 'string',
                 'max:50',
             ],

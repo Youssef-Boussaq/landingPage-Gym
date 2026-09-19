@@ -6,6 +6,7 @@ import { Link, router, useForm } from '@inertiajs/react';
 import { Loader2, ImagePlus, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 
+
 export default function Create() {
     const fileRef = useRef(null);
     const [preview, setPreview] = useState(null);
@@ -87,7 +88,7 @@ export default function Create() {
     };
 
     return (
-        <AdminLayout title="Nouveau produit">
+        <AdminLayout title="Nouvelle promotion">
             <AdminBreadcrumbs
                 items={[
                     { label: 'Admin', href: route('admin.dashboard') },

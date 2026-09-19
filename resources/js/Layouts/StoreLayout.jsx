@@ -6,6 +6,7 @@ import Header from '@/Components/Store/Header';
 import CartDrawer from '@/Components/Store/Cart/CartDrawer';
 
 
+
 function StoreLayoutContent({ children }) {
     const { auth } = usePage().props;
 
@@ -25,6 +26,8 @@ function StoreLayoutContent({ children }) {
                 user={user}
                 onOpenCart={openCart}
             />
+
+
 
             <main>
                 {children}

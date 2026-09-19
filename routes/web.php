@@ -89,7 +89,7 @@ Route::middleware(['auth', 'admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
-            ->name('admin');
+            ->name('dashboard');
 
         Route::resource(
     'store-promotions',

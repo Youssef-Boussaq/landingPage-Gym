@@ -7,6 +7,7 @@ import Footer from '@/Components/Landing/Footer';
 import EmptyProducts from '@/Components/Store/EmptyProducts';
 import CategoryShowcase from '@/Components/Store/CategoryShowcase';
 import CategorySection from '@/Components/Store/CategorySection';
+import PromotionBanner from '@/Components/Store/PromotionBanner';
 
 /* -------------------------------------------------------------------------- */
 /* COMPOSANT D'EN-TÊTE DE SECTION (Avec Animations & Descriptions)           */
@@ -71,6 +72,7 @@ export default function StoreIndex({
     trendingProducts = [],
     bestSellers = [],
     offers = [],
+    storePromotion,
 }) {
     const isCategoryPage = Boolean(selectedCategory);
     console.log("categories", categories);
@@ -79,6 +81,7 @@ export default function StoreIndex({
         <StoreLayout>
             <Head title="Boutique" />
 
+            <PromotionBanner promotion={storePromotion} />
             <div className="w-full min-h-screen font-inter py-6 mt-14 sm:mt-16 sm:py-12 text-slate-900 dark:text-slate-100">
                 <main className="w-full mt-4 sm:mt-8">
                     {products.length === 0 ? (

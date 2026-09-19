@@ -30,6 +30,7 @@ class StorePromotionController extends Controller
         return Inertia::render('Admin/StorePromotions/Create');
     }
 
+
     public function store(StorePromotionRequest $request): RedirectResponse
     {
         $data = $request->validated();

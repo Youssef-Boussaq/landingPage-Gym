@@ -107,7 +107,7 @@ export default function Edit({ promotion }) {
     };
 
     return (
-        <AdminLayout title="Nouveau produit">
+        <AdminLayout title="Modifier la promotion">
             <AdminBreadcrumbs
                 items={[
                     { label: 'Admin', href: route('admin.dashboard') },

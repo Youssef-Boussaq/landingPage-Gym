@@ -15,7 +15,7 @@ class UpdateStorePromotionRequest extends FormRequest
     {
         return [
             'type' => [
-                'required',
+               
                 'string',
                 'max:50',
             ],
