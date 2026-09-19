@@ -11,10 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('store_promotions', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+       Schema::create('store_promotions', function (Blueprint $table) {
+    $table->id();
+
+    $table->string('type')->default('free_shipping');
+
+    $table->string('title');
+    $table->text('description')->nullable();
+
+    $table->string('image')->nullable();
+
+    $table->boolean('is_active')->default(true);
+
+    $table->unsignedInteger('sort_order')->default(0);
+
+    $table->timestamps();
+});
     }
 
     /**

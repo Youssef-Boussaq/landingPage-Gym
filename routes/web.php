@@ -10,7 +10,7 @@ use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\NotificationController;
 
 use App\Http\Controllers\OrderController;
-
+use App\Http\Controllers\Admin\StorePromotionController;
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -89,7 +89,12 @@ Route::middleware(['auth', 'admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
-            ->name('dashboard');
+            ->name('admin');
+
+        Route::resource(
+    'store-promotions',
+    StorePromotionController::class
+)->except(['show']);
 
         Route::get('/orders', [App\Http\Controllers\Admin\OrderController::class, 'index'])
             ->name('orders.index');
@@ -146,6 +151,7 @@ Route::middleware(['auth', 'admin'])
 
         Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])
             ->name('settings');
+        
     });
 
 require __DIR__.'/auth.php';

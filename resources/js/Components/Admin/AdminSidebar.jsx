@@ -8,6 +8,7 @@ import {
     Bell,
     BarChart3,
     Settings,
+    Megaphone,
 } from 'lucide-react';
 
 const items = [
@@ -19,6 +20,7 @@ const items = [
     { label: 'Notifications', href: 'admin.notifications.index', icon: Bell, badge: 'unreadNotificationsCount' },
     { label: 'Analytics', href: 'admin.dashboard', icon: BarChart3 },
     { label: 'Settings', href: 'admin.settings', icon: Settings },
+    { label: 'Store Promotions', href: 'admin.store-promotions.index', icon: Megaphone },
 ];
 
 export default function AdminSidebar({ onNavigate }) {
@@ -31,10 +33,10 @@ export default function AdminSidebar({ onNavigate }) {
                 const active = route().current(item.href) || (
                     item.href === 'admin.orders.index' && route().current('admin.orders.*')
                 ) || (
-                    item.href === 'admin.products.index' && route().current('admin.products.*')
-                ) || (
-                    item.href === 'admin.customers.index' && route().current('admin.customers.*')
-                );
+                        item.href === 'admin.products.index' && route().current('admin.products.*')
+                    ) || (
+                        item.href === 'admin.customers.index' && route().current('admin.customers.*')
+                    );
 
                 const count = item.badge ? adminNav?.[item.badge] : 0;
 
@@ -43,11 +45,10 @@ export default function AdminSidebar({ onNavigate }) {
                         key={item.label}
                         href={route(item.href)}
                         onClick={onNavigate}
-                        className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
-                            active
-                                ? 'bg-white/10 text-[#9de500]'
-                                : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                        }`}
+                        className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold transition ${active
+                            ? 'bg-white/10 text-[#9de500]'
+                            : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                            }`}
                     >
                         <span className="inline-flex items-center gap-3">
                             <Icon className="h-4 w-4" />
