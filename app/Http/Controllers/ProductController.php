@@ -243,6 +243,8 @@ class ProductController extends Controller
             'images',
         ])->findOrFail($id);
 
+        
+
         return Inertia::render('Store/Products/Show', [
             'product' => $product,
         ]);

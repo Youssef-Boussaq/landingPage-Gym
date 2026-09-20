@@ -29,6 +29,7 @@ use HasFactory, SoftDeletes;
         'price',
         'sale_price',
         'stock_quantity',
+        'reserved_quantity',
         'manage_stock',
         'is_active',
     ];
@@ -40,9 +41,15 @@ use HasFactory, SoftDeletes;
             'price' => 'decimal:2',
             'sale_price' => 'decimal:2',
             'stock_quantity' => 'integer',
+            'reserved_quantity' => 'integer',
             'manage_stock' => 'boolean',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function getAvailableStockAttribute(): int
+    {
+        return max(0, $this->stock_quantity - $this->reserved_quantity);
     }
 
     // Catégories du produit

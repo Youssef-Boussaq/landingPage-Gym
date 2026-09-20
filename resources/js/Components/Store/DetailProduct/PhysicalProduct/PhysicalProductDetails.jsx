@@ -13,13 +13,62 @@ export default function PhysicalProductDetails({
     selectedVariant,
     onVariantSelect,
     onAddToCart,
-    onBuyNow
+    onBuyNow,
 }) {
-    const isOutOfStock = product.stock <= 0;
-    const totalPrice = product.price * quantity;
+    const manageStock = Boolean(product.manage_stock);
+
+    const stockQuantity = Number(product.stock_quantity ?? 0);
+    const reservedQuantity = Number(product.reserved_quantity ?? 0);
+
+    // Stock réellement disponible
+    const availableStock = Math.max(
+        0,
+        stockQuantity - reservedQuantity
+    );
+
+    const isOutOfStock =
+        manageStock && availableStock <= 0;
+
+    // Maximum selectable quantity
+    const maxQuantity = manageStock
+        ? availableStock
+        : 99;
+
+    const totalPrice =
+        Number(product.sale_price ?? product.price ?? 0) * quantity;
+
+    const handleQuantityChange = (newQuantity) => {
+        let nextQuantity = Number(newQuantity);
+
+        if (!Number.isFinite(nextQuantity)) {
+            return;
+        }
+
+        nextQuantity = Math.floor(nextQuantity);
+
+        if (nextQuantity < 1) {
+            nextQuantity = 1;
+        }
+
+        // Si le stock est géré
+        if (manageStock) {
+            if (availableStock <= 0) {
+                onQuantityChange(1);
+                return;
+            }
+
+            nextQuantity = Math.min(
+                nextQuantity,
+                availableStock
+            );
+        }
+
+        onQuantityChange(nextQuantity);
+    };
 
     return (
         <div className="space-y-6">
+
             <ProductVariants
                 variants={product.variants}
                 selectedVariant={selectedVariant}
@@ -27,11 +76,15 @@ export default function PhysicalProductDetails({
             />
 
             <div className="flex flex-wrap items-end gap-6 pt-4 border-t border-slate-100">
+
                 <ProductQuantity
                     quantity={quantity}
-                    onQuantityChange={onQuantityChange}
-                    max={product.stock_quantity || 99}
+                    onQuantityChange={handleQuantityChange}
+                    max={maxQuantity}
+                    availableStock={availableStock}
+                    manageStock={manageStock}
                 />
+
                 <div className="flex flex-col gap-1">
                     <span className="font-inter text-sm text-slate-500">
                         Total
@@ -43,8 +96,13 @@ export default function PhysicalProductDetails({
                 </div>
 
                 <div className="flex-1 min-w-[200px]">
-                    <StockInfo inStock={!isOutOfStock} stockCount={product.stock} />
+                    <StockInfo
+                        manageStock={manageStock}
+                        inStock={!isOutOfStock}
+                        stockCount={availableStock}
+                    />
                 </div>
+
             </div>
 
             <ProductActions
@@ -54,6 +112,7 @@ export default function PhysicalProductDetails({
             />
 
             <ShippingInfo />
+
         </div>
     );
 }

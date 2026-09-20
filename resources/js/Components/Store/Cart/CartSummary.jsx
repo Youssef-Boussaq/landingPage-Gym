@@ -11,6 +11,11 @@ export default function CartSummary({ items = [] }) {
     const totalAmount = subtotal + shipping;
     const amountForFreeShipping = 250 - subtotal;
 
+    // Bloquer checkout si au moins un produit est en rupture de stock
+    const hasUnavailable = items.some(
+        (item) => item.stock_available === false
+    );
+
     return (
         <div className="shrink-0 border-t border-slate-200 bg-white px-6 py-5">
             {/* Free Shipping UI */}
@@ -38,7 +43,7 @@ export default function CartSummary({ items = [] }) {
                 </div>
                 {subtotal <= 250 && (
                     <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
-                        <div 
+                        <div
                             className="h-full bg-slate-900 transition-all duration-500"
                             style={{ width: `${Math.min((subtotal / 250) * 100, 100)}%` }}
                         />
@@ -65,10 +70,20 @@ export default function CartSummary({ items = [] }) {
             </div>
 
             {/* Checkout */}
+            {hasUnavailable && (
+                <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-700">
+                    Certains produits ne sont plus disponibles. Veuillez les supprimer pour continuer.
+                </p>
+            )}
             <button
                 type="button"
-                className="mt-5 w-full rounded-full bg-black px-5 py-4 text-sm font-bold text-white transition hover:bg-slate-800"
-                onClick={() => router.get(route('checkout.index'))}
+                disabled={hasUnavailable}
+                className={`mt-5 w-full rounded-full px-5 py-4 text-sm font-bold text-white transition ${
+                    hasUnavailable
+                        ? 'cursor-not-allowed bg-slate-300'
+                        : 'bg-black hover:bg-slate-800'
+                }`}
+                onClick={() => !hasUnavailable && router.get(route('checkout.index'))}
             >
                 PASSER LA COMMANDE
             </button>

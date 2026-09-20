@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 
 import CustomerInformation from './CustomerInformation';
@@ -7,14 +9,12 @@ import CheckoutSubmit from './CheckoutSubmit';
 
 import useCheckout from '../../../hooks/Store/Checkout/useCheckout';
 
-
-
-
 export default function CheckoutForm({
     isAuthenticated,
     user,
+    checkoutMode = 'cart',
 }) {
-    const checkout = useCheckout();
+    const checkout = useCheckout(checkoutMode);
 
     return (
         <form onSubmit={checkout.submit}>
@@ -49,5 +49,6 @@ export default function CheckoutForm({
             />
 
         </form>
-    );
+    )
+
 }

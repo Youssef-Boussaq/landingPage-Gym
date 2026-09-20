@@ -53,6 +53,9 @@ Route::post('/checkout', [CheckoutController::class, 'store'])
     ->name('checkout.store');
 Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])
     ->name('checkout.success');
+Route::post('/checkout/buy-now', [CheckoutController::class, 'buyNow'])
+    ->name('checkout.buy-now');
+
 
 Route::get('/checkout/cancel/{order}', [CheckoutController::class, 'cancel'])
     ->name('checkout.cancel');

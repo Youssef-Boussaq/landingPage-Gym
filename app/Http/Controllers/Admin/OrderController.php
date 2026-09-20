@@ -95,9 +95,12 @@ class OrderController extends Controller
 
     public function updateStatus(AdminOrderStatusRequest $request, Order $order): RedirectResponse
     {
-        $order->update([
-            'status' => $request->enum('status', OrderStatus::class),
-        ]);
+        $this->authorize('update', $order);
+
+        \App\Support\OrderStatusTransition::change(
+            $order,
+            $request->enum('status', OrderStatus::class)
+        );
 
         return back()->with('success', 'Statut de la commande mis à jour.');
     }

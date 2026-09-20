@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 
 import CheckoutForm from '@/Components/Store/Checkout/CheckoutForm';
@@ -7,6 +9,7 @@ export default function Index({
     cart,
     isAuthenticated,
     user,
+    checkoutMode = 'cart',
 }) {
     return (
         <div className="mx-auto max-w-7xl px-4 py-10">
@@ -22,6 +25,7 @@ export default function Index({
                     <CheckoutForm
                         isAuthenticated={isAuthenticated}
                         user={user}
+                        checkoutMode={checkoutMode}
                     />
 
                 </div>
@@ -34,4 +38,5 @@ export default function Index({
 
         </div>
     );
+
 }

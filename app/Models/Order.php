@@ -24,6 +24,8 @@ class Order extends Model
     'shipping_fee',
     'payment_method',
     'transaction_id',
+    'stripe_session_id',
+    'stripe_payment_intent_id',
 
     'customer_name',
     'customer_email',
@@ -32,6 +34,11 @@ class Order extends Model
     'shipping_address',
     'city',
     'postal_code',
+    
+    'shipped_at',
+    'delivered_at',
+    'returned_at',
+    'cancelled_at',
 ];
 
     protected function casts(): array
@@ -40,6 +47,10 @@ class Order extends Model
         'status' => \App\Enums\OrderStatus::class,
         'payment_status' => \App\Enums\PaymentStatus::class,
         'total_amount' => 'decimal:2',
+        'shipped_at' => 'datetime',
+        'delivered_at' => 'datetime',
+        'returned_at' => 'datetime',
+        'cancelled_at' => 'datetime',
     ];
 }
 

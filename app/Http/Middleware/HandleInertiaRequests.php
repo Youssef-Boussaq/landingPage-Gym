@@ -9,6 +9,7 @@ use App\Enums\OrderStatus;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\Cart\CartSynchronizer;
 use App\Support\CustomerIdentity;
 use Illuminate\Support\Facades\Cache;
 
@@ -39,9 +40,15 @@ class HandleInertiaRequests extends Middleware
 
 public function share(Request $request): array
 {
-    $cart = session()->get('cart', []);
+    // ── Synchronisation cart ↔ stock DB ─────────────────────────────────
+    // CartSynchronizer charge les produits, corrige les quantités obsolètes,
+    // persiste la session propre, et retourne le cart enrichi avec les
+    // flags UI (stock_available, stock_adjusted, available_stock).
+    $sync = app(CartSynchronizer::class)->synchronize();
+    $cart = $sync['cart'];
+
     $user = $request->user();
-    
+
     return [
         ...parent::share($request),
 

@@ -1,20 +1,120 @@
 import { Link } from '@inertiajs/react';
-import { CheckCircle, Package, ArrowRight } from 'lucide-react';
+import {
+    CheckCircle,
+    Package,
+    ArrowRight,
+    LoaderCircle,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 
+export default function Success({ order, paymentPending = false }) {
+    const [isPaid, setIsPaid] = useState(!paymentPending);
 
-export default function Success({ order }) {
+    useEffect(() => {
+        if (!paymentPending) {
+            return;
+        }
+
+        let attempts = 0;
+        const maxAttempts = 30;
+
+        const checkPayment = async () => {
+            try {
+                const response = await fetch(
+                    `/checkout/success/${order.id}/status`,
+                    {
+                        headers: {
+                            Accept: 'application/json',
+                        },
+                        credentials: 'same-origin',
+                    }
+                );
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.paid) {
+                    setIsPaid(true);
+
+                    // Reload page once so Laravel returns
+                    // the final confirmed state.
+                    window.location.reload();
+
+                    return;
+                }
+
+                attempts++;
+
+                if (attempts >= maxAttempts) {
+                    clearInterval(interval);
+                }
+            } catch (error) {
+                console.error(
+                    'Payment status check failed:',
+                    error
+                );
+            }
+        };
+
+        checkPayment();
+
+        const interval = setInterval(checkPayment, 1000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [paymentPending, order.id]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Waiting for Stripe webhook
+    |--------------------------------------------------------------------------
+    */
+
+    if (!isPaid) {
+        return (
+            <div className="min-h-screen bg-gray-50 py-20">
+                <div className="mx-auto max-w-xl px-4 text-center">
+
+                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100">
+                        <LoaderCircle className="h-8 w-8 animate-spin text-yellow-600" />
+                    </div>
+
+                    <h1 className="text-2xl font-bold text-gray-900">
+                        Paiement en cours de confirmation
+                    </h1>
+
+                    <p className="mt-3 text-gray-600">
+                        Votre paiement a été reçu par Stripe.
+                        Nous attendons encore la confirmation finale.
+                    </p>
+
+                    <p className="mt-2 text-sm text-gray-500">
+                        Commande #{order.order_number}
+                    </p>
+
+                </div>
+            </div>
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Confirmed
+    |--------------------------------------------------------------------------
+    */
 
     return (
         <div className="min-h-screen bg-gray-50 py-12">
             <div className="mx-auto max-w-4xl px-4">
 
-                {/* Success Header */}
                 <div className="mb-8 text-center">
 
                     <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                        <CheckCircle
-                            className="h-9 w-9 text-green-600"
-                        />
+                        <CheckCircle className="h-9 w-9 text-green-600" />
                     </div>
 
                     <h1 className="text-3xl font-bold text-gray-900">
@@ -31,15 +131,11 @@ export default function Success({ order }) {
 
                 </div>
 
-
-                {/* Order Card */}
                 <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
 
-                    {/* Header */}
                     <div className="border-b px-6 py-5">
 
                         <div className="flex items-center gap-3">
-
                             <Package className="h-6 w-6 text-gray-700" />
 
                             <div>
@@ -51,13 +147,10 @@ export default function Success({ order }) {
                                     #{order.order_number}
                                 </p>
                             </div>
-
                         </div>
 
                     </div>
 
-
-                    {/* Items */}
                     <div className="divide-y">
 
                         {order.items.map((item) => {
@@ -73,13 +166,14 @@ export default function Success({ order }) {
                                     className="flex items-center gap-4 p-6"
                                 >
 
-                                    {/* Image */}
                                     <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-gray-100">
 
                                         {image ? (
                                             <img
                                                 src={
-                                                    image?.startsWith('/storage/')
+                                                    image.startsWith(
+                                                        '/storage/'
+                                                    )
                                                         ? image
                                                         : `/storage/${image}`
                                                 }
@@ -94,8 +188,6 @@ export default function Success({ order }) {
 
                                     </div>
 
-
-                                    {/* Product */}
                                     <div className="min-w-0 flex-1">
 
                                         <h3 className="font-medium text-gray-900">
@@ -108,19 +200,19 @@ export default function Success({ order }) {
 
                                     </div>
 
-
-                                    {/* Price */}
                                     <div className="text-right">
 
                                         <p className="font-semibold text-gray-900">
                                             {(
                                                 Number(item.unit_price) *
                                                 item.quantity
-                                            ).toFixed(2)} MAD
+                                            ).toFixed(2)}{' '}
+                                            MAD
                                         </p>
 
                                         <p className="text-xs text-gray-500">
-                                            {Number(item.unit_price).toFixed(2)} MAD / unité
+                                            {Number(item.unit_price).toFixed(2)}{' '}
+                                            MAD / unité
                                         </p>
 
                                     </div>
@@ -131,8 +223,6 @@ export default function Success({ order }) {
 
                     </div>
 
-
-                    {/* Total */}
                     <div className="border-t bg-gray-50 px-6 py-5">
 
                         <div className="flex items-center justify-between">
@@ -151,8 +241,6 @@ export default function Success({ order }) {
 
                 </div>
 
-
-                {/* Actions */}
                 <div className="mt-8 flex justify-center">
 
                     <Link

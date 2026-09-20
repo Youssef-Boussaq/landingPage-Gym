@@ -1,20 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, ShoppingBag } from 'lucide-react';
 
 import CartItem from './CartItem';
 import CartSummary from './CartSummary';
-import { useState, useEffect } from 'react';
 
-import { updateCartQuantity } from '../../../services/cartService';
-import { removeFromCart } from '../../../services/cartService';
+import {
+    updateCartQuantity,
+    removeFromCart,
+} from '../../../services/cartService';
 
-export default function CartDrawer({ isOpen, onClose, items = {}, count = 0 }) {
-    const [cartItems, setCartItems] = useState(() => Object.values(items ?? {}));
+export default function CartDrawer({
+    isOpen,
+    onClose,
+    items = {},
+    count = 0,
+}) {
+    const [cartItems, setCartItems] = useState(
+        () => Object.values(items ?? {})
+    );
+
     useEffect(() => {
         setCartItems(Object.values(items ?? {}));
     }, [items]);
 
     const handleQuantityChange = (item, newQuantity) => {
+        const previousQuantity = Number(item.quantity);
+
         setCartItems((currentItems) =>
             currentItems.map((currentItem) =>
                 currentItem.id === item.id
@@ -29,9 +40,36 @@ export default function CartDrawer({ isOpen, onClose, items = {}, count = 0 }) {
         updateCartQuantity(
             item.id,
             newQuantity,
-            item.variant_id
+            item.variant_id,
+            {
+                onSuccess: () => {
+                    // Laravel accepted the quantity.
+                },
+
+                onError: (errors) => {
+                    setCartItems((currentItems) =>
+                        currentItems.map((currentItem) =>
+                            currentItem.id === item.id
+                                ? {
+                                    ...currentItem,
+                                    quantity: previousQuantity,
+                                }
+                                : currentItem
+                        )
+                    );
+
+                    const message =
+                        errors?.quantity ||
+                        errors?.cart ||
+                        'Impossible de mettre à jour la quantité.';
+
+                    // Temporary user-facing feedback
+                    window.alert(message);
+                },
+            }
         );
     };
+
     const handleDelete = (item) => {
         removeFromCart(
             item.id,
@@ -40,7 +78,8 @@ export default function CartDrawer({ isOpen, onClose, items = {}, count = 0 }) {
                 onSuccess: () => {
                     setCartItems((currentItems) =>
                         currentItems.filter(
-                            (currentItem) => currentItem.id !== item.id
+                            (currentItem) =>
+                                currentItem.id !== item.id
                         )
                     );
                 },
@@ -56,13 +95,15 @@ export default function CartDrawer({ isOpen, onClose, items = {}, count = 0 }) {
                 className={`fixed inset-0 z-[90] bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${isOpen
                     ? 'visible opacity-100'
                     : 'pointer-events-none invisible opacity-0'
-                    } `}
+                    }`}
             />
 
             {/* Drawer */}
             <aside
-                className={`fixed right-0 top-0 z-[100] flex h-screen w-full max-w-md flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
-                    } `}
+                className={`fixed right-0 top-0 z-[100] flex h-screen w-full max-w-md flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out ${isOpen
+                    ? 'translate-x-0'
+                    : 'translate-x-full'
+                    }`}
             >
                 {/* Header */}
                 <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-6 py-5">
@@ -72,7 +113,8 @@ export default function CartDrawer({ isOpen, onClose, items = {}, count = 0 }) {
                         </h2>
 
                         <p className="mt-1 text-xs text-slate-500">
-                            {count} article{count > 1 ? 's' : ''}
+                            {count} article
+                            {count > 1 ? 's' : ''}
                         </p>
                     </div>
 
@@ -98,7 +140,7 @@ export default function CartDrawer({ isOpen, onClose, items = {}, count = 0 }) {
                     ) : (
                         cartItems.map((item) => (
                             <CartItem
-                                key={item.id}
+                                key={`${item.id}-${item.variant_id ?? 'default'}`}
                                 item={item}
                                 onQuantityChange={handleQuantityChange}
                                 onDelete={handleDelete}
@@ -108,7 +150,9 @@ export default function CartDrawer({ isOpen, onClose, items = {}, count = 0 }) {
                 </div>
 
                 {/* Footer */}
-                {count > 0 && <CartSummary items={cartItems} />}
+                {count > 0 && (
+                    <CartSummary items={cartItems} />
+                )}
             </aside>
         </>
     );
