@@ -3,10 +3,9 @@
 namespace App\Services\Checkout;
 
 use App\Events\OrderCreated;
-use App\Models\Order;
-use App\Support\CustomerIdentity;
-use App\Services\Stripe\StripeCheckoutService;
 use App\Services\Orders\InventoryService;
+use App\Services\Stripe\StripeCheckoutService;
+use App\Support\CustomerIdentity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -25,35 +24,41 @@ class CheckoutService
 
         $checkoutMode = $validated['checkout_mode'];
 
-        // ── CART ─────────────────────────────────────────────────────────────
+        /*
+        |--------------------------------------------------------------------------
+        | 1. Determine checkout source
+        |--------------------------------------------------------------------------
+        */
+
         if ($checkoutMode === 'cart') {
             $cart = session('cart', []);
 
             if (empty($cart)) {
                 throw new \RuntimeException('Votre panier est vide.');
             }
-        }
-
-        // ── BUY NOW ───────────────────────────────────────────────────────────
-        // Lit uniquement session('buy_now'). Ne touche JAMAIS session('cart').
-        elseif ($checkoutMode === 'buy_now') {
+        } elseif ($checkoutMode === 'buy_now') {
             $buyNow = session('buy_now');
 
             if (!$buyNow) {
                 throw new \RuntimeException('Aucun achat direct en cours.');
             }
 
-            // Même structure qu'attend CartCalculator : ['id', 'quantity']
-            // Le prix et le stock viennent de la DB via CartCalculator.
-            $cart = [[
-                'id'       => (int) $buyNow['product_id'],
-                'quantity' => (int) $buyNow['quantity'],
-            ]];
-        }
-
-        else {
+            $cart = [
+                [
+                    'id'       => (int) $buyNow['product_id'],
+                    'quantity' => (int) $buyNow['quantity'],
+                    'variant_id' => $buyNow['variant_id'] ?? null,
+                ],
+            ];
+        } else {
             throw new \RuntimeException('Mode de commande invalide.');
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 2. Customer identity
+        |--------------------------------------------------------------------------
+        */
 
         $userId = $identity->userId();
         $guestToken = $identity->guestToken();
@@ -63,8 +68,26 @@ class CheckoutService
             $customerEmail = $request->user()->email;
         } else {
             $customerName = $validated['customer_name'];
-            $customerEmail = $validated['customer_email'];
+            $customerEmail = $validated['customer_email'] ?? null;
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 3. Create order + reserve stock atomically
+        |--------------------------------------------------------------------------
+        |
+        | IMPORTANT:
+        |
+        | Order creation and stock reservation are in the SAME transaction.
+        |
+        | If stock is insufficient:
+        | - Order is rolled back
+        | - OrderItems are rolled back
+        | - Attribution is rolled back
+        | - InventoryMovement is rolled back
+        | - reserved_quantity changes are rolled back
+        |
+        */
 
         $order = DB::transaction(function () use (
             $request,
@@ -75,7 +98,19 @@ class CheckoutService
             $customerName,
             $customerEmail
         ) {
+            /*
+            |--------------------------------------------------------------------------
+            | Calculate cart using fresh DB prices / stock
+            |--------------------------------------------------------------------------
+            */
+
             $calculation = $this->cartCalculator->calculate($cart);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Create Order + OrderItems
+            |--------------------------------------------------------------------------
+            */
 
             $order = $this->orderCreator->create(
                 validated: $validated,
@@ -87,29 +122,64 @@ class CheckoutService
                 customerEmail: $customerEmail,
             );
 
+            /*
+            |--------------------------------------------------------------------------
+            | Attribution
+            |--------------------------------------------------------------------------
+            */
+
             $order->attribution()->create([
-                'utm_source' => $request->input('utm_source'),
-                'utm_medium' => $request->input('utm_medium'),
+                'utm_source'   => $request->input('utm_source'),
+                'utm_medium'   => $request->input('utm_medium'),
                 'utm_campaign' => $request->input('utm_campaign'),
-                'utm_content' => $request->input('utm_content'),
-                'fbclid' => $request->input('fbclid'),
-                'gclid' => $request->input('gclid'),
-                'referer_url' => $request->header('referer'),
+                'utm_content'  => $request->input('utm_content'),
+                'fbclid'       => $request->input('fbclid'),
+                'gclid'        => $request->input('gclid'),
+                'referer_url'  => $request->header('referer'),
             ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | CASH → Reserve stock immediately
+            |--------------------------------------------------------------------------
+            |
+            | This MUST happen before the transaction commits.
+            |
+            */
+
+            if ($validated['payment_method'] === 'cash') {
+                $this->inventoryService->reserveStock($order);
+            }
 
             return $order;
         });
 
+        /*
+        |--------------------------------------------------------------------------
+        | 4. Event after successful transaction
+        |--------------------------------------------------------------------------
+        */
+
         OrderCreated::dispatch($order);
 
-        if ($validated['payment_method'] === 'cash') {
-            $this->inventoryService->reserveStock($order);
+        /*
+        |--------------------------------------------------------------------------
+        | 5. CASH
+        |--------------------------------------------------------------------------
+        */
 
+        if ($validated['payment_method'] === 'cash') {
             return [
-                'type' => 'cash',
+                'type'  => 'cash',
                 'order' => $order,
             ];
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 6. STRIPE
+        |--------------------------------------------------------------------------
+        */
 
         $stripeSession = $this->stripeCheckout->createSession(
             $order,
@@ -117,14 +187,14 @@ class CheckoutService
         );
 
         $order->update([
-            'transaction_id' => $stripeSession->id,
-            'stripe_session_id' => $stripeSession->id,
+            'transaction_id'          => $stripeSession->id,
+            'stripe_session_id'       => $stripeSession->id,
             'stripe_payment_intent_id' => $stripeSession->payment_intent,
         ]);
 
         return [
-            'type' => 'stripe',
-            'order' => $order,
+            'type'    => 'stripe',
+            'order'   => $order,
             'session' => $stripeSession,
         ];
     }

@@ -13,34 +13,41 @@ class InventoryService
      * Reserve stock for an order (e.g. CASH).
      */
     public function reserveStock(Order $order): void
-    {
-        DB::transaction(function () use ($order) {
-            foreach ($order->items as $item) {
-                $product = Product::whereKey($item->product_id)->lockForUpdate()->first();
+{
+    foreach ($order->items as $item) {
+        $product = Product::whereKey($item->product_id)
+            ->lockForUpdate()
+            ->first();
 
-                if (!$product || !$product->manage_stock) {
-                    continue;
-                }
+        if (!$product || !$product->manage_stock) {
+            continue;
+        }
 
-                if ($product->available_stock < $item->quantity) {
-                    throw new \RuntimeException("Stock insuffisant pour le produit: {$product->title}");
-                }
+        if ($product->available_stock < $item->quantity) {
+            throw new \RuntimeException(
+                "Stock insuffisant pour le produit : {$product->title}"
+            );
+        }
 
-                // Create movement (idempotent due to DB unique constraint idx_unique_movement)
-                $movement = InventoryMovement::firstOrCreate([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'type' => 'reserve',
-                ], [
-                    'quantity' => $item->quantity,
-                ]);
+        $movement = InventoryMovement::firstOrCreate(
+            [
+                'order_id'   => $order->id,
+                'product_id' => $product->id,
+                'type'       => 'reserve',
+            ],
+            [
+                'quantity' => $item->quantity,
+            ]
+        );
 
-                if ($movement->wasRecentlyCreated) {
-                    $product->increment('reserved_quantity', $item->quantity);
-                }
-            }
-        });
+        if ($movement->wasRecentlyCreated) {
+            $product->increment(
+                'reserved_quantity',
+                $item->quantity
+            );
+        }
     }
+}
 
     /**
      * Release previously reserved stock (e.g. order cancelled before shipment).
