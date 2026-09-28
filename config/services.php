@@ -39,5 +39,19 @@ return [
         'secret' => env('STRIPE_SECRET'),
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
+    'ameex' => [
+    'base_url' => env(
+        'AMEEX_BASE_URL',
+        'https://api.ameex.app/customer'
+    ),
+
+    'api_id' => env('AMEEX_API_ID'),
+
+    'api_key' => env('AMEEX_API_KEY'),
+
+    'webhook_secret' => env('AMEEX_WEBHOOK_SECRET'),
+],
+
+
 
 ];

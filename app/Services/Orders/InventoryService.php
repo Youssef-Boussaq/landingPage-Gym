@@ -6,138 +6,210 @@ use App\Models\InventoryMovement;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 class InventoryService
 {
     /**
-     * Reserve stock for an order (e.g. CASH).
+     * Reserve stock for an order.
+     *
+     * Physical stock is NOT decreased here.
+     * Only reserved_quantity is increased.
      */
     public function reserveStock(Order $order): void
-{
-    foreach ($order->items as $item) {
-        $product = Product::whereKey($item->product_id)
-            ->lockForUpdate()
-            ->first();
+    {
+        DB::transaction(function () use ($order) {
+            foreach ($order->items as $item) {
+                $product = Product::query()
+                    ->whereKey($item->product_id)
+                    ->lockForUpdate()
+                    ->first();
 
-        if (!$product || !$product->manage_stock) {
-            continue;
-        }
+                if (!$product || !$product->manage_stock) {
+                    continue;
+                }
 
-        if ($product->available_stock < $item->quantity) {
-            throw new \RuntimeException(
-                "Stock insuffisant pour le produit : {$product->title}"
-            );
-        }
+                $quantity = (int) $item->quantity;
 
-        $movement = InventoryMovement::firstOrCreate(
-            [
-                'order_id'   => $order->id,
-                'product_id' => $product->id,
-                'type'       => 'reserve',
-            ],
-            [
-                'quantity' => $item->quantity,
-            ]
-        );
+                if ($quantity <= 0) {
+                    continue;
+                }
 
-        if ($movement->wasRecentlyCreated) {
-            $product->increment(
-                'reserved_quantity',
-                $item->quantity
-            );
-        }
+                if ($product->available_stock < $quantity) {
+                    throw new RuntimeException(
+                        "Stock insuffisant pour le produit : {$product->title}"
+                    );
+                }
+
+                $movement = InventoryMovement::firstOrCreate(
+                    [
+                        'order_id' => $order->id,
+                        'product_id' => $product->id,
+                        'type' => 'reserve',
+                    ],
+                    [
+                        'quantity' => $quantity,
+                    ]
+                );
+
+                if ($movement->wasRecentlyCreated) {
+                    $product->increment('reserved_quantity', $quantity);
+                }
+            }
+        });
     }
-}
 
     /**
-     * Release previously reserved stock (e.g. order cancelled before shipment).
+     * Release a previous reservation.
+     *
+     * Physical stock is NOT changed.
+     * Only reserved_quantity is decreased.
      */
     public function releaseReservation(Order $order): void
     {
         DB::transaction(function () use ($order) {
             foreach ($order->items as $item) {
-                $product = Product::whereKey($item->product_id)->lockForUpdate()->first();
+                $product = Product::query()
+                    ->whereKey($item->product_id)
+                    ->lockForUpdate()
+                    ->first();
 
                 if (!$product || !$product->manage_stock) {
                     continue;
                 }
 
-                $movement = InventoryMovement::firstOrCreate([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'type' => 'release',
-                ], [
-                    'quantity' => $item->quantity,
-                ]);
+                $quantity = (int) $item->quantity;
 
-                if ($movement->wasRecentlyCreated) {
-                    // Reduce reserved_quantity, but do not let it drop below 0
-                    $newReserved = max(0, $product->reserved_quantity - $item->quantity);
-                    $product->update(['reserved_quantity' => $newReserved]);
+                if ($quantity <= 0) {
+                    continue;
                 }
+
+                $movement = InventoryMovement::firstOrCreate(
+                    [
+                        'order_id' => $order->id,
+                        'product_id' => $product->id,
+                        'type' => 'release',
+                    ],
+                    [
+                        'quantity' => $quantity,
+                    ]
+                );
+
+                if (!$movement->wasRecentlyCreated) {
+                    continue;
+                }
+
+                if ($product->reserved_quantity < $quantity) {
+                    throw new RuntimeException(
+                        "Réservation insuffisante pour libérer le produit : {$product->title}"
+                    );
+                }
+
+                $product->decrement('reserved_quantity', $quantity);
             }
         });
     }
 
     /**
-     * Mark stock as shipped (deduct physical stock and release reservation).
+     * Ship the reserved stock.
+     *
+     * Physical stock decreases.
+     * reserved_quantity also decreases.
      */
     public function shipStock(Order $order): void
     {
         DB::transaction(function () use ($order) {
             foreach ($order->items as $item) {
-                $product = Product::whereKey($item->product_id)->lockForUpdate()->first();
+                $product = Product::query()
+                    ->whereKey($item->product_id)
+                    ->lockForUpdate()
+                    ->first();
 
                 if (!$product || !$product->manage_stock) {
                     continue;
                 }
 
-                $movement = InventoryMovement::firstOrCreate([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'type' => 'ship',
-                ], [
-                    'quantity' => $item->quantity,
-                ]);
+                $quantity = (int) $item->quantity;
 
-                if ($movement->wasRecentlyCreated) {
-                    $newReserved = max(0, $product->reserved_quantity - $item->quantity);
-                    $newStock = max(0, $product->stock_quantity - $item->quantity);
-
-                    $product->update([
-                        'reserved_quantity' => $newReserved,
-                        'stock_quantity' => $newStock,
-                    ]);
+                if ($quantity <= 0) {
+                    continue;
                 }
+
+                $movement = InventoryMovement::firstOrCreate(
+                    [
+                        'order_id' => $order->id,
+                        'product_id' => $product->id,
+                        'type' => 'ship',
+                    ],
+                    [
+                        'quantity' => $quantity,
+                    ]
+                );
+
+                if (!$movement->wasRecentlyCreated) {
+                    continue;
+                }
+
+                if ($product->reserved_quantity < $quantity) {
+                    throw new RuntimeException(
+                        "Réservation insuffisante pour expédier le produit : {$product->title}"
+                    );
+                }
+
+                if ($product->stock_quantity < $quantity) {
+                    throw new RuntimeException(
+                        "Stock physique insuffisant pour expédier le produit : {$product->title}"
+                    );
+                }
+
+                $product->decrement('reserved_quantity', $quantity);
+                $product->decrement('stock_quantity', $quantity);
             }
         });
     }
 
     /**
-     * Restore stock when returned (add back to physical stock).
+     * Return stock after a returned order.
+     *
+     * Physical stock increases.
      */
     public function returnStock(Order $order): void
     {
         DB::transaction(function () use ($order) {
             foreach ($order->items as $item) {
-                $product = Product::whereKey($item->product_id)->lockForUpdate()->first();
+                $product = Product::query()
+                    ->whereKey($item->product_id)
+                    ->lockForUpdate()
+                    ->first();
 
                 if (!$product || !$product->manage_stock) {
                     continue;
                 }
 
-                $movement = InventoryMovement::firstOrCreate([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'type' => 'return',
-                ], [
-                    'quantity' => $item->quantity,
-                ]);
+                $quantity = (int) $item->quantity;
 
-                if ($movement->wasRecentlyCreated) {
-                    $product->increment('stock_quantity', $item->quantity);
+                if ($quantity <= 0) {
+                    continue;
                 }
+
+                $movement = InventoryMovement::firstOrCreate(
+                    [
+                        'order_id' => $order->id,
+                        'product_id' => $product->id,
+                        'type' => 'return',
+                    ],
+                    [
+                        'quantity' => $quantity,
+                    ]
+                );
+
+                if (!$movement->wasRecentlyCreated) {
+                    continue;
+                }
+
+                $product->increment('stock_quantity', $quantity);
             }
         });
     }
 }
+

@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Support\OrderStatusTransition;
 
 class OrderController extends Controller
 {
@@ -93,15 +94,23 @@ class OrderController extends Controller
         ]);
     }
 
-    public function updateStatus(AdminOrderStatusRequest $request, Order $order): RedirectResponse
-    {
-        $this->authorize('update', $order);
 
-        \App\Support\OrderStatusTransition::change(
-            $order,
-            $request->enum('status', OrderStatus::class)
-        );
 
-        return back()->with('success', 'Statut de la commande mis à jour.');
-    }
+public function updateStatus(
+    AdminOrderStatusRequest $request,
+    Order $order
+): RedirectResponse {
+    \App\Support\OrderStatusTransition::change(
+        $order,
+        $request->enum('status', OrderStatus::class)
+    );
+
+    return back()->with(
+        'success',
+        'Statut de la commande mis à jour.'
+    );
+}
+
+
+
 }

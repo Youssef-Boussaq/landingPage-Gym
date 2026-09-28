@@ -11,13 +11,15 @@ use Illuminate\Validation\Validator;
 
 class AdminOrderStatusRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        $order = $this->route('order');
+  
+public function authorize(): bool
+{
+    $order = $this->route('order');
 
-        return $order instanceof Order
-            && ($this->user()?->can('updateStatus', $order) ?? false);
-    }
+    return $order instanceof Order
+        && ($this->user()?->can('updateStatus', $order) ?? false);
+}
+
 
     /**
      * @return array<string, mixed>
