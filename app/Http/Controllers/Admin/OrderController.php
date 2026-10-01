@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Support\OrderStatusTransition;
+use App\Services\Ameex\AmeexCityService;
+
 
 class OrderController extends Controller
 {
@@ -79,20 +81,54 @@ class OrderController extends Controller
         ]);
     }
 
-    public function show(Order $order): Response
-    {
-        $this->authorize('view', $order);
+   public function show(
+    Order $order,
+    AmeexCityService $ameexCityService
+): Response {
+    $this->authorize('view', $order);
 
-        $order->load([
-            'items.product.primaryImage',
-            'user:id,name,email,role',
-            'attribution',
-        ]);
+    $order->load([
+        'items.product.primaryImage',
+        'user:id,name,email,role',
+        'attribution',
+        'ameexShipment.city',
+    ]);
 
-        return Inertia::render('Admin/Orders/Show', [
-            'order' => AdminOrderPresenter::detail($order),
-        ]);
+    return Inertia::render('Admin/Orders/Show', [
+        'order' => AdminOrderPresenter::detail($order),
+
+        'ameexCities' => $ameexCityService
+            ->activeCities()
+            ->map(fn ($city) => [
+                'id' => $city->id,
+                'ameex_id' => $city->ameex_id,
+                'name' => $city->name,
+                'name_ar' => $city->name_ar,
+                'name_fr' => $city->name_fr,
+            ])
+            ->values(),
+    ]);
+}
+
+ public function shipToAmeex(Order $order): RedirectResponse
+{
+    $this->authorize('updateStatus', $order);
+
+    try {
+        OrderStatusTransition::shipToAmeex($order);
+
+        return back()->with(
+            'success',
+            'La commande a été envoyée à AMEEX et marquée comme expédiée.'
+        );
+    } catch (\Throwable $e) {
+        return back()
+            ->withErrors([
+                'ameex' => $e->getMessage(),
+            ])
+            ->withInput();
     }
+}
 
 
 
@@ -100,7 +136,7 @@ public function updateStatus(
     AdminOrderStatusRequest $request,
     Order $order
 ): RedirectResponse {
-    \App\Support\OrderStatusTransition::change(
+    OrderStatusTransition::change(
         $order,
         $request->enum('status', OrderStatus::class)
     );
@@ -110,7 +146,10 @@ public function updateStatus(
         'Statut de la commande mis à jour.'
     );
 }
-
-
-
 }
+
+
+
+
+
+

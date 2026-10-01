@@ -11,6 +11,9 @@ use App\Http\Controllers\NotificationController;
 
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Admin\StorePromotionController;
+
+
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -19,6 +22,15 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+ 
+use App\Http\Controllers\AmeexWebhookController;
+
+Route::post('/webhooks/ameex', [
+    AmeexWebhookController::class,
+    'handle',
+])->name('webhooks.ameex');
+
+
 
 Route::get('/store', [App\Http\Controllers\ProductController::class, 'index'])
     ->name('store.index');
@@ -105,6 +117,7 @@ Route::middleware(['auth', 'admin'])
             ->name('orders.show');
         Route::patch('/orders/{order}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])
             ->name('orders.status');
+        Route::post('/orders/{order}/ship', [ App\Http\Controllers\Admin\OrderController::class, 'shipToAmeex', ])->name('orders.ship');
 
         Route::get('/products', [App\Http\Controllers\Admin\ProductController::class, 'index'])
             ->name('products.index');

@@ -12,7 +12,7 @@ import OrderStatusStepper from '@/Components/Admin/Orders/OrderStatusStepper';
 import OrderActions from '@/Components/Admin/Orders/OrderActions';
 import OrderWhatsApp from '@/Components/Admin/Orders/OrderWhatsApp';
 
-export default function OrderShow({ order }) {
+export default function OrderShow({ order, ameexCities }) {
     return (
         <AdminLayout title={`Commande ${order.order_number}`}>
             <div className="print:hidden">
@@ -51,8 +51,11 @@ export default function OrderShow({ order }) {
 
                 <div className="space-y-6">
                     <OrderSummary summary={order.summary} />
-                    <OrderActions order={order} />
-                    
+                    <OrderActions
+                        order={order}
+                        ameexCities={ameexCities}
+                    />
+
                     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm print:hidden">
                         <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4">Attribution</h2>
                         {order.attribution ? (
@@ -70,9 +73,10 @@ export default function OrderShow({ order }) {
                     </section>
                 </div>
             </div>
-            
+
             {/* Print-only CSS to ensure things fit properly */}
-            <style dangerouslySetInnerHTML={{__html: `
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 @media print {
                     @page { margin: 1cm; }
                     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }

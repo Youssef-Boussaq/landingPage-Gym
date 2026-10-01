@@ -9,6 +9,8 @@ use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\AmeexShipment;
+
 
 class Order extends Model
 {
@@ -93,4 +95,13 @@ class Order extends Model
             }
         });
     }
+
+   public function ameexShipment(): HasOne
+{
+    return $this->hasOne(
+        AmeexShipment::class,
+        'order_id',
+        'id'
+    );
+}
 }
