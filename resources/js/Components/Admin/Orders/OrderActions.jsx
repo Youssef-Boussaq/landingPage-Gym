@@ -1,296 +1,382 @@
-import { useForm } from '@inertiajs/react';
+import { useState } from 'react';
+import { router } from '@inertiajs/react';
 import {
+    AlertTriangle,
     Ban,
+    Box,
     CheckCircle2,
     ChevronRight,
-    Clock3,
     Loader2,
     PackageCheck,
-    RotateCcw,
+    Send,
+    Truck,
+    X,
 } from 'lucide-react';
 
-const ACTION_CONFIG = {
+const ACTIONS = {
     confirmed: {
         label: 'Confirmer la commande',
+        description: 'La commande sera confirmée et pourra être préparée.',
         icon: CheckCircle2,
-        className: `
-            border-[var(--color-primary-dark)]/30
-            bg-[var(--color-primary)]/15
-            text-[#547900]
-            hover:bg-[var(--color-primary)]/25
-            hover:border-[var(--color-primary-dark)]/50
-        `,
+        tone: 'primary',
+        nextStatus: 'confirmed',
     },
 
     processing: {
         label: 'Mettre en préparation',
-        icon: Clock3,
-        className: `
-            border-blue-200
-            bg-blue-50
-            text-blue-700
-            hover:bg-blue-100
-            hover:border-blue-300
-        `,
-    },
-
-    cancelled: {
-        label: 'Annuler la commande',
-        icon: Ban,
-        className: `
-            border-red-200
-            bg-red-50
-            text-red-700
-            hover:bg-red-100
-            hover:border-red-300
-        `,
+        description: 'La commande passe en préparation avant son expédition.',
+        icon: Box,
+        tone: 'violet',
+        nextStatus: 'processing',
     },
 };
 
-export default function OrderActions({ order }) {
-    const form = useForm({
-        status: '',
-    });
+function getAction(order) {
+    switch (order.status) {
+        case 'pending':
+        case 'paid':
+            return ACTIONS.confirmed;
 
-    const ameexForm = useForm();
+        case 'confirmed':
+            return ACTIONS.processing;
 
-    if (
-        !order.allowed_statuses ||
-        order.allowed_statuses.length === 0
-    ) {
-        /*
-         * Processing has a separate AMEEX action,
-         * so it must still render.
-         */
-        if (order.status !== 'processing') {
+        default:
             return null;
-        }
+    }
+}
+
+function PrimaryAction({ order }) {
+    const action = getAction(order);
+    const [processing, setProcessing] = useState(false);
+
+    if (!action) {
+        return null;
     }
 
-    const submitStatus = (status) => {
-        form.setData('status', status);
+    const Icon = action.icon;
 
-        form.patch(
+    function submit() {
+        setProcessing(true);
+
+        router.patch(
             route('admin.orders.status', order.id),
             {
-                preserveScroll: true,
-            }
-        );
-    };
-
-    const sendToAmeex = () => {
-        ameexForm.post(
-            route('admin.orders.ship', order.id),
+                status: action.nextStatus,
+            },
             {
                 preserveScroll: true,
+                onFinish: () => setProcessing(false),
             }
         );
-    };
-
-    const isSendingToAmeex = ameexForm.processing;
+    }
 
     return (
-        <section
-            className="
-                print:hidden
-                rounded-2xl
-                border border-black/[0.08]
-                bg-white
-                p-5
-                shadow-[0_10px_35px_rgba(11,12,14,0.06)]
-            "
+        <button
+            type="button"
+            disabled={processing}
+            onClick={submit}
+            className="group flex w-full items-center justify-between rounded-2xl bg-[var(--color-primary)] px-4 py-4 text-left text-black shadow-sm transition hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60"
         >
-            {/* Header */}
-            <div className="mb-5">
-                <div className="flex items-center gap-2">
-                    <div
-                        className="
-                            flex h-9 w-9 items-center justify-center
-                            rounded-xl
-                            bg-[var(--color-primary)]/15
-                            text-[var(--color-primary-dark)]
-                        "
-                    >
-                        <ChevronRight
-                            size={18}
-                            strokeWidth={2.5}
-                        />
-                    </div>
-
-                    <h2
-                        className="
-                            font-archivo
-                            text-sm
-                            uppercase
-                            tracking-wide
-                            text-[var(--color-black)]
-                        "
-                    >
-                        Actions de la commande
-                    </h2>
+            <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-black/10">
+                    {processing ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                        <Icon className="h-5 w-5" />
+                    )}
                 </div>
 
-                <p className="mt-2 text-sm text-[#596254]">
-                    Faites évoluer le statut de cette commande.
-                </p>
+                <div className="min-w-0">
+                    <p className="text-sm font-black">
+                        {processing
+                            ? 'Mise à jour...'
+                            : action.label}
+                    </p>
+
+                    <p className="mt-0.5 text-xs text-black/60">
+                        {action.description}
+                    </p>
+                </div>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-                {order.allowed_statuses?.map((status) => {
-                    const config =
-                        ACTION_CONFIG[status] || {
-                            label: `Passer à ${status}`,
-                            icon: ChevronRight,
-                            className: `
-                                border-black/10
-                                bg-[#f5f7f1]
-                                text-[var(--color-black)]
-                                hover:bg-[#eaf0df]
-                            `,
-                        };
-
-                    const Icon = config.icon;
-
-                    const isProcessing =
-                        form.processing &&
-                        form.data.status === status;
-
-                    return (
-                        <button
-                            key={status}
-                            type="button"
-                            onClick={() => submitStatus(status)}
-                            disabled={
-                                form.processing ||
-                                isSendingToAmeex
-                            }
-                            className={`
-                                inline-flex
-                                items-center
-                                gap-2
-                                rounded-xl
-                                border
-                                px-4
-                                py-2.5
-                                text-sm
-                                font-bold
-                                shadow-sm
-                                transition-all
-                                duration-200
-                                disabled:cursor-not-allowed
-                                disabled:opacity-50
-                                ${config.className}
-                            `}
-                        >
-                            {isProcessing ? (
-                                <Loader2
-                                    className="h-4 w-4 animate-spin"
-                                />
-                            ) : (
-                                <Icon
-                                    className="h-4 w-4"
-                                    strokeWidth={2.2}
-                                />
-                            )}
-
-                            <span>
-                                {isProcessing
-                                    ? 'Traitement...'
-                                    : config.label}
-                            </span>
-                        </button>
-                    );
-                })}
-
-                {/* AMEEX */}
-                {order.status === 'processing' && (
-                    <button
-                        type="button"
-                        onClick={sendToAmeex}
-                        disabled={
-                            form.processing ||
-                            isSendingToAmeex
-                        }
-                        className="
-                            inline-flex
-                            items-center
-                            gap-2
-                            rounded-xl
-                            border
-                            border-indigo-200
-                            bg-indigo-50
-                            px-4
-                            py-2.5
-                            text-sm
-                            font-bold
-                            text-indigo-700
-                            shadow-sm
-                            transition-all
-                            duration-200
-                            hover:border-indigo-300
-                            hover:bg-indigo-100
-                            disabled:cursor-not-allowed
-                            disabled:opacity-50
-                        "
-                    >
-                        {isSendingToAmeex ? (
-                            <Loader2
-                                className="h-4 w-4 animate-spin"
-                            />
-                        ) : (
-                            <PackageCheck
-                                className="h-4 w-4"
-                                strokeWidth={2.2}
-                            />
-                        )}
-
-                        <span>
-                            {isSendingToAmeex
-                                ? 'Création du colis...'
-                                : 'Envoyer à AMEEX'}
-                        </span>
-                    </button>
-                )}
-            </div>
-
-            {/* Normal status error */}
-            {form.errors.status && (
-                <div
-                    className="
-                        mt-4
-                        rounded-xl
-                        border border-rose-200
-                        bg-rose-50
-                        px-4
-                        py-3
-                        text-sm
-                        font-medium
-                        text-rose-700
-                    "
-                >
-                    {form.errors.status}
-                </div>
+            {!processing && (
+                <ChevronRight className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5" />
             )}
-
-            {/* AMEEX error */}
-            {ameexForm.errors.ameex && (
-                <div
-                    className="
-                        mt-4
-                        rounded-xl
-                        border border-rose-200
-                        bg-rose-50
-                        px-4
-                        py-3
-                        text-sm
-                        font-medium
-                        text-rose-700
-                    "
-                >
-                    {ameexForm.errors.ameex}
-                </div>
-            )}
-        </section>
+        </button>
     );
 }
 
+function AmeexAction({ order }) {
+    const [processing, setProcessing] = useState(false);
+
+    if (order.status !== 'processing') {
+        return null;
+    }
+
+    function ship() {
+        setProcessing(true);
+
+        router.post(
+            route('admin.orders.ship', order.id),
+            {},
+            {
+                preserveScroll: true,
+                onFinish: () => setProcessing(false),
+            }
+        );
+    }
+
+    return (
+        <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-4">
+            <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
+                    <Truck className="h-5 w-5" />
+                </div>
+
+                <div className="min-w-0">
+                    <p className="text-sm font-black text-slate-900">
+                        Prête pour l'expédition
+                    </p>
+
+                    <p className="mt-1 text-xs leading-5 text-slate-500">
+                        Créez le colis AMEEX puis envoyez la commande
+                        au transporteur.
+                    </p>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                disabled={processing}
+                onClick={ship}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+                {processing ? (
+                    <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Envoi en cours...
+                    </>
+                ) : (
+                    <>
+                        <Send className="h-4 w-4" />
+                        Envoyer à AMEEX
+                    </>
+                )}
+            </button>
+        </div>
+    );
+}
+
+function ShippingWaiting({ order }) {
+    if (order.status !== 'shipped') {
+        return null;
+    }
+
+    return (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4">
+            <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-emerald-600 shadow-sm">
+                    <PackageCheck className="h-5 w-5" />
+                </div>
+
+                <div>
+                    <p className="text-sm font-black text-emerald-800">
+                        Colis expédié
+                    </p>
+
+                    <p className="mt-1 text-xs leading-5 text-emerald-700/70">
+                        La commande est maintenant suivie par AMEEX.
+                        Les prochaines étapes seront synchronisées via
+                        les événements de livraison.
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function TerminalState({ order }) {
+    if (order.status === 'delivered') {
+        return (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+
+                    <div>
+                        <p className="text-sm font-black text-emerald-800">
+                            Commande terminée
+                        </p>
+
+                        <p className="mt-0.5 text-xs text-emerald-700/70">
+                            La commande a été livrée au client.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (order.status === 'returned') {
+        return (
+            <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+                <div className="flex items-center gap-3">
+                    <PackageCheck className="h-5 w-5 rotate-180 text-red-600" />
+
+                    <div>
+                        <p className="text-sm font-black text-red-800">
+                            Commande retournée
+                        </p>
+
+                        <p className="mt-0.5 text-xs text-red-700/70">
+                            AMEEX a signalé le retour du colis.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (order.status === 'cancelled') {
+        return (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="flex items-center gap-3">
+                    <Ban className="h-5 w-5 text-slate-500" />
+
+                    <div>
+                        <p className="text-sm font-black text-slate-800">
+                            Commande annulée
+                        </p>
+
+                        <p className="mt-0.5 text-xs text-slate-500">
+                            Aucune action supplémentaire n'est disponible.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return null;
+}
+
+function CancelAction({ order }) {
+    const [open, setOpen] = useState(false);
+    const [processing, setProcessing] = useState(false);
+
+    const canCancel = [
+        'pending',
+        'paid',
+        'confirmed',
+    ].includes(order.status);
+
+    if (!canCancel) {
+        return null;
+    }
+
+    function cancelOrder() {
+        setProcessing(true);
+
+        router.patch(
+            route('admin.orders.status', order.id),
+            {
+                status: 'cancelled',
+            },
+            {
+                preserveScroll: true,
+                onFinish: () => {
+                    setProcessing(false);
+                    setOpen(false);
+                },
+            }
+        );
+    }
+
+    return (
+        <>
+            {!open ? (
+                <button
+                    type="button"
+                    onClick={() => setOpen(true)}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50"
+                >
+                    <Ban className="h-4 w-4" />
+                    Annuler la commande
+                </button>
+            ) : (
+                <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+                    <div className="flex items-start gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-red-500 shadow-sm">
+                            <AlertTriangle className="h-4 w-4" />
+                        </div>
+
+                        <div className="min-w-0">
+                            <p className="text-sm font-black text-red-800">
+                                Confirmer l'annulation ?
+                            </p>
+
+                            <p className="mt-1 text-xs leading-5 text-red-700/70">
+                                Cette action libérera la réservation de
+                                stock de la commande.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setOpen(false)}
+                            disabled={processing}
+                            className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-600"
+                        >
+                            <X className="h-4 w-4" />
+                            Retour
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={cancelOrder}
+                            disabled={processing}
+                            className="flex items-center justify-center gap-2 rounded-xl bg-red-600 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-red-700 disabled:opacity-60"
+                        >
+                            {processing ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <Ban className="h-4 w-4" />
+                            )}
+
+                            Confirmer
+                        </button>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+}
+
+export default function OrderActions({ order }) {
+    return (
+        <section className="rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <div className="border-b border-slate-100 px-5 py-4">
+                <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">
+                    Actions
+                </h2>
+
+                <p className="mt-1 text-xs text-slate-500">
+                    Gestion de la commande
+                </p>
+            </div>
+
+            <div className="space-y-3 p-5">
+                <PrimaryAction order={order} />
+
+                <AmeexAction order={order} />
+
+                <ShippingWaiting order={order} />
+
+                <TerminalState order={order} />
+
+                <CancelAction order={order} />
+            </div>
+        </section>
+    );
+}

@@ -1,208 +1,160 @@
-
 import {
-    CheckCircle2,
     MessageCircle,
-    PackageOpen,
-    Truck,
+    Phone,
+    UserRound,
+    Copy,
+    Check,
 } from 'lucide-react';
+import { useState } from 'react';
 
-import { formatMoney } from '@/helpers/format';
+function normalizePhone(phone) {
+    if (!phone) {
+        return '';
+    }
+
+    // Remove spaces, +, -, parentheses, etc.
+    let value = String(phone).replace(/\D/g, '');
+
+    // Morocco local format: 0612345678 → 212612345678
+    if (value.startsWith('0') && value.length === 10) {
+        value = `212${value.slice(1)}`;
+    }
+
+    // Already international Morocco format
+    if (value.startsWith('212')) {
+        return value;
+    }
+
+    return value;
+}
+
+function buildWhatsAppMessage(order) {
+    const customerName = order.customer?.name || 'Client';
+
+    return `Bonjour ${customerName},
+
+Nous vous contactons concernant votre commande ${order.order_number}.
+
+Nous souhaitons confirmer les informations de votre commande et sa livraison.
+
+Merci.`;
+}
 
 export default function OrderWhatsApp({ order }) {
-    if (!order.customer?.phone) {
+    const [copied, setCopied] = useState(false);
+
+    const phone = order.customer?.phone;
+    const normalizedPhone = normalizePhone(phone);
+
+    if (!phone) {
         return null;
     }
 
-    const phone = order.customer.phone.replace(/[^0-9]/g, '');
-    const amount = formatMoney(order.summary.total);
+    const message = buildWhatsAppMessage(order);
 
-    const templates = [
-        {
-            label: 'Commande confirmée',
-            icon: CheckCircle2,
-            message: `Bonjour ${order.customer.name},\n\nVotre commande #${order.order_number} d'un montant de ${amount} est bien confirmée.\n\nMerci pour votre confiance !`,
-            iconClass:
-                'bg-[var(--color-primary)]/15 text-[var(--color-primary-dark)]',
-            hoverClass:
-                'hover:border-[var(--color-primary-dark)]/30 hover:bg-[var(--color-primary)]/10',
-        },
-        {
-            label: 'En préparation',
-            icon: PackageOpen,
-            message: `Bonjour ${order.customer.name},\n\nVotre commande #${order.order_number} est actuellement en préparation. Nous vous tiendrons au courant de son expédition.`,
-            iconClass: 'bg-blue-50 text-blue-600',
-            hoverClass: 'hover:border-blue-200 hover:bg-blue-50/70',
-        },
-        {
-            label: 'Expédition / En livraison',
-            icon: Truck,
-            message: `Bonjour ${order.customer.name},\n\nBonne nouvelle ! Votre commande #${order.order_number} a été expédiée et sera bientôt livrée.\n\nMerci de vous tenir disponible.`,
-            iconClass: 'bg-orange-50 text-orange-600',
-            hoverClass: 'hover:border-orange-200 hover:bg-orange-50/70',
-        },
-    ];
+    const whatsappUrl = `https://wa.me/${normalizedPhone}?text=${encodeURIComponent(
+        message
+    )}`;
+
+    const phoneUrl = `tel:${phone}`;
+
+    async function copyPhone() {
+        try {
+            await navigator.clipboard.writeText(phone);
+
+            setCopied(true);
+
+            setTimeout(() => {
+                setCopied(false);
+            }, 1600);
+        } catch {
+            // Clipboard unavailable.
+        }
+    }
 
     return (
-        <section
-            className="
-                rounded-2xl
-                border border-black/[0.08]
-                bg-white
-                p-5
-                shadow-[0_10px_35px_rgba(11,12,14,0.06)]
-                print:hidden
-            "
-        >
-            {/* Header */}
-            <div className="mb-5 flex items-center gap-3">
-                <div
-                    className="
-                        flex h-10 w-10
-                        items-center justify-center
-                        rounded-xl
-                        bg-[#25D366]/10
-                        text-[#128C4A]
-                    "
-                >
-                    <MessageCircle
-                        size={20}
-                        strokeWidth={2.2}
-                    />
+        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <div className="p-5 sm:p-6">
+                {/* Header */}
+                <div className="flex items-start gap-3">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                        <MessageCircle className="h-5 w-5" />
+                    </div>
+
+                    <div className="min-w-0">
+                        <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">
+                            Contacter le client
+                        </h2>
+
+                        <p className="mt-1 text-xs text-slate-500">
+                            Contact rapide pour confirmer la commande
+                        </p>
+                    </div>
                 </div>
 
-                <div>
-                    <h2
-                        className="
-                            font-archivo
-                            text-sm
-                            uppercase
-                            tracking-wide
-                            text-[var(--color-black)]
-                        "
+                {/* Customer */}
+                <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-3">
+                    <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-slate-400 shadow-sm">
+                            <UserRound className="h-4 w-4" />
+                        </div>
+
+                        <div className="min-w-0">
+                            <p className="truncate text-sm font-bold text-slate-800">
+                                {order.customer?.name || 'Client'}
+                            </p>
+
+                            <p className="mt-0.5 font-mono text-xs text-slate-500">
+                                {phone}
+                            </p>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={copyPhone}
+                        className="flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 text-xs font-bold text-slate-500 transition hover:bg-slate-50"
+                        title="Copier le numéro"
                     >
-                        Messages & WhatsApp
-                    </h2>
+                        {copied ? (
+                            <Check className="h-4 w-4 text-emerald-600" />
+                        ) : (
+                            <Copy className="h-4 w-4" />
+                        )}
 
-                    <p className="mt-0.5 text-xs text-[#596254]">
-                        Contactez rapidement le client
-                    </p>
+                        <span className="hidden sm:inline">
+                            {copied ? 'Copié' : 'Copier'}
+                        </span>
+                    </button>
                 </div>
-            </div>
 
-            {/* Templates */}
-            <div className="space-y-2.5">
-                {templates.map((tpl) => {
-                    const Icon = tpl.icon;
+                {/* Actions */}
+                <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <a
+                        href={whatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-600"
+                    >
+                        <MessageCircle className="h-4 w-4 transition-transform group-hover:scale-110" />
+                        Ouvrir WhatsApp
+                    </a>
 
-                    const whatsappUrl =
-                        `https://wa.me/${phone}` +
-                        `?text=${encodeURIComponent(tpl.message)}`;
+                    <a
+                        href={phoneUrl}
+                        className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                    >
+                        <Phone className="h-4 w-4" />
+                        Appeler
+                    </a>
+                </div>
 
-                    return (
-                        <a
-                            key={tpl.label}
-                            href={whatsappUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className={`
-                                group
-                                flex
-                                items-center
-                                gap-3
-                                rounded-xl
-                                border
-                                border-black/[0.07]
-                                bg-[#f8faf5]
-                                px-3
-                                py-3
-                                text-sm
-                                font-bold
-                                text-[var(--color-black)]
-                                shadow-sm
-                                transition-all
-                                duration-200
-                                hover:-translate-y-0.5
-                                hover:shadow-md
-                                ${tpl.hoverClass}
-                            `}
-                        >
-                            {/* Icon */}
-                            <span
-                                className={`
-                                    flex
-                                    h-9
-                                    w-9
-                                    shrink-0
-                                    items-center
-                                    justify-center
-                                    rounded-xl
-                                    transition-transform
-                                    duration-200
-                                    group-hover:scale-105
-                                    ${tpl.iconClass}
-                                `}
-                            >
-                                <Icon
-                                    size={17}
-                                    strokeWidth={2.2}
-                                />
-                            </span>
-
-                            {/* Label */}
-                            <span className="min-w-0 flex-1">
-                                {tpl.label}
-                            </span>
-
-                            {/* WhatsApp indicator */}
-                            <MessageCircle
-                                size={16}
-                                strokeWidth={2.1}
-                                className="
-                                    shrink-0
-                                    text-[#25D366]
-                                    opacity-60
-                                    transition-all
-                                    duration-200
-                                    group-hover:translate-x-0.5
-                                    group-hover:opacity-100
-                                "
-                            />
-                        </a>
-                    );
-                })}
-            </div>
-
-            {/* Phone number */}
-            <div
-                className="
-                    mt-4
-                    flex
-                    items-center
-                    gap-2
-                    rounded-xl
-                    border
-                    border-[#25D366]/15
-                    bg-[#25D366]/5
-                    px-3
-                    py-2.5
-                    text-xs
-                    text-[#596254]
-                "
-            >
-                <MessageCircle
-                    size={14}
-                    className="shrink-0 text-[#25D366]"
-                    strokeWidth={2.2}
-                />
-
-                <span>
-                    WhatsApp :{' '}
-                    <strong className="text-[var(--color-black)]">
-                        {order.customer.phone}
-                    </strong>
-                </span>
+                {/* Notice */}
+                <p className="mt-3 text-center text-[10px] leading-4 text-slate-400">
+                    Le contact avec le client ne modifie pas automatiquement
+                    le statut de la commande.
+                </p>
             </div>
         </section>
     );
 }
-

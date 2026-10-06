@@ -88,6 +88,18 @@ class AdminOrderPresenter
                 'city' => $order->city,
                 'postal_code' => $order->postal_code,
             ],
+            'ameex_shipment' => $order->ameexShipment ? [
+    'id' => $order->ameexShipment->id,
+    'parcel_code' => $order->ameexShipment->parcel_code,
+    'status' => $order->ameexShipment->status,
+    'status_name' => $order->ameexShipment->status_name,
+    'status_color' => $order->ameexShipment->status_color,
+    'sub_status' => $order->ameexShipment->sub_status,
+    'sub_status_name' => $order->ameexShipment->sub_status_name,
+    'sub_status_color' => $order->ameexShipment->sub_status_color,
+    'comment' => $order->ameexShipment->comment,
+    'sandbox' => (bool) $order->ameexShipment->sandbox,
+] : null,
             
             'items' => $order->items->map(function ($item) {
                 $product = $item->product;

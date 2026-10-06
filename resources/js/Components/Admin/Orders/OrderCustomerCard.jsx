@@ -1,4 +1,3 @@
-
 import {
     Mail,
     Phone,
@@ -6,6 +5,8 @@ import {
 } from 'lucide-react';
 
 export default function OrderCustomerCard({ customer }) {
+    const name = customer?.name || 'Client inconnu';
+
     return (
         <section
             className="
@@ -54,13 +55,14 @@ export default function OrderCustomerCard({ customer }) {
 
             {/* Customer */}
             <div className="space-y-4">
-                {/* Name */}
+
+                {/* Name + Type */}
                 <div>
                     <p className="text-lg font-bold text-[var(--color-black)]">
-                        {customer.name}
+                        {name}
                     </p>
 
-                    {customer.type_label && (
+                    {customer?.type_label && (
                         <span
                             className="
                                 mt-1
@@ -84,7 +86,9 @@ export default function OrderCustomerCard({ customer }) {
 
                 {/* Contact */}
                 <div className="space-y-2.5">
-                    {customer.phone && (
+
+                    {/* Phone */}
+                    {customer?.phone && (
                         <a
                             href={`tel:${customer.phone}`}
                             className="
@@ -131,7 +135,8 @@ export default function OrderCustomerCard({ customer }) {
                         </a>
                     )}
 
-                    {customer.email && (
+                    {/* Email */}
+                    {customer?.email && (
                         <a
                             href={`mailto:${customer.email}`}
                             className="
@@ -177,9 +182,26 @@ export default function OrderCustomerCard({ customer }) {
                             </span>
                         </a>
                     )}
+
+                    {/* No contact information */}
+                    {!customer?.phone && !customer?.email && (
+                        <div
+                            className="
+                                rounded-xl
+                                border border-dashed
+                                border-black/[0.08]
+                                bg-[#f8faf5]
+                                px-3
+                                py-3
+                                text-xs
+                                text-[#596254]
+                            "
+                        >
+                            Aucune information de contact disponible.
+                        </div>
+                    )}
                 </div>
             </div>
         </section>
     );
 }
-

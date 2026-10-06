@@ -7,15 +7,14 @@ use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdminOrderStatusRequest;
 use App\Models\Order;
+use App\Services\Ameex\AmeexCityService;
 use App\Support\AdminOrderPresenter;
+use App\Support\OrderStatusTransition;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Support\OrderStatusTransition;
-use App\Services\Ameex\AmeexCityService;
-
 
 class OrderController extends Controller
 {
@@ -51,23 +50,37 @@ class OrderController extends Controller
         if ($customerType === 'client') {
             $query->whereNotNull('user_id');
         } elseif ($customerType === 'guest') {
-            $query->whereNull('user_id')->whereNotNull('guest_token');
+            $query->whereNull('user_id')
+                ->whereNotNull('guest_token');
         }
 
         $sort = $request->query('sort', 'created_at');
-        $direction = $request->query('direction', 'desc') === 'asc' ? 'asc' : 'desc';
 
-        if (in_array($sort, ['created_at', 'total_amount', 'order_number'], true)) {
-            $query->reorder()->orderBy($sort, $direction);
+        $direction = $request->query('direction', 'desc') === 'asc'
+            ? 'asc'
+            : 'desc';
+
+        if (in_array(
+            $sort,
+            ['created_at', 'total_amount', 'order_number'],
+            true
+        )) {
+            $query
+                ->reorder()
+                ->orderBy($sort, $direction);
         }
 
         $orders = $query
             ->paginate(15)
             ->withQueryString()
-            ->through(fn (Order $order) => AdminOrderPresenter::listItem($order));
+            ->through(
+                fn (Order $order) =>
+                    AdminOrderPresenter::listItem($order)
+            );
 
         return Inertia::render('Admin/Orders/Index', [
             'orders' => $orders,
+
             'filters' => [
                 'search' => $request->query('search', ''),
                 'status' => $request->query('status', ''),
@@ -76,80 +89,79 @@ class OrderController extends Controller
                 'sort' => $sort,
                 'direction' => $direction,
             ],
-            'statusOptions' => collect(OrderStatus::cases())->map(fn ($status) => $status->value),
-            'paymentStatusOptions' => collect(PaymentStatus::cases())->map(fn ($status) => $status->value),
+
+            'statusOptions' => collect(OrderStatus::cases())
+                ->map(fn ($status) => $status->value),
+
+            'paymentStatusOptions' => collect(PaymentStatus::cases())
+                ->map(fn ($status) => $status->value),
         ]);
     }
 
-   public function show(
-    Order $order,
-    AmeexCityService $ameexCityService
-): Response {
-    $this->authorize('view', $order);
+    public function show(
+        Order $order,
+        AmeexCityService $ameexCityService
+    ): Response {
+        $this->authorize('view', $order);
 
-    $order->load([
-        'items.product.primaryImage',
-        'user:id,name,email,role',
-        'attribution',
-        'ameexShipment.city',
-    ]);
+        $order->load([
+            'items.product.primaryImage',
+            'user:id,name,email,role',
+            'attribution',
 
-    return Inertia::render('Admin/Orders/Show', [
-        'order' => AdminOrderPresenter::detail($order),
+            // AMEEX
+            'ameexShipment.city',
+            'ameexShipment.events',
+        ]);
 
-        'ameexCities' => $ameexCityService
-            ->activeCities()
-            ->map(fn ($city) => [
-                'id' => $city->id,
-                'ameex_id' => $city->ameex_id,
-                'name' => $city->name,
-                'name_ar' => $city->name_ar,
-                'name_fr' => $city->name_fr,
-            ])
-            ->values(),
-    ]);
-}
+        return Inertia::render('Admin/Orders/Show', [
+            'order' => AdminOrderPresenter::detail($order),
 
- public function shipToAmeex(Order $order): RedirectResponse
-{
-    $this->authorize('updateStatus', $order);
+            'ameexCities' => $ameexCityService
+                ->activeCities()
+                ->map(fn ($city) => [
+                    'id' => $city->id,
+                    'ameex_id' => $city->ameex_id,
+                    'name' => $city->name,
+                    'name_ar' => $city->name_ar,
+                    'name_fr' => $city->name_fr,
+                ])
+                ->values(),
+        ]);
+    }
 
-    try {
-        OrderStatusTransition::shipToAmeex($order);
+    public function shipToAmeex(Order $order): RedirectResponse
+    {
+        $this->authorize('updateStatus', $order);
+
+        try {
+            OrderStatusTransition::shipToAmeex($order);
+
+            return back()->with(
+                'success',
+                'La commande a été envoyée à AMEEX et marquée comme expédiée.'
+            );
+        } catch (\Throwable $e) {
+            return back()
+                ->withErrors([
+                    'ameex' => $e->getMessage(),
+                ])
+                ->withInput();
+        }
+    }
+
+    public function updateStatus(
+        AdminOrderStatusRequest $request,
+        Order $order
+    ): RedirectResponse {
+        OrderStatusTransition::change(
+            $order,
+            $request->enum('status', OrderStatus::class)
+        );
 
         return back()->with(
             'success',
-            'La commande a été envoyée à AMEEX et marquée comme expédiée.'
+            'Statut de la commande mis à jour.'
         );
-    } catch (\Throwable $e) {
-        return back()
-            ->withErrors([
-                'ameex' => $e->getMessage(),
-            ])
-            ->withInput();
     }
 }
-
-
-
-public function updateStatus(
-    AdminOrderStatusRequest $request,
-    Order $order
-): RedirectResponse {
-    OrderStatusTransition::change(
-        $order,
-        $request->enum('status', OrderStatus::class)
-    );
-
-    return back()->with(
-        'success',
-        'Statut de la commande mis à jour.'
-    );
-}
-}
-
-
-
-
-
-

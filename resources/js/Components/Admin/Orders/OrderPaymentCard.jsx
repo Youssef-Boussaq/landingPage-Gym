@@ -1,210 +1,211 @@
-
 import {
     Banknote,
+    CheckCircle2,
     CreditCard,
-    Info,
-    ReceiptText,
+    Hash,
+    ShieldCheck,
+    XCircle,
+    Clock3,
 } from 'lucide-react';
 
-import AdminStatusBadge from '@/Components/Admin/AdminStatusBadge';
+function getPaymentMethod(paymentMethod) {
+    switch (paymentMethod) {
+        case 'cash':
+            return {
+                label: 'Paiement à la livraison',
+                shortLabel: 'À la livraison',
+                icon: Banknote,
+                description: 'Le client paiera à la réception.',
+            };
 
-export default function OrderPaymentCard({ order }) {
-    const isCash = order.is_cash;
-    const PaymentIcon = isCash ? Banknote : CreditCard;
+        case 'card':
+        case 'stripe':
+            return {
+                label: 'Carte bancaire',
+                shortLabel: 'Carte bancaire',
+                icon: CreditCard,
+                description: 'Paiement effectué par carte bancaire.',
+            };
 
-    return (
-        <section
-            className="
-                rounded-2xl
-                border border-black/[0.08]
-                bg-white
-                p-5
-                shadow-[0_10px_35px_rgba(11,12,14,0.06)]
-            "
-        >
-            {/* Header */}
-            <div className="mb-5 flex items-center gap-3">
-                <div
-                    className="
-                        flex h-10 w-10
-                        items-center justify-center
-                        rounded-xl
-                        bg-[var(--color-primary)]/15
-                        text-[var(--color-primary-dark)]
-                    "
-                >
-                    <ReceiptText
-                        size={19}
-                        strokeWidth={2.2}
-                    />
+        default:
+            return {
+                label: paymentMethod || 'Non défini',
+                shortLabel: paymentMethod || 'Non défini',
+                icon: CreditCard,
+                description: 'Méthode de paiement non précisée.',
+            };
+    }
+}
+
+function getPaymentStatus(status) {
+    switch (status) {
+        case 'paid':
+            return {
+                label: 'Payé',
+                description: 'Le paiement a été confirmé.',
+                icon: CheckCircle2,
+                className: 'text-emerald-600',
+                bgClassName: 'bg-emerald-50',
+                borderClassName: 'border-emerald-200',
+            };
+
+        case 'failed':
+            return {
+                label: 'Échec',
+                description: 'Le paiement a échoué.',
+                icon: XCircle,
+                className: 'text-red-600',
+                bgClassName: 'bg-red-50',
+                borderClassName: 'border-red-200',
+            };
+
+        case 'pending':
+        default:
+            return {
+                label: 'En attente',
+                description: 'Le paiement n’est pas encore confirmé.',
+                icon: Clock3,
+                className: 'text-amber-600',
+                bgClassName: 'bg-amber-50',
+                borderClassName: 'border-amber-200',
+            };
+    }
+}
+
+function TransactionId({ value }) {
+    if (!value) {
+        return (
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-slate-400 shadow-sm">
+                    <Hash className="h-4 w-4" />
                 </div>
 
                 <div>
-                    <h2
-                        className="
-                            font-archivo
-                            text-sm
-                            uppercase
-                            tracking-wide
-                            text-[var(--color-black)]
-                        "
-                    >
-                        Paiement
-                    </h2>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">
+                        Transaction
+                    </p>
 
-                    <p className="text-xs text-[#596254]">
-                        Informations du paiement
+                    <p className="mt-0.5 text-xs font-medium text-slate-500">
+                        Aucune transaction enregistrée
                     </p>
                 </div>
             </div>
+        );
+    }
 
-            {/* Payment information */}
-            <dl className="space-y-1">
-                {/* Method */}
-                <div
-                    className="
-                        flex
-                        items-center
-                        justify-between
-                        gap-4
-                        rounded-xl
-                        px-3
-                        py-3
-                        transition-colors
-                        hover:bg-[#f8faf5]
-                    "
-                >
-                    <dt className="text-sm text-[#596254]">
-                        Méthode
-                    </dt>
+    return (
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div className="flex items-center gap-2">
+                <Hash className="h-4 w-4 text-slate-400" />
 
-                    <dd
-                        className="
-                            flex
-                            items-center
-                            gap-2
-                            text-right
-                            text-sm
-                            font-bold
-                            uppercase
-                            tracking-wide
-                            text-[var(--color-black)]
-                        "
-                    >
-                        <PaymentIcon
-                            size={16}
-                            strokeWidth={2.2}
-                            className="text-[var(--color-primary-dark)]"
-                        />
+                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">
+                    ID de transaction
+                </span>
+            </div>
 
-                        {order.payment_method}
-                    </dd>
-                </div>
-
-                {/* Status */}
-                <div
-                    className="
-                        flex
-                        items-center
-                        justify-between
-                        gap-4
-                        rounded-xl
-                        px-3
-                        py-3
-                        transition-colors
-                        hover:bg-[#f8faf5]
-                    "
-                >
-                    <dt className="text-sm text-[#596254]">
-                        Statut
-                    </dt>
-
-                    <dd>
-                        <AdminStatusBadge
-                            status={order.payment_status}
-                            label={order.payment_status_label}
-                        />
-                    </dd>
-                </div>
-
-                {/* Transaction */}
-                {order.transaction_id && (
-                    <div
-                        className="
-                            flex
-                            items-center
-                            justify-between
-                            gap-4
-                            rounded-xl
-                            px-3
-                            py-3
-                            transition-colors
-                            hover:bg-[#f8faf5]
-                        "
-                    >
-                        <dt className="shrink-0 text-sm text-[#596254]">
-                            Transaction ID
-                        </dt>
-
-                        <dd
-                            className="
-                                min-w-0
-                                max-w-[180px]
-                                truncate
-                                rounded-lg
-                                bg-[#f5f7f1]
-                                px-2.5
-                                py-1.5
-                                font-mono
-                                text-xs
-                                font-medium
-                                text-[var(--color-black)]
-                            "
-                            title={order.transaction_id}
-                        >
-                            {order.transaction_id}
-                        </dd>
-                    </div>
-                )}
-            </dl>
-
-            {/* Cash payment information */}
-            {order.is_cash &&
-                order.payment_status === 'pending' && (
-                    <div
-                        className="
-                            mt-4
-                            flex
-                            items-start
-                            gap-3
-                            rounded-xl
-                            border
-                            border-blue-200
-                            bg-blue-50
-                            px-4
-                            py-3
-                            text-sm
-                            text-blue-700
-                        "
-                    >
-                        <Info
-                            className="mt-0.5 h-4 w-4 shrink-0"
-                            strokeWidth={2.2}
-                        />
-
-                        <div>
-                            <p className="font-bold">
-                                Paiement à la livraison
-                            </p>
-
-                            <p className="mt-0.5 text-xs leading-relaxed text-blue-600">
-                                Le paiement est confirmé uniquement
-                                après la livraison de la commande.
-                            </p>
-                        </div>
-                    </div>
-                )}
-        </section>
+            <p className="mt-2 break-all font-mono text-xs font-bold text-slate-700">
+                {value}
+            </p>
+        </div>
     );
 }
 
+export default function OrderPaymentCard({ order }) {
+    const payment = getPaymentMethod(order?.payment_method);
+    const paymentStatus = getPaymentStatus(order?.payment_status);
+
+    const PaymentIcon = payment.icon;
+    const PaymentStatusIcon = paymentStatus.icon;
+
+    return (
+        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            {/* Header */}
+            <div className="border-b border-slate-100 px-5 py-4 sm:px-6">
+                <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+                        <CreditCard className="h-5 w-5" />
+                    </div>
+
+                    <div>
+                        <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">
+                            Paiement
+                        </h2>
+
+                        <p className="mt-0.5 text-xs text-slate-500">
+                            Informations de paiement
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-4 p-5 sm:p-6">
+                {/* Payment method */}
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+                    <div className="flex items-start gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm">
+                            <PaymentIcon className="h-5 w-5" />
+                        </div>
+
+                        <div className="min-w-0">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">
+                                Méthode
+                            </p>
+
+                            <p className="mt-1 text-sm font-black text-slate-800">
+                                {payment.label}
+                            </p>
+
+                            <p className="mt-1 text-xs leading-5 text-slate-500">
+                                {payment.description}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Payment status */}
+                <div
+                    className={`rounded-2xl border p-4 ${paymentStatus.bgClassName} ${paymentStatus.borderClassName}`}
+                >
+                    <div className="flex items-start gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm">
+                            <PaymentStatusIcon
+                                className={`h-5 w-5 ${paymentStatus.className}`}
+                            />
+                        </div>
+
+                        <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">
+                                    Statut du paiement
+                                </p>
+
+                                <span
+                                    className={`rounded-full bg-white px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${paymentStatus.className}`}
+                                >
+                                    {paymentStatus.label}
+                                </span>
+                            </div>
+
+                            <p className="mt-1 text-xs leading-5 text-slate-600">
+                                {paymentStatus.description}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Transaction */}
+                <TransactionId value={order?.transaction_id} />
+
+                {/* Security note */}
+                <div className="flex items-start gap-3 border-t border-slate-100 pt-4">
+                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+
+                    <p className="text-[11px] leading-5 text-slate-400">
+                        Les informations sensibles de paiement ne sont pas
+                        affichées dans le tableau de bord.
+                    </p>
+                </div>
+            </div>
+        </section>
+    );
+}
