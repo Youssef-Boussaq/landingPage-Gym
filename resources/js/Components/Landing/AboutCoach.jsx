@@ -2,6 +2,7 @@
 import React from "react";
 import { ArrowUpRight, Award, Dumbbell } from "lucide-react";
 import { useReveal } from "@/hooks/useReveal";
+import { usePage } from "@inertiajs/react";
 
 const About = () => {
     const headerRef = useReveal();
@@ -10,6 +11,10 @@ const About = () => {
 
     const certificateImageRef = useReveal();
     const certificateContentRef = useReveal();
+    const { appearance } = usePage().props;
+
+
+    console.log(appearance);
 
     return (
         <section

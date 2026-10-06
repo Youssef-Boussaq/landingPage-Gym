@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Services\Cart\CartSynchronizer;
 use App\Support\CustomerIdentity;
 use Illuminate\Support\Facades\Cache;
+use App\Services\Setting\SettingService;
 
 
 class HandleInertiaRequests extends Middleware
@@ -48,9 +49,11 @@ public function share(Request $request): array
     $cart = $sync['cart'];
 
     $user = $request->user();
+    $settingService = app(SettingService::class);
 
     return [
         ...parent::share($request),
+        'appearance' => $settingService->appearance(),
 
         'auth' => [
             'user' => $user,
