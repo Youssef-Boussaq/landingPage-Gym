@@ -140,7 +140,7 @@ export default function CategoryForm({
                                     <div className="flex items-center justify-between gap-1 p-2">
                                         <span className="text-[10px] font-bold uppercase text-slate-500">{item.type}</span>
                                         {isPrimary && (
-                                            <span className="rounded-full bg-[#9de500] px-2 py-0.5 text-[10px] font-black text-slate-950">
+                                            <span className="rounded-full bg-[var(--color-primary)] px-2 py-0.5 text-[10px] font-black text-slate-950">
                                                 Primary
                                             </span>
                                         )}
@@ -191,7 +191,7 @@ export default function CategoryForm({
                                 <div className="flex items-center justify-between p-2">
                                     <span className="truncate text-[10px] text-slate-500">{item.name}</span>
                                     {form.data.primary_index === index && !form.data.existing_primary_id && (
-                                        <span className="rounded-full bg-[#9de500] px-2 py-0.5 text-[10px] font-black text-slate-950">
+                                        <span className="rounded-full bg-[var(--color-primary)] px-2 py-0.5 text-[10px] font-black text-slate-950">
                                             Primary
                                         </span>
                                     )}
@@ -224,7 +224,7 @@ export default function CategoryForm({
             <button
                 type="submit"
                 disabled={form.processing}
-                className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-[#9de500]"
+                className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-[var(--color-primary)]"
             >
                 {form.processing ? 'Saving…' : submitLabel}
             </button>

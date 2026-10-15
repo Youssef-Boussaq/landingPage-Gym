@@ -282,7 +282,7 @@ export default function ProductForm({
                                     event.target.value
                                 )
                             }
-                            className="mt-2 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-[#9de500] focus:ring-[#9de500]"
+                            className="mt-2 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                             placeholder="Ex: Whey Protein Isolate"
                         />
 
@@ -310,7 +310,7 @@ export default function ProductForm({
                                         event.target.value
                                     )
                                 }
-                                className="mt-2 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-[#9de500] focus:ring-[#9de500]"
+                                className="mt-2 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                             >
                                 {types.map((type) => (
                                     <option
@@ -387,7 +387,7 @@ export default function ProductForm({
                                         event.target.value
                                     )
                                 }
-                                className="block w-full rounded-xl border-slate-300 pr-14 text-sm shadow-sm focus:border-[#9de500] focus:ring-[#9de500]"
+                                className="block w-full rounded-xl border-slate-300 pr-14 text-sm shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                                 placeholder="0.00"
                             />
 
@@ -424,7 +424,7 @@ export default function ProductForm({
                                         event.target.value
                                     )
                                 }
-                                className="block w-full rounded-xl border-slate-300 pr-14 text-sm shadow-sm focus:border-[#9de500] focus:ring-[#9de500]"
+                                className="block w-full rounded-xl border-slate-300 pr-14 text-sm shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                                 placeholder="Optionnel"
                             />
 
@@ -459,7 +459,7 @@ export default function ProductForm({
                                     event.target.value
                                 )
                             }
-                            className="mt-2 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-[#9de500] focus:ring-[#9de500]"
+                            className="mt-2 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                             placeholder="0"
                         />
 
@@ -485,7 +485,7 @@ export default function ProductForm({
                                 event.target.checked
                             )
                         }
-                        className="h-4 w-4 rounded border-slate-300 text-[#9de500] focus:ring-[#9de500]"
+                        className="h-4 w-4 rounded border-slate-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                     />
 
                     <span className="text-sm font-medium text-slate-700">
@@ -549,7 +549,7 @@ export default function ProductForm({
                 <div>
                     <label
                         htmlFor="product-images"
-                        className="flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/50 px-6 py-8 text-center transition hover:border-[#9de500] hover:bg-lime-50/30"
+                        className="flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/50 px-6 py-8 text-center transition hover:border-[var(--color-primary)] hover:bg-lime-50/30"
                     >
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
                             <svg
@@ -600,7 +600,7 @@ export default function ProductForm({
                                     <div
                                         key={image.id}
                                         className={`group relative overflow-hidden rounded-2xl border bg-white ${image.isPrimary
-                                            ? 'border-[#9de500] ring-2 ring-[#9de500]/20'
+                                            ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)]/20'
                                             : 'border-slate-200'
                                             }`}
                                     >
@@ -617,7 +617,7 @@ export default function ProductForm({
 
                                         {/* Primary badge */}
                                         {image.isPrimary && (
-                                            <div className="absolute left-2 top-2 rounded-full bg-[#9de500] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-950">
+                                            <div className="absolute left-2 top-2 rounded-full bg-[var(--color-primary)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-950">
                                                 Principale
                                             </div>
                                         )}
@@ -663,7 +663,7 @@ export default function ProductForm({
                                                         );
                                                     }
                                                 }}
-                                                className="absolute bottom-2 left-2 right-2 rounded-lg bg-white/95 px-3 py-2 text-xs font-medium text-slate-700 opacity-0 shadow-sm transition group-hover:opacity-100 hover:bg-[#9de500] hover:text-slate-950"
+                                                className="absolute bottom-2 left-2 right-2 rounded-lg bg-white/95 px-3 py-2 text-xs font-medium text-slate-700 opacity-0 shadow-sm transition group-hover:opacity-100 hover:bg-[var(--color-primary)] hover:text-slate-950"
                                             >
                                                 Définir comme principale
                                             </button>

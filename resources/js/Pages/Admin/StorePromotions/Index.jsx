@@ -28,7 +28,7 @@ export default function StorePromotionsIndex({ promotions = [] }) {
                 </div>
                 <Link
                     href={route('admin.store-promotions.create')}
-                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-[#9de500]"
+                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-[var(--color-primary)]"
                 >
                     <Plus className="h-4 w-4" />
                     Nouvelle promotion

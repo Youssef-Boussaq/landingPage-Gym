@@ -80,7 +80,7 @@ export default function OrderSummary({ summary }) {
                 <div className="my-5 border-t border-dashed border-slate-200" />
 
                 {/* Total */}
-                <div className="rounded-2xl border border-[#9de500]/20 bg-[#9de500]/5 p-4">
+                <div className="rounded-2xl border border-[var(--color-primary)]/20 bg-[var(--color-primary)]/5 p-4">
                     <div className="flex items-end justify-between gap-4">
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">

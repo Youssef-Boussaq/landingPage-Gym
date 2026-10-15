@@ -1,5 +1,7 @@
+
 import { Head } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+
 import Hero from '@/Components/Landing/Hero';
 import AboutCoach from '@/Components/Landing/AboutCoach';
 import Services from '@/Components/Landing/Services';
@@ -9,15 +11,15 @@ import Programs from '@/Components/Landing/Programs';
 import Contact from '@/Components/Landing/Contact';
 import Footer from '@/Components/Landing/Footer';
 
-export default function Welcome({ auth }) {
+export default function Welcome({ auth, heroConfig = {} }) {
     return (
         <PublicLayout>
             <Head title="Accueil" />
 
-            {/* Changed from dark mode background to match light theme */}
             <div className="relative overflow-x-clip bg-white text-slate-900 font-sans selection:bg-[var(--color-primary)] selection:text-slate-900">
                 <main>
-                    <Hero />
+                    <Hero config={heroConfig} />
+
                     <AboutCoach />
                     <Services />
                     <Transformations />
@@ -25,6 +27,7 @@ export default function Welcome({ auth }) {
                     <Programs />
                     <Contact />
                 </main>
+
                 <Footer />
             </div>
         </PublicLayout>

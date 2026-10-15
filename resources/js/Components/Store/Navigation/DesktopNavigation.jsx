@@ -81,7 +81,7 @@ export default function DesktopNavigation({ categories = [] }) {
                             {/* Ligne d'indication active au survol / sélection */}
                             <span
                                 className={`
-                                    absolute bottom-0 left-0 h-[2.5px] w-full rounded-full bg-[#9de500]
+                                    absolute bottom-0 left-0 h-[2.5px] w-full rounded-full bg-[var(--color-primary)]
                                     transition-all duration-200 ease-out
                                     ${active
                                         ? 'scale-x-100 opacity-100'
@@ -108,7 +108,7 @@ export default function DesktopNavigation({ categories = [] }) {
                     "
                 >
                     <span>Explore</span>
-                    <span className="absolute bottom-0 left-0 h-[2.5px] w-full scale-x-0 rounded-full bg-[#9de500] opacity-0 transition-all duration-200 group-hover:scale-x-100 group-hover:opacity-100" />
+                    <span className="absolute bottom-0 left-0 h-[2.5px] w-full scale-x-0 rounded-full bg-[var(--color-primary)] opacity-0 transition-all duration-200 group-hover:scale-x-100 group-hover:opacity-100" />
                 </Link>
             </div>
         </nav>

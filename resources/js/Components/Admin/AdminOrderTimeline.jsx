@@ -12,7 +12,7 @@ export default function AdminOrderTimeline({ events = [] }) {
         <ol className="space-y-4">
             {events.map((event, index) => (
                 <li key={`${event.key}-${index}`} className="flex gap-3">
-                    <div className="mt-0.5 text-[#9de500]">
+                    <div className="mt-0.5 text-[var(--color-primary)]">
                         <CheckCircle2 className="h-5 w-5" />
                     </div>
                     <div>

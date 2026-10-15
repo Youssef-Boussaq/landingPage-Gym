@@ -293,7 +293,7 @@ export default function OrderStatusStepper({ status }) {
                                                     : ''
                                                 }
                                                 ${current
-                                                    ? 'border-[var(--color-primary-dark)] bg-[var(--color-primary)] text-[var(--color-black)] shadow-[0_0_0_5px_rgba(157,229,0,0.12)]'
+                                                    ? 'border-[var(--color-primary-dark)] bg-[var(--color-primary)] text-[var(--color-black)] shadow-[0_0_0_5px_color-mix(in_srgb,var(--color-primary)_12%,transparent)]'
                                                     : ''
                                                 }
                                                 ${future
@@ -419,7 +419,7 @@ export default function OrderStatusStepper({ status }) {
                                                     : 'border-black/[0.07] bg-[#fafbf8] text-[#a2a99d]'
                                                 }
                                                 ${current
-                                                    ? 'shadow-[0_0_0_4px_rgba(157,229,0,0.12)]'
+                                                    ? 'shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-primary)_12%,transparent)]'
                                                     : ''
                                                 }
                                             `}

@@ -37,15 +37,15 @@ export default function Navbar() {
                             text-[11px] font-medium text-gray-700
 
                             transition-colors duration-200
-                            hover:text-[#9de500]
-                            focus:text-[#9de500]
-                            active:text-[#9de500]
+                            hover:text-[var(--color-primary)]
+                            focus:text-[var(--color-primary)]
+                            active:text-[var(--color-primary)]
 
                             after:mt-1
                             after:h-0.5
                             after:w-5
                             after:rounded-full
-                            after:bg-[#9de500]
+                            after:bg-[var(--color-primary)]
                             after:opacity-0
 
                             after:transition-opacity

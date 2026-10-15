@@ -11,7 +11,7 @@ export default function AdminPagination({ links = [] }) {
                 const className = [
                     'min-w-9 rounded-lg px-3 py-1.5 text-sm',
                     link.active
-                        ? 'bg-slate-900 text-[#9de500]'
+                        ? 'bg-slate-900 text-[var(--color-primary)]'
                         : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50',
                     !link.url ? 'opacity-40 pointer-events-none' : '',
                 ].join(' ');

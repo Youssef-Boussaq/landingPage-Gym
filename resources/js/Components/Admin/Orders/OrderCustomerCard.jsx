@@ -76,7 +76,7 @@ export default function OrderCustomerCard({ customer }) {
                                 py-1
                                 text-xs
                                 font-bold
-                                text-[#547900]
+                                text-[var(--color-primary-dark)]
                             "
                         >
                             {customer.type_label}

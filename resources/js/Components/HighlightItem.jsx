@@ -30,10 +30,10 @@ export default function HighlightItem({ icon: Icon, text, delay = 0 }) {
                 isVisible 
                     ? 'opacity-100 translate-y-0' 
                     : 'opacity-0 translate-y-6'
-            } hover:border-[#9de500] hover:shadow-md hover:translate-x-1.5`}
+            } hover:border-[var(--color-primary)] hover:shadow-md hover:translate-x-1.5`}
         >
             {/* Custom Icon Container */}
-            <div className="flex items-center justify-center p-2.5 rounded-xl bg-[#9de500]/20 border border-[#9de500]/40 text-slate-900 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:bg-[#9de500]">
+            <div className="flex items-center justify-center p-2.5 rounded-xl bg-[var(--color-primary)]/20 border border-[var(--color-primary)]/40 text-slate-900 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:bg-[var(--color-primary)]">
                 <Icon className="h-5 w-5" />
             </div>
 

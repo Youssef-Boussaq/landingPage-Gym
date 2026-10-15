@@ -153,7 +153,7 @@ export default function Edit({ promotion }) {
                                             event.target.value
                                         )
                                     }
-                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#9de500] focus:ring-2 focus:ring-[#9de500]/20"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
                                 />
 
                                 {form.errors.title && (
@@ -182,7 +182,7 @@ export default function Edit({ promotion }) {
                                             event.target.value
                                         )
                                     }
-                                    className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#9de500] focus:ring-2 focus:ring-[#9de500]/20"
+                                    className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
                                 />
 
                                 {form.errors.description && (
@@ -212,7 +212,7 @@ export default function Edit({ promotion }) {
                                             event.target.value
                                         )
                                     }
-                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#9de500] focus:ring-2 focus:ring-[#9de500]/20"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
                                 />
 
                                 {form.errors.sort_order && (
@@ -233,7 +233,7 @@ export default function Edit({ promotion }) {
                                             event.target.checked
                                         )
                                     }
-                                    className="h-4 w-4 rounded border-slate-300 text-[#9de500] focus:ring-[#9de500]"
+                                    className="h-4 w-4 rounded border-slate-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                                 />
 
                                 <span className="text-sm font-semibold text-slate-700">
@@ -290,7 +290,7 @@ export default function Edit({ promotion }) {
                                 onClick={() =>
                                     fileRef.current?.click()
                                 }
-                                className="flex min-h-64 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 px-6 text-center transition hover:border-[#9de500] hover:bg-[#9de500]/5"
+                                className="flex min-h-64 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 px-6 text-center transition hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5"
                             >
                                 <ImagePlus className="mb-3 h-10 w-10 text-slate-400" />
 
@@ -334,7 +334,7 @@ export default function Edit({ promotion }) {
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#9de500] px-6 py-3 text-sm font-bold text-slate-950 shadow-sm transition hover:bg-[#8cd000] disabled:cursor-not-allowed disabled:opacity-50"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] px-6 py-3 text-sm font-bold text-slate-950 shadow-sm transition hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {submitting ? (
                             <>

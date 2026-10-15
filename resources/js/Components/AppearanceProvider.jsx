@@ -9,22 +9,22 @@ export default function AppearanceProvider({
 
         root.style.setProperty(
             '--color-primary',
-            appearance?.primary || '#9de500'
+            appearance?.primary || 'var(--color-primary)'
         );
 
         root.style.setProperty(
             '--color-primary-hover',
-            appearance?.primary_hover || '#8cd000'
+            appearance?.primary_hover || 'var(--color-primary-hover)'
         );
 
         root.style.setProperty(
             '--color-primary-dark',
-            appearance?.primary_dark || '#7ec000'
+            appearance?.primary_dark || 'var(--color-primary-dark)'
         );
 
         root.style.setProperty(
             '--color-primary-light',
-            appearance?.primary_light || '#b8f526'
+            appearance?.primary_light || 'var(--color-primary-light)'
         );
     }, [appearance]);
 

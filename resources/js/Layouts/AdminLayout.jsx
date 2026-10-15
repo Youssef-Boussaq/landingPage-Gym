@@ -13,7 +13,7 @@ export default function AdminLayout({ title, children }) {
 
             <div className="flex min-h-screen">
                 <aside className="hidden w-64 shrink-0 bg-slate-950 lg:sticky lg:top-0 lg:block lg:h-screen">
-                    <div className="px-5 py-5 text-xs font-black uppercase tracking-[0.2em] text-[#9de500]">
+                    <div className="px-5 py-5 text-xs font-black uppercase tracking-[0.2em] text-[var(--color-primary)]">
                         Admin
                     </div>
                     <AdminSidebar />
@@ -28,7 +28,7 @@ export default function AdminLayout({ title, children }) {
                             onClick={() => setSidebarOpen(false)}
                         />
                         <aside className="relative z-50 h-full w-64 bg-slate-950 shadow-xl">
-                            <div className="px-5 py-5 text-xs font-black uppercase tracking-[0.2em] text-[#9de500]">
+                            <div className="px-5 py-5 text-xs font-black uppercase tracking-[0.2em] text-[var(--color-primary)]">
                                 Admin
                             </div>
                             <AdminSidebar onNavigate={() => setSidebarOpen(false)} />

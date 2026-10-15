@@ -17,13 +17,13 @@ import {
 
 function hexToRgba(hex, alpha = 0.1) {
     if (!hex) {
-        return `rgba(157, 229, 0, ${alpha})`;
+        return `color-mix(in srgb, var(--color-primary) calc(${alpha} * 100%), transparent)`;
     }
 
     const value = hex.replace('#', '');
 
     if (!/^[0-9a-fA-F]{6}$/.test(value)) {
-        return `rgba(157, 229, 0, ${alpha})`;
+        return `color-mix(in srgb, var(--color-primary) calc(${alpha} * 100%), transparent)`;
     }
 
     const r = parseInt(value.slice(0, 2), 16);
@@ -85,7 +85,7 @@ function getStatusAccent(status, color) {
         return '#22c55e';
     }
 
-    return color || '#9de500';
+    return color || 'var(--color-primary)';
 }
 
 function StatusBadge({ shipment }) {

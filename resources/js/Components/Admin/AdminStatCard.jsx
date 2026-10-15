@@ -10,7 +10,7 @@ export default function AdminStatCard({ label, value, icon: Icon, hint }) {
                     {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
                 </div>
                 {Icon && (
-                    <div className="rounded-xl bg-slate-900 p-2 text-[#9de500]">
+                    <div className="rounded-xl bg-slate-900 p-2 text-[var(--color-primary)]">
                         <Icon className="h-5 w-5" />
                     </div>
                 )}

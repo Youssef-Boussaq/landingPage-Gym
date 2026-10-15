@@ -24,7 +24,7 @@ export default function MegaMenu({ category }) {
             {/* Header de la catégorie */}
             <div className="flex items-center justify-between px-3 pt-2 pb-2 mb-1 border-b border-slate-100">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <Sparkles className="w-3 h-3 text-[#9de500]" />
+                    <Sparkles className="w-3 h-3 text-[var(--color-primary)]" />
                     {category.name}
                 </span>
                 <span className="text-[11px] font-medium text-slate-400">
@@ -50,7 +50,7 @@ export default function MegaMenu({ category }) {
                     >
                         <span className="flex items-center gap-2">
                             {/* Puce d'accentuation discrète au survol */}
-                            <span className="h-1.5 w-1.5 rounded-full bg-[#9de500] opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-primary)] opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200" />
                             {child.name}
                         </span>
 
@@ -69,7 +69,7 @@ export default function MegaMenu({ category }) {
                         flex items-center justify-between w-full
                         rounded-xl px-3.5 py-2.5
                         text-xs font-bold text-slate-900 bg-slate-50
-                        hover:bg-[#9de500] hover:text-slate-950
+                        hover:bg-[var(--color-primary)] hover:text-slate-950
                         transition-all duration-200 group
                     "
                 >

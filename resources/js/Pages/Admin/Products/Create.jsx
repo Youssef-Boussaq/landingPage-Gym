@@ -109,7 +109,7 @@ export default function ProductCreate({ categories, types }) {
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#9de500] px-6 py-3 text-sm font-bold text-slate-950 shadow-sm transition hover:bg-[#8cd000] disabled:cursor-not-allowed disabled:opacity-50"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] px-6 py-3 text-sm font-bold text-slate-950 shadow-sm transition hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {submitting ? (
                             <>

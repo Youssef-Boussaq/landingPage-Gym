@@ -18,7 +18,7 @@ export default function ProductShow({ product }) {
             <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
                 <h1 className="font-archivo text-2xl uppercase text-slate-900">{product.title}</h1>
                 <div className="flex gap-2">
-                    <Link href={route('admin.products.edit', product.id)} className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-[#9de500]">
+                    <Link href={route('admin.products.edit', product.id)} className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-[var(--color-primary)]">
                         Éditer
                     </Link>
                     {product.is_active && (

@@ -31,7 +31,7 @@ const About = () => {
                     className="reveal mb-16 max-w-3xl lg:mb-24"
                 >
                     <div className="mb-5 flex items-center gap-3">
-                        <span className="h-px w-10 bg-[#9de500]" />
+                        <span className="h-px w-10 bg-[var(--color-primary)]" />
 
                         <span className="font-inter text-xs font-semibold uppercase tracking-[0.25em] text-black/50">
                             About the coach
@@ -40,7 +40,7 @@ const About = () => {
 
                     <h2 className="font-archivo text-5xl uppercase leading-[0.9] tracking-[-0.04em] sm:text-6xl lg:text-8xl">
                         Built through
-                        <span className="block text-[#9de500]">
+                        <span className="block text-[var(--color-primary)]">
                             discipline.
                         </span>
                     </h2>
@@ -56,7 +56,7 @@ const About = () => {
                 ===================================================== */}
                 <article className="grid items-center gap-12 lg:grid-cols-2 lg:gap-24">
 
-                    {/* IMAGE */} <div ref={coachImageRef} className="reveal reveal-left relative mx-auto w-full max-w-[300px] sm:max-w-[320px] lg:max-w-[350px]" > <div className="group relative aspect-[9/16]"> <img src="/images/3.png" alt="Fit Youness coach" loading="lazy" decoding="async" className=" h-full w-full object-contain object-center transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform group-hover:-translate-y-1 group-hover:scale-[1.015] " /> <span className=" absolute left-0 top-4 font-archivo text-4xl leading-none text-black/[0.06] transition-all duration-700 ease-out group-hover:-translate-x-1 group-hover:text-[#9de500]/30 " > 01 </span> <div className=" absolute bottom-5 right-0 flex h-12 w-12 items-center justify-center rounded-full bg-[#9de500] shadow-[0_8px_25px_rgba(157,229,0,0.18)] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-6 group-hover:scale-105 " > <Dumbbell size={19} strokeWidth={2} /> </div> </div> </div>
+                    {/* IMAGE */} <div ref={coachImageRef} className="reveal reveal-left relative mx-auto w-full max-w-[300px] sm:max-w-[320px] lg:max-w-[350px]" > <div className="group relative aspect-[9/16]"> <img src="/images/3.png" alt="Fit Youness coach" loading="lazy" decoding="async" className=" h-full w-full object-contain object-center transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform group-hover:-translate-y-1 group-hover:scale-[1.015] " /> <span className=" absolute left-0 top-4 font-archivo text-4xl leading-none text-black/[0.06] transition-all duration-700 ease-out group-hover:-translate-x-1 group-hover:text-[var(--color-primary)]/30 " > 01 </span> <div className=" absolute bottom-5 right-0 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-primary)] shadow-[0_8px_25px_color-mix(in_srgb,var(--color-primary)_18%,transparent)] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-6 group-hover:scale-105 " > <Dumbbell size={19} strokeWidth={2} /> </div> </div> </div>
 
                     {/* CONTENT */}
                     <div
@@ -64,7 +64,7 @@ const About = () => {
                         className="reveal reveal-right max-w-xl"
                     >
                         <div className="mb-6 flex items-center gap-3">
-                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#9de500]/15">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)]/15">
                                 <Dumbbell size={18} />
                             </span>
 
@@ -90,7 +90,7 @@ const About = () => {
                         </p>
 
                         <div className="mt-9 flex items-center gap-4">
-                            <span className="h-px w-14 bg-[#9de500]" />
+                            <span className="h-px w-14 bg-[var(--color-primary)]" />
 
                             <span className="font-inter text-xs font-semibold uppercase tracking-[0.18em] text-black/40">
                                 Strength is built daily
@@ -110,7 +110,7 @@ const About = () => {
                         className="reveal reveal-left order-2 max-w-xl lg:order-1"
                     >
                         <div className="mb-6 flex items-center gap-3">
-                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#9de500]/15">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)]/15">
                                 <Award size={19} />
                             </span>
 
@@ -122,7 +122,7 @@ const About = () => {
                         <h3 className="font-archivo text-4xl uppercase leading-[0.95] tracking-[-0.03em] sm:text-5xl lg:text-6xl">
                             IFBB
                             <br />
-                            <span className="text-[#9de500]">
+                            <span className="text-[var(--color-primary)]">
                                 Certified.
                             </span>
                         </h3>
@@ -136,7 +136,7 @@ const About = () => {
                         </p>
 
                         <div className="mt-9 inline-flex items-center gap-3">
-                            <span className="h-2 w-2 rounded-full bg-[#9de500]" />
+                            <span className="h-2 w-2 rounded-full bg-[var(--color-primary)]" />
 
                             <span className="font-inter text-xs font-bold uppercase tracking-[0.15em] text-black/45">
                                 Knowledge • Training • Nutrition
@@ -144,7 +144,7 @@ const About = () => {
                         </div>
                     </div>
 
-                    {/* CERTIFICATE IMAGE */} <div ref={certificateImageRef} className="reveal reveal-right order-1 relative mx-auto w-full max-w-[300px] sm:max-w-[320px] lg:max-w-[350px] lg:order-2" > <div className="group relative aspect-[9/16]"> <img src="/images/4.png" alt="IFBB certified coach" loading="lazy" decoding="async" className=" h-full w-full object-contain object-center transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform group-hover:-translate-y-1 group-hover:scale-[1.015] " /> <span className=" absolute right-0 top-4 font-archivo text-4xl leading-none text-black/[0.06] transition-all duration-700 ease-out group-hover:translate-x-1 group-hover:text-[#9de500]/30 " > 02 </span> <div className=" absolute bottom-5 left-0 flex h-12 w-12 items-center justify-center rounded-full bg-[#9de500] shadow-[0_8px_25px_rgba(157,229,0,0.18)] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-rotate-6 group-hover:scale-105 " > <Award size={20} strokeWidth={2} /> </div> </div> </div>
+                    {/* CERTIFICATE IMAGE */} <div ref={certificateImageRef} className="reveal reveal-right order-1 relative mx-auto w-full max-w-[300px] sm:max-w-[320px] lg:max-w-[350px] lg:order-2" > <div className="group relative aspect-[9/16]"> <img src="/images/4.png" alt="IFBB certified coach" loading="lazy" decoding="async" className=" h-full w-full object-contain object-center transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform group-hover:-translate-y-1 group-hover:scale-[1.015] " /> <span className=" absolute right-0 top-4 font-archivo text-4xl leading-none text-black/[0.06] transition-all duration-700 ease-out group-hover:translate-x-1 group-hover:text-[var(--color-primary)]/30 " > 02 </span> <div className=" absolute bottom-5 left-0 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-primary)] shadow-[0_8px_25px_color-mix(in_srgb,var(--color-primary)_18%,transparent)] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-rotate-6 group-hover:scale-105 " > <Award size={20} strokeWidth={2} /> </div> </div> </div>
                 </article>
 
                 {/* =====================================================
@@ -179,7 +179,7 @@ const About = () => {
                                 text-white
                                 transition-all
                                 duration-300
-                                hover:bg-[#9de500]
+                                hover:bg-[var(--color-primary)]
                                 hover:text-[#0b0c0e]
                             "
                         >

@@ -96,7 +96,7 @@ export default function CreateCategoryModal({
                             autoFocus
                             disabled={loading}
                             placeholder="Ex: Protein"
-                            className="mt-2 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-[#9de500] focus:ring-[#9de500] disabled:bg-slate-50"
+                            className="mt-2 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)] disabled:bg-slate-50"
                         />
 
                         {error && (
@@ -125,7 +125,7 @@ export default function CreateCategoryModal({
                             loading ||
                             !name.trim()
                         }
-                        className="inline-flex items-center gap-2 rounded-xl bg-[#9de500] px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-[#8cd000] disabled:cursor-not-allowed disabled:opacity-50"
+                        className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary)] px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {loading && (
                             <Loader2 className="h-4 w-4 animate-spin" />

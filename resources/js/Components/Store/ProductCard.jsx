@@ -31,7 +31,7 @@ export default function ProductCard({ product, preview = false }) {
                 />
 
                 {/* Floating Action Badge */}
-                <div className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-md text-slate-900 shadow-md transition-all duration-300 group-hover:bg-[#9de500] group-hover:scale-110">
+                <div className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-md text-slate-900 shadow-md transition-all duration-300 group-hover:bg-[var(--color-primary)] group-hover:scale-110">
                     <ArrowUpRight className="w-4 h-4" />
                 </div>
             </div>
@@ -65,7 +65,7 @@ export default function ProductCard({ product, preview = false }) {
                     </div>
 
                     {/* Icon CTA Button */}
-                    <div className="inline-flex items-center justify-center p-2.5 rounded-xl bg-slate-900 text-[#9de500] transition-colors duration-300 group-hover:bg-[#9de500] group-hover:text-slate-950 shadow-sm">
+                    <div className="inline-flex items-center justify-center p-2.5 rounded-xl bg-slate-900 text-[var(--color-primary)] transition-colors duration-300 group-hover:bg-[var(--color-primary)] group-hover:text-slate-950 shadow-sm">
                         <ShoppingBag className="w-4 h-4" />
                     </div>
                 </div>

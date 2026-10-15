@@ -12,16 +12,13 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Admin\StorePromotionController;
 
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Admin\HeroSettingController;
 
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+
+Route::get('/', [HomeController::class, 'index'])
+    ->name('home');
  
 use App\Http\Controllers\AmeexWebhookController;
 
@@ -180,6 +177,16 @@ Route::patch('/settings/appearance', [
             ->name('notifications.read');
 
         
+
+            Route::get('/hero', [
+    HeroSettingController::class,
+    'index',
+])->name('hero.edit');
+
+Route::put('/hero', [
+    HeroSettingController::class,
+    'update',
+])->name('hero.update');
         
     });
 

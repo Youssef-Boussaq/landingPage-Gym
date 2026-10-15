@@ -19,7 +19,7 @@ export default function MobileMenu({ categories = [], onNavigate }) {
             <div className="w-1/2 border-r border-slate-100 bg-slate-50/50 p-2 space-y-1 dark:border-slate-800/80 dark:bg-slate-900/40">
                 <div className="px-2 py-1.5 mb-1">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-1">
-                        <Layers className="w-3 h-3 text-[#9de500]" />
+                        <Layers className="w-3 h-3 text-[var(--color-primary)]" />
                         Catégories
                     </span>
                 </div>
@@ -43,7 +43,7 @@ export default function MobileMenu({ categories = [], onNavigate }) {
                         >
                             <span className="flex items-center gap-2 truncate">
                                 <span
-                                    className={`h-3 w-1 rounded-full bg-[#9de500] transition-all duration-200 ${isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+                                    className={`h-3 w-1 rounded-full bg-[var(--color-primary)] transition-all duration-200 ${isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
                                         }`}
                                 />
                                 <span className="truncate">{category.name}</span>
@@ -51,7 +51,7 @@ export default function MobileMenu({ categories = [], onNavigate }) {
 
                             <ChevronRight
                                 className={`h-4 w-4 shrink-0 transition-transform duration-200 ${isActive
-                                        ? 'translate-x-0.5 text-[#9de500]'
+                                        ? 'translate-x-0.5 text-[var(--color-primary)]'
                                         : 'text-slate-400 opacity-60 group-hover:opacity-100'
                                     }`}
                             />
@@ -67,7 +67,7 @@ export default function MobileMenu({ categories = [], onNavigate }) {
                 <div>
                     <div className="px-2 py-1.5 mb-2 border-b border-slate-100 dark:border-slate-800">
                         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-1">
-                            <Sparkles className="w-3 h-3 text-[#9de500]" />
+                            <Sparkles className="w-3 h-3 text-[var(--color-primary)]" />
                             {currentCategory?.name}
                         </span>
                     </div>
@@ -109,7 +109,7 @@ export default function MobileMenu({ categories = [], onNavigate }) {
                         onClick={() => onNavigate && onNavigate()}
                         className="
                             flex items-center justify-between w-full rounded-xl px-3 py-2.5
-                            text-xs font-bold text-slate-950 bg-[#9de500]
+                            text-xs font-bold text-slate-950 bg-[var(--color-primary)]
                             hover:bg-[#8bd100] active:scale-[0.98]
                             transition-all duration-150 shadow-sm
                         "

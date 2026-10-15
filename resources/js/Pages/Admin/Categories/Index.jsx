@@ -81,7 +81,7 @@ export default function CategoriesIndex({ categories = [], stats }) {
                 </div>
                 <Link
                     href={route('admin.categories.create')}
-                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-[#9de500]"
+                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-[var(--color-primary)]"
                 >
                     <FolderPlus className="h-4 w-4" />
                     New category

@@ -16,25 +16,25 @@ function SectionHeader({ icon: Icon, title, description, badge, isHot }) {
     return (
         <div className="group relative mb-8 flex flex-col gap-2 rounded-2xl transition-all duration-300">
             {/* Effet de lueur d'arrière-plan au survol */}
-            <div className="absolute -inset-x-4 -inset-y-3 -z-10 rounded-3xl bg-gradient-to-r from-[#9de500]/10 via-[#9de500]/5 to-transparent opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100" />
+            <div className="absolute -inset-x-4 -inset-y-3 -z-10 rounded-3xl bg-gradient-to-r from-[var(--color-primary)]/10 via-[var(--color-primary)]/5 to-transparent opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100" />
 
             <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3 sm:gap-4">
                     {/* Badge Icône Animé */}
-                    <div className="relative flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-slate-900 text-[#9de500] shadow-md transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 dark:bg-slate-800">
+                    <div className="relative flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-slate-900 text-[var(--color-primary)] shadow-md transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 dark:bg-slate-800">
                         <Icon className={`h-6 w-6 sm:h-7 sm:w-7 transition-transform duration-300 group-hover:scale-110 ${isHot ? 'animate-pulse' : ''}`} />
-                        <span className="absolute -inset-1 -z-10 rounded-2xl bg-[#9de500]/20 blur-md opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                        <span className="absolute -inset-1 -z-10 rounded-2xl bg-[var(--color-primary)]/20 blur-md opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     </div>
 
                     {/* Titre & Badge */}
                     <div className="flex flex-col">
                         <div className="flex items-center gap-3">
-                            <h2 className="font-archivo text-2xl sm:text-3xl tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-[#9de500] dark:text-white">
+                            <h2 className="font-archivo text-2xl sm:text-3xl tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-[var(--color-primary)] dark:text-white">
                                 {title}
                             </h2>
 
                             {badge && (
-                                <span className="inline-flex items-center rounded-full bg-[#9de500]/15 px-3 py-1 text-xs font-bold text-slate-900 dark:text-[#9de500] border border-[#9de500]/30 shadow-xs">
+                                <span className="inline-flex items-center rounded-full bg-[var(--color-primary)]/15 px-3 py-1 text-xs font-bold text-slate-900 dark:text-[var(--color-primary)] border border-[var(--color-primary)]/30 shadow-xs">
                                     {badge}
                                 </span>
                             )}
@@ -43,7 +43,7 @@ function SectionHeader({ icon: Icon, title, description, badge, isHot }) {
                 </div>
 
                 {/* Petite ligne/barre décorative sous le titre */}
-                <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-400 group-hover:text-[#9de500] transition-colors duration-300">
+                <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-400 group-hover:text-[var(--color-primary)] transition-colors duration-300">
                     <span>Explorer</span>
                     <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
@@ -56,7 +56,7 @@ function SectionHeader({ icon: Icon, title, description, badge, isHot }) {
 
             {/* Ligne d'accentuation animée */}
             <div className="mt-2 h-0.5 w-full bg-slate-200/60 dark:bg-slate-800/80 overflow-hidden rounded-full">
-                <div className="h-full w-24 bg-[#9de500] transition-all duration-500 group-hover:w-full" />
+                <div className="h-full w-24 bg-[var(--color-primary)] transition-all duration-500 group-hover:w-full" />
             </div>
         </div>
     );

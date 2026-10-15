@@ -21,7 +21,7 @@ export default function AdminSearchBar({
                 value={term}
                 onChange={(event) => setTerm(event.target.value)}
                 placeholder={placeholder}
-                className="w-full rounded-xl border-slate-200 py-2.5 pl-10 pr-3 text-sm shadow-sm focus:border-[#9de500] focus:ring-[#9de500]"
+                className="w-full rounded-xl border-slate-200 py-2.5 pl-10 pr-3 text-sm shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
             />
         </form>
     );

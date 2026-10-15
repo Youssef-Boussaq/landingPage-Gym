@@ -26,7 +26,7 @@ export default function ProductsIndex({ products, filters, categories, lowStockT
                 <h1 className="font-archivo text-2xl uppercase text-slate-900">Products</h1>
                 <Link
                     href={route('admin.products.create')}
-                    className="inline-flex rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-[#9de500]"
+                    className="inline-flex rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-[var(--color-primary)]"
                 >
                     Nouveau produit
                 </Link>

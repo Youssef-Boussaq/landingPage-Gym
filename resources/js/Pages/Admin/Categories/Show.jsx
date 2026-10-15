@@ -27,7 +27,7 @@ export default function CategoryShow({ category }) {
                 <div className="flex gap-2">
                     <Link
                         href={route('admin.categories.edit', category.id)}
-                        className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-[#9de500]"
+                        className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-[var(--color-primary)]"
                     >
                         Edit
                     </Link>
@@ -66,7 +66,7 @@ export default function CategoryShow({ category }) {
                             )}
                         </div>
                         <ArrowDown className="h-4 w-4 text-slate-400" />
-                        <div className="rounded-xl bg-slate-900 px-3 py-2 font-bold text-[#9de500]">
+                        <div className="rounded-xl bg-slate-900 px-3 py-2 font-bold text-[var(--color-primary)]">
                             {category.name}
                         </div>
                         {(category.children || []).length > 0 && (
