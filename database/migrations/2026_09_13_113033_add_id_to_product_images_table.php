@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('product_images', function (Blueprint $table) {
-            $table->id()->first();
-        });
+        if (!Schema::hasColumn('product_images', 'id')) {
+            Schema::table('product_images', function (Blueprint $table) {
+                $table->id()->first();
+            });
+        }
     }
 
     /**

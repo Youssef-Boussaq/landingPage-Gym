@@ -13,7 +13,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('product_images', function (Blueprint $table) {
-           $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
+            $table->id();
+            $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
             
             $table->string('path'); // ex: products/12/thumbnail-cover.webp
             $table->string('alt_text')->nullable(); // SEO & Accessibilité

@@ -179,15 +179,24 @@ Route::patch('/settings/appearance', [
         
 
             Route::get('/hero', [
-    HeroSettingController::class,
-    'index',
-])->name('hero.edit');
+                HeroSettingController::class,
+                'index',
+            ])->name('hero.edit');
 
-Route::put('/hero', [
-    HeroSettingController::class,
-    'update',
-])->name('hero.update');
-        
-    });
+            Route::put('/hero', [
+                HeroSettingController::class,
+                'update',
+            ])->name('hero.update');
+
+            Route::post('/hero/publish', [
+                HeroSettingController::class,
+                'publish',
+            ])->name('hero.publish');
+
+            Route::post('/hero/revert', [
+                HeroSettingController::class,
+                'revert',
+            ])->name('hero.revert');
+        });
 
 require __DIR__.'/auth.php';
