@@ -81,12 +81,12 @@ const landingItems = [
     },
     {
         label: 'About Coach',
-        href: null,
+        href: 'admin.about.edit',
         icon: UserRound,
     },
     {
         label: 'Services',
-        href: null,
+        href: 'admin.services.index',
         icon: Dumbbell,
     },
     {
@@ -96,12 +96,12 @@ const landingItems = [
     },
     {
         label: 'Reviews',
-        href: null,
+        href: 'admin.reviews.index',
         icon: Star,
     },
     {
         label: 'Programs',
-        href: null,
+        href: 'admin.programs.index',
         icon: Layers,
     },
     {
@@ -122,8 +122,13 @@ export default function AdminSidebar({ onNavigate }) {
     const currentRoute = route().current();
 
     const isLandingRoute =
-        typeof currentRoute === 'string' &&
-        currentRoute.startsWith('admin.hero.');
+        typeof currentRoute === 'string' && (
+            currentRoute.startsWith('admin.hero.') ||
+            currentRoute.startsWith('admin.about.') ||
+            currentRoute.startsWith('admin.services.') ||
+            currentRoute.startsWith('admin.programs.') ||
+            currentRoute.startsWith('admin.reviews.')
+        );
 
     const [landingOpen, setLandingOpen] = useState(isLandingRoute);
 

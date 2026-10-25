@@ -14,6 +14,10 @@ use App\Http\Controllers\Admin\StorePromotionController;
 
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\HeroSettingController;
+use App\Http\Controllers\Admin\AboutSettingController;
+use App\Http\Controllers\Admin\LandingServiceController;
+use App\Http\Controllers\Admin\LandingProgramController;
+use App\Http\Controllers\Admin\LandingReviewController;
 
 
 
@@ -197,6 +201,64 @@ Route::patch('/settings/appearance', [
                 HeroSettingController::class,
                 'revert',
             ])->name('hero.revert');
+
+            // ── About Section ──────────────────────────────────────────────
+            Route::get('/about', [AboutSettingController::class, 'index'])
+                ->name('about.edit');
+            Route::put('/about', [AboutSettingController::class, 'update'])
+                ->name('about.update');
+            Route::post('/about/publish', [AboutSettingController::class, 'publish'])
+                ->name('about.publish');
+            Route::post('/about/revert', [AboutSettingController::class, 'revert'])
+                ->name('about.revert');
+
+            // ── Services Section ───────────────────────────────────────────
+            Route::get('/services', [LandingServiceController::class, 'index'])
+                ->name('services.index');
+            Route::post('/services', [LandingServiceController::class, 'store'])
+                ->name('services.store');
+            Route::put('/services/{service}', [LandingServiceController::class, 'update'])
+                ->name('services.update');
+            Route::delete('/services/{service}', [LandingServiceController::class, 'destroy'])
+                ->name('services.destroy');
+            Route::patch('/services/{service}/toggle', [LandingServiceController::class, 'toggleEnabled'])
+                ->name('services.toggle');
+            Route::post('/services/reorder', [LandingServiceController::class, 'reorder'])
+                ->name('services.reorder');
+            Route::put('/services-section', [LandingServiceController::class, 'updateSection'])
+                ->name('services.section.update');
+
+            // ── Programs Section ───────────────────────────────────────────
+            Route::get('/programs', [LandingProgramController::class, 'index'])
+                ->name('programs.index');
+            Route::post('/programs', [LandingProgramController::class, 'store'])
+                ->name('programs.store');
+            Route::put('/programs/{program}', [LandingProgramController::class, 'update'])
+                ->name('programs.update');
+            Route::delete('/programs/{program}', [LandingProgramController::class, 'destroy'])
+                ->name('programs.destroy');
+            Route::patch('/programs/{program}/toggle', [LandingProgramController::class, 'toggleEnabled'])
+                ->name('programs.toggle');
+            Route::post('/programs/reorder', [LandingProgramController::class, 'reorder'])
+                ->name('programs.reorder');
+            Route::put('/programs-section', [LandingProgramController::class, 'updateSection'])
+                ->name('programs.section.update');
+
+            // ── Reviews Section ────────────────────────────────────────────
+            Route::get('/reviews', [LandingReviewController::class, 'index'])
+                ->name('reviews.index');
+            Route::post('/reviews', [LandingReviewController::class, 'store'])
+                ->name('reviews.store');
+            Route::put('/reviews/{review}', [LandingReviewController::class, 'update'])
+                ->name('reviews.update');
+            Route::delete('/reviews/{review}', [LandingReviewController::class, 'destroy'])
+                ->name('reviews.destroy');
+            Route::patch('/reviews/{review}/toggle', [LandingReviewController::class, 'toggleEnabled'])
+                ->name('reviews.toggle');
+            Route::post('/reviews/reorder', [LandingReviewController::class, 'reorder'])
+                ->name('reviews.reorder');
+            Route::put('/reviews-section', [LandingReviewController::class, 'updateSection'])
+                ->name('reviews.section.update');
         });
 
 require __DIR__.'/auth.php';

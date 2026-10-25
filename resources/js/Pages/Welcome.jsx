@@ -1,4 +1,3 @@
-
 import { Head } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 
@@ -11,7 +10,17 @@ import Programs from '@/Components/Landing/Programs';
 import Contact from '@/Components/Landing/Contact';
 import Footer from '@/Components/Landing/Footer';
 
-export default function Welcome({ auth, heroConfig = {} }) {
+export default function Welcome({
+    auth,
+    heroConfig       = {},
+    aboutConfig      = {},
+    services         = [],
+    servicesConfig   = {},
+    programs         = [],
+    programsConfig   = {},
+    reviews          = [],
+    reviewsConfig    = {},
+}) {
     return (
         <PublicLayout>
             <Head title="Accueil" />
@@ -20,11 +29,11 @@ export default function Welcome({ auth, heroConfig = {} }) {
                 <main>
                     <Hero config={heroConfig} />
 
-                    <AboutCoach />
-                    <Services />
+                    <AboutCoach config={aboutConfig} />
+                    <Services   services={services}   sectionConfig={servicesConfig} />
                     <Transformations />
-                    <Reviews />
-                    <Programs />
+                    <Reviews    reviews={reviews}     sectionConfig={reviewsConfig} />
+                    <Programs   programs={programs}   sectionConfig={programsConfig} />
                     <Contact />
                 </main>
 
