@@ -3,9 +3,10 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import ProductForm from '@/Pages/Admin/Products/ProductForm';
 
 import { router, useForm } from '@inertiajs/react';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 export default function ProductEdit({ product, categories, types }) {
+    const uploadToken = useMemo(() => crypto.randomUUID(), []);
     const filesRef = useRef([]);
     const [submitting, setSubmitting] = useState(false);
 
@@ -29,8 +30,8 @@ export default function ProductEdit({ product, categories, types }) {
 
         primary_index: null,
 
-        existing_primary_path:
-            primaryImage?.path || null,
+        existing_primary_id: primaryImage?.id ?? null,
+        removed_image_paths: [],
 
         removed_image_paths: [],
     });
@@ -100,11 +101,8 @@ export default function ProductEdit({ product, categories, types }) {
             );
         }
 
-        form.data.removed_image_ids?.forEach((id) => {
-            body.append(
-                'removed_image_ids[]',
-                id
-            );
+        form.data.removed_image_paths?.forEach((path) => {
+            body.append('removed_image_paths[]', path);
         });
 
         filesRef.current.forEach((file) => {
@@ -114,6 +112,7 @@ export default function ProductEdit({ product, categories, types }) {
                 file.name
             );
         });
+        body.append('upload_token', uploadToken);
 
         setSubmitting(true);
         form.clearErrors();
@@ -170,6 +169,7 @@ export default function ProductEdit({ product, categories, types }) {
                     categories={categories}
                     types={types}
                     existingImages={product.images || []}
+                    uploadToken={uploadToken}
                 />
 
                 <div className="mt-8 flex items-center justify-end gap-3">

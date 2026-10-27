@@ -29,7 +29,7 @@ export default function ProductCreate({ categories, types }) {
         category_ids: [],
         primary_index: 0,
         existing_primary_id: null,
-        removed_image_ids: [],
+        removed_image_paths: [],
         upload_token: uploadToken,
     });
 

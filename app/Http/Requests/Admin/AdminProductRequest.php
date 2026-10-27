@@ -161,17 +161,6 @@ class AdminProductRequest extends FormRequest
 |--------------------------------------------------------------------------
 */
 
-'images' => [
-    $isUpdate ? 'nullable' : 'required',
-    'array',
-    $isUpdate ? 'min:0' : 'min:1',
-],
-
-'images.*' => [
-    'image',
-    'mimes:jpg,jpeg,png,webp,gif',
-    'max:20480',
-],
 
 /*
 |--------------------------------------------------------------------------
@@ -185,28 +174,16 @@ class AdminProductRequest extends FormRequest
     'min:0',
 ],
 
-'existing_primary_id' => [
-    'nullable',
-    'integer',
-    Rule::exists('product_images', 'id')
-        ->when(
-            $productId,
-            fn ($rule) => $rule->where('product_id', $productId)
-        ),
-],
-
-'removed_image_ids' => [
+'removed_image_paths' => [
     'nullable',
     'array',
+    'max:10',
 ],
 
-'removed_image_ids.*' => [
-    'integer',
-    Rule::exists('product_images', 'id')
-        ->when(
-            $productId,
-            fn ($rule) => $rule->where('product_id', $productId)
-        ),
+'removed_image_paths.*' => [
+    'required',
+    'string',
+    'max:500',
 ],
             /*
             |--------------------------------------------------------------------------

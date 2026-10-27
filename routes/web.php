@@ -153,6 +153,11 @@ Route::patch('/settings/appearance', [
         Route::patch('/products/{product}/deactivate', [App\Http\Controllers\Admin\ProductController::class, 'deactivate'])
             ->name('products.deactivate');
 
+        
+        Route::post('/products/description-image',
+        [App\Http\Controllers\Admin\ProductController::class, 'uploadDescriptionImage']
+        )->name('products.description-images.store');
+
         Route::get('/categories', [App\Http\Controllers\Admin\CategoryController::class, 'index'])
             ->name('categories.index');
         Route::get('/categories/create', [App\Http\Controllers\Admin\CategoryController::class, 'create'])

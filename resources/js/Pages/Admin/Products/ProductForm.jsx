@@ -5,13 +5,13 @@ import RichTextEditor from '@/Components/Admin/RichTextEditor';
 import ProductCategorySelector from '@/Components/Admin/Product/ProductCategorySelector';
 
 import { useEffect, useMemo, useState } from 'react';
-
 export default function ProductForm({
     form,
     categories = [],
     types = [],
     existingImages = [],
     filesRef,
+    uploadToken,
 }) {
     /*
     |--------------------------------------------------------------------------
@@ -54,17 +54,14 @@ export default function ProductForm({
     */
 
     const remainingExisting = useMemo(() => {
-        const removedIds = new Set(
-            (form.data.removed_image_ids || []).map(Number)
+        const removedPaths = new Set(
+            form.data.removed_image_paths || []
         );
 
         return existingImages.filter(
-            (image) => !removedIds.has(Number(image.id))
+            (image) => !removedPaths.has(image.path)
         );
-    }, [
-        existingImages,
-        form.data.removed_image_ids,
-    ]);
+    }, [existingImages, form.data.removed_image_paths]);
     /*
     |--------------------------------------------------------------------------
     | Preview images
@@ -76,6 +73,7 @@ export default function ProductForm({
             ...remainingExisting.map((image) => ({
                 id: `existing-${image.id}`,
                 url: image.url,
+                path: image.path,
                 type: 'existing',
                 originalId: image.id,
                 alt: image.alt_text || '',
@@ -202,20 +200,16 @@ export default function ProductForm({
     |--------------------------------------------------------------------------
     */
 
-    const removeExistingImage = (imageId) => {
-        const removedIds = [
-            ...(form.data.removed_image_ids || []),
+    const removeExistingImage = (imagePath) => {
+        const removedPaths = [
+            ...(form.data.removed_image_paths || []),
         ];
 
-        if (!removedIds.includes(imageId)) {
-            removedIds.push(imageId);
+        if (!removedPaths.includes(imagePath)) {
+            removedPaths.push(imagePath);
         }
 
-        form.setData('removed_image_ids', removedIds);
-
-        if (form.data.existing_primary_id === imageId) {
-            form.setData('existing_primary_id', null);
-        }
+        form.setData('removed_image_paths', removedPaths);
     };
 
     /*
@@ -516,12 +510,8 @@ export default function ProductForm({
 
                 <RichTextEditor
                     value={form.data.description || ''}
-                    onChange={(value) =>
-                        form.setData(
-                            'description',
-                            value
-                        )
-                    }
+                    onChange={(value) => form.setData('description', value)}
+                    uploadToken={uploadToken}
                 />
 
                 <InputError
@@ -630,9 +620,7 @@ export default function ProductForm({
                                                     image.type ===
                                                     'existing'
                                                 ) {
-                                                    removeExistingImage(
-                                                        image.originalId
-                                                    );
+                                                    removeExistingImage(image.path);
                                                 } else {
                                                     removeNewImage(
                                                         image.fileIndex

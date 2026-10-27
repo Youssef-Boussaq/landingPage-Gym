@@ -937,33 +937,32 @@ private function storeProductImage(
             $product->description;
 
         foreach ($files as $file) {
+    $filename = basename($file);
+    $newPath = $finalDirectory . '/' . $filename;
 
-            $filename =
-                basename($file);
+    // Don't overwrite an existing file.
+    if ($disk->exists($newPath)) {
+        throw new \RuntimeException(
+            "Description image already exists: {$newPath}"
+        );
+    }
 
-            $newPath =
-                $finalDirectory
-                . '/'
-                . $filename;
+    $oldUrl = $disk->url($file);
 
-            $oldUrl =
-                $disk->url($file);
+    if (!$disk->move($file, $newPath)) {
+        throw new \RuntimeException(
+            "Failed to move description image: {$file}"
+        );
+    }
 
-            $disk->move(
-                $file,
-                $newPath
-            );
+    $newUrl = $disk->url($newPath);
 
-            $newUrl =
-                $disk->url($newPath);
-
-            $description =
-                str_replace(
-                    $oldUrl,
-                    $newUrl,
-                    $description
-                );
-        }
+    $description = str_replace(
+        $oldUrl,
+        $newUrl,
+        $description ?? ''
+    );
+}
 
         $product->update([
             'description' =>

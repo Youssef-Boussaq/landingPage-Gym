@@ -852,10 +852,16 @@ export default function RichTextEditor({
         async (file) => {
             if (!editor || !file) return;
 
-            /* Validate type */
-            if (!file.type.startsWith("image/")) {
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp",
+                "image/gif",
+            ];
+
+            if (!allowedTypes.includes(file.type)) {
                 setUploadError(
-                    "Veuillez sélectionner une image valide."
+                    "Formats acceptés : JPG, PNG, WebP et GIF."
                 );
                 return;
             }
