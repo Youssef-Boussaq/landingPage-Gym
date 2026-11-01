@@ -14,7 +14,7 @@ export default function HeaderLogo() {
             {/* Texte avec typographie Archivo Black et soulignement animé */}
             <div className="flex flex-col">
                 <span className="font-archivo text-xl sm:text-2xl uppercase tracking-wider text-slate-900 dark:text-white">
-                    FIT <span className="text-[var(--color-primary)] transition-opacity duration-300 group-hover:opacity-90">YOUNESS</span>
+                    FIT <span className="text-[var(--color-primary)] transition-opacity duration-300 group-hover:opacity-90">YOUSSSEF</span>
                 </span>
 
                 {/* Ligne d'accentuation fluide sous le texte */}
