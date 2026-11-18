@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\AboutSettingController;
 use App\Http\Controllers\Admin\LandingServiceController;
 use App\Http\Controllers\Admin\LandingProgramController;
 use App\Http\Controllers\Admin\LandingReviewController;
+use App\Http\Controllers\Admin\LandingTransformationController;
 
 
 
@@ -264,6 +265,22 @@ Route::patch('/settings/appearance', [
                 ->name('reviews.reorder');
             Route::put('/reviews-section', [LandingReviewController::class, 'updateSection'])
                 ->name('reviews.section.update');
+
+            // ── Transformations Section ────────────────────────────────────
+            Route::get('/transformations', [LandingTransformationController::class, 'index'])
+                ->name('transformations.index');
+            Route::post('/transformations', [LandingTransformationController::class, 'store'])
+                ->name('transformations.store');
+            Route::put('/transformations/{transformation}', [LandingTransformationController::class, 'update'])
+                ->name('transformations.update');
+            Route::delete('/transformations/{transformation}', [LandingTransformationController::class, 'destroy'])
+                ->name('transformations.destroy');
+            Route::patch('/transformations/{transformation}/toggle', [LandingTransformationController::class, 'toggleEnabled'])
+                ->name('transformations.toggle');
+            Route::post('/transformations/reorder', [LandingTransformationController::class, 'reorder'])
+                ->name('transformations.reorder');
+            Route::put('/transformations-section', [LandingTransformationController::class, 'updateSection'])
+                ->name('transformations.section.update');
         });
 
 require __DIR__.'/auth.php';

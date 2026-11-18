@@ -7,6 +7,7 @@ use App\Models\LandingSectionSetting;
 use App\Models\LandingService;
 use App\Models\LandingProgram;
 use App\Models\LandingReview;
+use App\Models\LandingTransformation;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -46,19 +47,26 @@ class HomeController extends Controller
         $reviewsConfig  = $reviewsSetting->getEffectivePublishedConfig();
         $reviews        = LandingReview::enabled()->ordered()->get()->map->toFrontend()->values();
 
+        // Transformations
+        $transformationsSetting = LandingSectionSetting::forSection('transformations');
+        $transformationsConfig  = $transformationsSetting->getEffectivePublishedConfig();
+        $transformations        = LandingTransformation::enabled()->ordered()->get()->map->toFrontend()->values();
+
         return Inertia::render('Welcome', [
-            'canLogin'        => \Illuminate\Support\Facades\Route::has('login'),
-            'canRegister'     => \Illuminate\Support\Facades\Route::has('register'),
-            'laravelVersion'  => app()->version(),
-            'phpVersion'      => PHP_VERSION,
-            'heroConfig'      => $heroConfig,
-            'aboutConfig'     => $aboutConfig,
-            'services'        => $services,
-            'servicesConfig'  => $servicesConfig,
-            'programs'        => $programs,
-            'programsConfig'  => $programsConfig,
-            'reviews'         => $reviews,
-            'reviewsConfig'   => $reviewsConfig,
+            'canLogin'               => \Illuminate\Support\Facades\Route::has('login'),
+            'canRegister'            => \Illuminate\Support\Facades\Route::has('register'),
+            'laravelVersion'         => app()->version(),
+            'phpVersion'             => PHP_VERSION,
+            'heroConfig'             => $heroConfig,
+            'aboutConfig'            => $aboutConfig,
+            'services'               => $services,
+            'servicesConfig'         => $servicesConfig,
+            'programs'               => $programs,
+            'programsConfig'         => $programsConfig,
+            'reviews'                => $reviews,
+            'reviewsConfig'          => $reviewsConfig,
+            'transformations'        => $transformations,
+            'transformationsConfig'  => $transformationsConfig,
         ]);
     }
 }

@@ -2,13 +2,15 @@ import { useReveal } from '@/hooks/useReveal';
 import { cn } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
 
-const TRANSFORMATIONS = [
+// Static fallback data — used when no dynamic props are passed (SSG, storybook, etc.)
+const STATIC_TRANSFORMATIONS = [
     {
         id: 1,
         title: '12 Weeks Transformation',
         program: 'Weight Loss',
         beforeImg: '/images/tran1.jpeg',
         afterImg: '/images/tran1after.jpeg',
+        resultBadge: 'Real Result',
         shape: 'fashion-card-shape-1',
         offset: '',
     },
@@ -18,6 +20,7 @@ const TRANSFORMATIONS = [
         program: 'Muscle Building',
         afterImg: '/images/after_fog.jpg',
         beforeImg: '/images/before_fog.jpg',
+        resultBadge: 'Real Result',
         shape: 'fashion-card-shape-2',
         offset: 'lg:translate-y-8',
     },
@@ -27,10 +30,15 @@ const TRANSFORMATIONS = [
         program: 'Strength & Power',
         afterImg: '/images/man_right_fog.jpg',
         beforeImg: '/images/man_left_fog.jpg',
+        resultBadge: 'Real Result',
         shape: 'fashion-card-shape-3',
         offset: '',
     },
 ];
+
+// Shape cycle for dynamic items that don't specify a shape
+const SHAPES = ['fashion-card-shape-1', 'fashion-card-shape-2', 'fashion-card-shape-3'];
+const OFFSETS = ['', 'lg:translate-y-8', ''];
 
 function TransformationCard({ data, className }) {
     return (
@@ -221,9 +229,15 @@ function TransformationCard({ data, className }) {
                         group-hover:rotate-0
                     "
                 >
-                    Real
-                    <br />
-                    Result
+                    {data.resultBadge
+                        ? data.resultBadge.split(' ').map((word, i) => (
+                              <span key={i}>
+                                  {word}
+                                  {i < data.resultBadge.split(' ').length - 1 && <br />}
+                              </span>
+                          ))
+                        : (<>Real<br />Result</>)
+                    }
                 </div>
             </div>
 
@@ -279,9 +293,22 @@ function TransformationCard({ data, className }) {
     );
 }
 
-export default function Transformations() {
+export default function Transformations({ transformations: dynamicItems, sectionConfig } = {}) {
     const titleRef = useReveal();
     const gridRef = useReveal();
+
+    // Use dynamic data from DB if passed, otherwise fall back to static array
+    const items = (Array.isArray(dynamicItems) && dynamicItems.length > 0)
+        ? dynamicItems.map((item, index) => ({
+              ...item,
+              shape:  item.shape  ?? SHAPES[index % SHAPES.length],
+              offset: item.offset ?? OFFSETS[index % OFFSETS.length],
+          }))
+        : STATIC_TRANSFORMATIONS;
+
+    // Section config (eyebrow / heading) — fall back to hardcoded values
+    const eyebrow  = sectionConfig?.eyebrow ?? 'FIT YOUNESS';
+    const heading  = sectionConfig?.heading ?? 'Clients';
 
     return (
         <section
@@ -327,7 +354,7 @@ export default function Transformations() {
                             text-[var(--color-primary-dark)]
                         "
                     >
-                        FIT YOUNESS
+                        {eyebrow}
                     </p>
 
                     <h2
@@ -343,7 +370,7 @@ export default function Transformations() {
                             lg:text-7xl
                         "
                     >
-                        Clients
+                        {heading}
                         <br />
                         <span className="text-slate-300">
                             Transformations
@@ -367,7 +394,7 @@ export default function Transformations() {
                         lg:gap-8
                     "
                 >
-                    {TRANSFORMATIONS.map((item, index) => (
+                    {items.map((item, index) => (
                         <div
                             key={item.id}
                             className={cn(

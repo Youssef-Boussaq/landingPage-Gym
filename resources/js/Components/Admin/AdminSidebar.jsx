@@ -5,6 +5,7 @@ import {
     Dumbbell,
     FolderTree,
     Image,
+    Images,
     LayoutDashboard,
     Megaphone,
     Package,
@@ -47,6 +48,7 @@ const sections = [
             { label: 'Services', href: 'admin.services.index', icon: Dumbbell, match: 'admin.services.*' },
             { label: 'Programs', href: 'admin.programs.index', icon: PanelsTopLeft, match: 'admin.programs.*' },
             { label: 'Reviews', href: 'admin.reviews.index', icon: Star, match: 'admin.reviews.*' },
+            { label: 'Transformations', href: 'admin.transformations.index', icon: Images, match: 'admin.transformations.*' },
         ],
     },
     {

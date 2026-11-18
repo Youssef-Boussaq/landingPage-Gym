@@ -73,6 +73,11 @@ class LandingSectionSetting extends Model
                 'heading'     => 'What Clients Say',
                 'is_visible'  => true,
             ],
+            'transformations' => [
+                'eyebrow'    => 'FIT YOUNESS',
+                'heading'    => 'Clients',
+                'is_visible' => true,
+            ],
             default => [],
         };
     }

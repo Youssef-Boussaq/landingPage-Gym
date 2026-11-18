@@ -12,14 +12,16 @@ import Footer from '@/Components/Landing/Footer';
 
 export default function Welcome({
     auth,
-    heroConfig       = {},
-    aboutConfig      = {},
-    services         = [],
-    servicesConfig   = {},
-    programs         = [],
-    programsConfig   = {},
-    reviews          = [],
-    reviewsConfig    = {},
+    heroConfig           = {},
+    aboutConfig          = {},
+    services             = [],
+    servicesConfig       = {},
+    programs             = [],
+    programsConfig       = {},
+    reviews              = [],
+    reviewsConfig        = {},
+    transformations      = [],
+    transformationsConfig= {},
 }) {
     return (
         <PublicLayout>
@@ -30,10 +32,13 @@ export default function Welcome({
                     <Hero config={heroConfig} />
 
                     <AboutCoach config={aboutConfig} />
-                    <Services   services={services}   sectionConfig={servicesConfig} />
-                    <Transformations />
-                    <Reviews    reviews={reviews}     sectionConfig={reviewsConfig} />
-                    <Programs   programs={programs}   sectionConfig={programsConfig} />
+                    <Services   services={services}                   sectionConfig={servicesConfig} />
+                    <Transformations
+                        transformations={transformations}
+                        sectionConfig={transformationsConfig}
+                    />
+                    <Reviews    reviews={reviews}                     sectionConfig={reviewsConfig} />
+                    <Programs   programs={programs}                   sectionConfig={programsConfig} />
                     <Contact />
                 </main>
 
