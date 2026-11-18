@@ -5,7 +5,6 @@ import Footer from '@/Components/Landing/Footer';
 import ProductDetail from '@/Components/Store/DetailProduct/ProductDetail';
 
 export default function ProductShow({ product = {} }) {
-    console.log(product);
     return (
         <StoreLayout>
             <Head title={product.title || 'Produit'} />

@@ -20,12 +20,32 @@ export default function AdminPagination({ links = [] }) {
                     <Link
                         key={`${link.label}-${index}`}
                         href={link.url || '#'}
-                        className={className}
-                        dangerouslySetInnerHTML={{ __html: link.label }}
+                        className={`${className} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]`}
+                        aria-current={link.active ? 'page' : undefined}
+                        aria-disabled={!link.url ? 'true' : undefined}
+                        aria-label={paginationLabel(link.label)}
+                        tabIndex={!link.url ? -1 : undefined}
                         preserveScroll
-                    />
+                    >
+                        {decodePaginationLabel(link.label)}
+                    </Link>
                 );
             })}
         </nav>
     );
+}
+
+function decodePaginationLabel(label = '') {
+    return label
+        .replace(/<[^>]*>/g, '')
+        .replace(/&laquo;/g, '«')
+        .replace(/&raquo;/g, '»')
+        .replace(/&amp;/g, '&');
+}
+
+function paginationLabel(label = '') {
+    const text = decodePaginationLabel(label).trim();
+    if (text === '« Previous' || text === '‹ Previous') return 'Previous page';
+    if (text === 'Next »' || text === 'Next ›') return 'Next page';
+    return text;
 }

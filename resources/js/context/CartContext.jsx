@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import { addToCart } from '@/services/cartService';
 
@@ -14,12 +14,10 @@ export function CartProvider({ children }) {
     const cartCount = Number(cart?.count ?? 0);
 
     const openCart = () => {
-        console.log('🔥 OPEN CART');
         setIsCartOpen(true);
     };
 
     const closeCart = () => {
-        console.log('🔥 CLOSE CART');
         setIsCartOpen(false);
     };
 
@@ -29,23 +27,13 @@ export function CartProvider({ children }) {
         variant = null,
     }) => {
 
-        console.log('🔥 ADD PRODUCT');
-        console.log('productId:', productId);
-        console.log('quantity:', quantity);
-        console.log('variant:', variant);
-
         return addToCart(
             productId,
             quantity,
             variant,
             {
                 onSuccess: () => {
-                    console.log('🔥 CART ADD SUCCESS');
                     openCart();
-                },
-
-                onError: (errors) => {
-                    console.log('❌ CART ADD ERROR:', errors);
                 },
             }
         );

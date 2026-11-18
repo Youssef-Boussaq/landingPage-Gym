@@ -9,8 +9,6 @@ import { Loader2 } from 'lucide-react';
 export default function ProductCreate({ categories, types }) {
     const uploadToken = useMemo(() => crypto.randomUUID(), []);
     const filesRef = useRef([]);
-    console.log(categories);
-
 
     // Separate processing flag because router.post() bypasses useForm's internal
     // processing state (form.processing would stay false if we use router.post directly).

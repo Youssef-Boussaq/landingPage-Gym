@@ -1,5 +1,6 @@
 import AdminHeader from '@/Components/Admin/AdminHeader';
 import AdminSidebar from '@/Components/Admin/AdminSidebar';
+import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
 import { Head, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -19,34 +20,54 @@ export default function AdminLayout({ title, children }) {
                     <AdminSidebar />
                 </aside>
 
-                {sidebarOpen && (
-                    <div className="fixed inset-0 z-40 lg:hidden">
-                        <button
-                            type="button"
-                            className="absolute inset-0 bg-slate-950/60"
-                            aria-label="Fermer le menu"
-                            onClick={() => setSidebarOpen(false)}
-                        />
-                        <aside className="relative z-50 h-full w-64 bg-slate-950 shadow-xl">
-                            <div className="px-5 py-5 text-xs font-black uppercase tracking-[0.2em] text-[var(--color-primary)]">
-                                Admin
-                            </div>
-                            <AdminSidebar onNavigate={() => setSidebarOpen(false)} />
-                        </aside>
-                    </div>
-                )}
+                <Transition show={sidebarOpen} as="div">
+                    <Dialog onClose={() => setSidebarOpen(false)} className="relative z-40 lg:hidden">
+                        <TransitionChild
+                            enter="ease-out duration-200"
+                            enterFrom="opacity-0"
+                            enterTo="opacity-100"
+                            leave="ease-in duration-150"
+                            leaveFrom="opacity-100"
+                            leaveTo="opacity-0"
+                        >
+                            <div aria-hidden="true" className="fixed inset-0 bg-slate-950/60" />
+                        </TransitionChild>
+                        <div className="fixed inset-0 flex">
+                            <TransitionChild
+                                enter="transform transition ease-out duration-200"
+                                enterFrom="-translate-x-full"
+                                enterTo="translate-x-0"
+                                leave="transform transition ease-in duration-150"
+                                leaveFrom="translate-x-0"
+                                leaveTo="-translate-x-full"
+                            >
+                                <DialogPanel
+                                    as="aside"
+                                    id="admin-mobile-navigation"
+                                    className="h-full w-72 max-w-[85vw] overflow-y-auto bg-slate-950 shadow-xl"
+                                >
+                                    <DialogTitle className="sr-only">Navigation admin</DialogTitle>
+                                    <div className="px-5 py-5 text-xs font-black uppercase tracking-[0.2em] text-[var(--color-primary)]">
+                                        Admin
+                                    </div>
+                                    <AdminSidebar mobile onClose={() => setSidebarOpen(false)} onNavigate={() => setSidebarOpen(false)} />
+                                </DialogPanel>
+                            </TransitionChild>
+                        </div>
+                    </Dialog>
+                </Transition>
 
                 <div className="flex min-w-0 flex-1 flex-col">
-                    <AdminHeader onMenuClick={() => setSidebarOpen(true)} />
+                    <AdminHeader onMenuClick={() => setSidebarOpen(true)} menuExpanded={sidebarOpen} />
 
-                    <main className="flex-1 px-4 py-6 lg:px-8">
+                    <main id="admin-main" className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
                         {flash?.success && (
-                            <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                            <div role="status" className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
                                 {flash.success}
                             </div>
                         )}
                         {flash?.error && (
-                            <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+                            <div role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
                                 {flash.error}
                             </div>
                         )}

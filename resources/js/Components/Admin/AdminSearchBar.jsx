@@ -11,7 +11,7 @@ export default function AdminSearchBar({
 
     const submit = (event) => {
         event.preventDefault();
-        onSearch(term);
+        if (typeof onSearch === 'function') onSearch(term.trim());
     };
 
     return (
@@ -20,6 +20,8 @@ export default function AdminSearchBar({
             <input
                 value={term}
                 onChange={(event) => setTerm(event.target.value)}
+                aria-label={placeholder}
+                type="search"
                 placeholder={placeholder}
                 className="w-full rounded-xl border-slate-200 py-2.5 pl-10 pr-3 text-sm shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
             />
