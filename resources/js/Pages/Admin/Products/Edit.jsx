@@ -18,6 +18,12 @@ export default function ProductEdit({ product, categories, types }) {
         description: product.description || '',
         slug: product.slug || '',
         type: product.type || 'physical',
+        digital_file: null,
+        digital_download_link: product.digital_download_link || '',
+        digital_file_name: product.digital_file_name || '',
+        digital_file_size: product.digital_file_size || null,
+        digital_file_path: product.digital_file_path || null,
+        remove_digital_file: false,
         price: product.price || '',
         sale_price: product.sale_price || '',
         stock_quantity: product.stock_quantity ?? '',
@@ -52,6 +58,11 @@ export default function ProductEdit({ product, categories, types }) {
         body.append('description', form.data.description ?? '');
         body.append('slug', form.data.slug ?? '');
         body.append('type', form.data.type ?? '');
+        if (form.data.digital_file instanceof File) {
+            body.append('digital_file', form.data.digital_file, form.data.digital_file.name);
+        }
+        body.append('digital_download_link', form.data.digital_download_link ?? '');
+        body.append('remove_digital_file', form.data.remove_digital_file ? '1' : '0');
 
         body.append(
             'price',

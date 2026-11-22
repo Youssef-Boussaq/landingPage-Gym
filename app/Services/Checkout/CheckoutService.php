@@ -67,7 +67,7 @@ class CheckoutService
             $customerName = $request->user()->name;
             $customerEmail = $request->user()->email;
         } else {
-            $customerName = $validated['customer_name'];
+            $customerName = $validated['customer_name'] ?? null;
             $customerEmail = $validated['customer_email'] ?? null;
         }
 

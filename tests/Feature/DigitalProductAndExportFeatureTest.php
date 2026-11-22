@@ -125,7 +125,7 @@ test('digital product creation sanitizes stock fields', function () {
         'category_ids' => [$category->id],
         'is_active' => true,
         'images' => [
-            UploadedFile::fake()->image('cover.jpg'),
+            UploadedFile::fake()->create('cover.jpg', 100, 'image/jpeg'),
         ],
     ]);
 
@@ -147,14 +147,16 @@ test('digital checkout validation requires email, ignores physical address and r
         'is_active' => true,
     ]);
 
-    session()->put('buy_now', [
-        'product_id' => $digitalProduct->id,
-        'quantity' => 1,
-        'variant_id' => null,
-    ]);
+    $sessionData = [
+        'buy_now' => [
+            'product_id' => $digitalProduct->id,
+            'quantity' => 1,
+            'variant_id' => null,
+        ],
+    ];
 
     // 1. Missing email should fail
-    $responseNoEmail = $this->post(route('checkout.store'), [
+    $responseNoEmail = $this->withSession($sessionData)->post(route('checkout.store'), [
         'checkout_mode' => 'buy_now',
         'customer_first_name' => 'John',
         'customer_last_name' => 'Doe',
@@ -165,7 +167,7 @@ test('digital checkout validation requires email, ignores physical address and r
     $responseNoEmail->assertSessionHasErrors(['customer_email']);
 
     // 2. COD on digital should fail
-    $responseCod = $this->post(route('checkout.store'), [
+    $responseCod = $this->withSession($sessionData)->post(route('checkout.store'), [
         'checkout_mode' => 'buy_now',
         'customer_first_name' => 'John',
         'customer_last_name' => 'Doe',
@@ -175,3 +177,83 @@ test('digital checkout validation requires email, ignores physical address and r
     ]);
     $responseCod->assertSessionHasErrors(['payment_method']);
 });
+
+test('admin can upload digital file and provide external link for e-products', function () {
+    Storage::fake('public');
+    $admin = User::factory()->admin()->create();
+    $category = Category::factory()->create();
+
+    $response = $this->actingAs($admin)->post(route('admin.products.store'), [
+        'title' => 'E-Book Musculation Avancée',
+        'slug' => 'ebook-musculation-avancee-' . uniqid(),
+        'description' => 'Un guide digital PDF.',
+        'price' => 299.00,
+        'type' => 'digital',
+        'category_ids' => [$category->id],
+        'is_active' => true,
+        'images' => [
+            UploadedFile::fake()->create('cover.jpg', 100, 'image/jpeg'),
+        ],
+        'digital_file' => UploadedFile::fake()->create('workout-plan.pdf', 2048, 'application/pdf'),
+        'digital_download_link' => 'https://drive.google.com/file/d/example/view',
+    ]);
+
+    $response->assertSessionHasNoErrors();
+
+    $created = Product::where('title', 'E-Book Musculation Avancée')->first();
+    expect($created)->not->toBeNull()
+        ->and($created->type)->toBe(ProductType::DIGITAL)
+        ->and($created->digital_file_name)->toBe('workout-plan.pdf')
+        ->and($created->digital_download_link)->toBe('https://drive.google.com/file/d/example/view')
+        ->and($created->has_digital_content)->toBeTrue();
+
+    Storage::disk('public')->assertExists($created->digital_file_path);
+});
+
+test('buyer can download digital product after order is paid and unauthorized access is blocked', function () {
+    Storage::fake('public');
+    $user = User::factory()->create(['email' => 'client@example.com']);
+    $otherUser = User::factory()->create(['email' => 'other@example.com']);
+
+    $filePath = 'digital_products/workout-guide.pdf';
+    Storage::disk('public')->put($filePath, 'PDF-CONTENT-BINARY-STREAM');
+
+    $digitalProduct = Product::factory()->create([
+        'type' => ProductType::DIGITAL,
+        'title' => 'Guide Musculation',
+        'price' => 199.00,
+        'digital_file_path' => $filePath,
+        'digital_file_name' => 'workout-guide.pdf',
+        'digital_file_size' => 26,
+    ]);
+
+    $paidOrder = Order::factory()->create([
+        'user_id' => $user->id,
+        'customer_email' => $user->email,
+        'status' => OrderStatus::DELIVERED->value,
+        'payment_status' => PaymentStatus::PAID->value,
+    ]);
+
+    OrderItem::factory()->create([
+        'order_id' => $paidOrder->id,
+        'product_id' => $digitalProduct->id,
+        'quantity' => 1,
+        'unit_price' => 199.00,
+    ]);
+
+    // 1. Authorized buyer can download
+    $res = $this->actingAs($user)->get(route('checkout.digital.download', [
+        'order' => $paidOrder->id,
+        'product' => $digitalProduct->id,
+    ]));
+    $res->assertOk();
+    $res->assertHeader('content-disposition', 'attachment; filename=workout-guide.pdf');
+
+    // 2. Another user cannot download
+    $resForbidden = $this->actingAs($otherUser)->get(route('checkout.digital.download', [
+        'order' => $paidOrder->id,
+        'product' => $digitalProduct->id,
+    ]));
+    $resForbidden->assertForbidden();
+});
+

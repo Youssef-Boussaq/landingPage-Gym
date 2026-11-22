@@ -18,14 +18,19 @@ class CheckoutRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        $user = $this->user();
+        $isDigital = $this->isDigitalCheckout();
+
+        $customerName = $this->filled('customer_name')
+            ? trim($this->input('customer_name'))
+            : (trim(($this->input('customer_first_name', '') . ' ' . $this->input('customer_last_name', ''))) ?: ($user?->name ?? null));
+
         $this->merge([
-            'customer_name' => $this->filled('customer_name')
-                ? trim($this->input('customer_name'))
-                : null,
+            'customer_name' => $customerName,
 
             'customer_email' => $this->filled('customer_email')
                 ? strtolower(trim($this->input('customer_email')))
-                : null,
+                : ($user?->email ?? null),
 
             'customer_phone' => $this->filled('customer_phone')
                 ? trim($this->input('customer_phone'))
@@ -33,15 +38,19 @@ class CheckoutRequest extends FormRequest
 
             'shipping_address' => $this->filled('shipping_address')
                 ? trim($this->input('shipping_address'))
-                : null,
+                : ($isDigital ? 'Commande numérique (Livraison par email)' : null),
 
             'city' => $this->filled('city')
                 ? trim($this->input('city'))
-                : null,
+                : ($isDigital ? 'En ligne' : null),
 
             'shipping_postal_code' => $this->filled('shipping_postal_code')
                 ? trim($this->input('shipping_postal_code'))
                 : null,
+
+            'payment_method' => $this->filled('payment_method')
+                ? $this->input('payment_method')
+                : ($isDigital ? 'stripe' : null),
         ]);
     }
 

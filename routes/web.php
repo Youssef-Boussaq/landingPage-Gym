@@ -47,9 +47,12 @@ Route::post('/store/products/{product}/reviews', [App\Http\Controllers\Store\Pro
     ->middleware('throttle:10,1')
     ->name('store.products.reviews.store');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
+    if ($request->user()?->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+    return redirect()->route('store.index');
+})->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -79,6 +82,12 @@ Route::post('/checkout/buy-now', [CheckoutController::class, 'buyNow'])
 
 Route::get('/checkout/cancel/{order}', [CheckoutController::class, 'cancel'])
     ->name('checkout.cancel');
+
+Route::get('/orders/{order}/download/{product}', [CheckoutController::class, 'downloadDigitalProduct'])
+    ->name('orders.download');
+
+Route::get('/checkout/orders/{order}/download/{product}', [CheckoutController::class, 'downloadDigitalProduct'])
+    ->name('checkout.digital.download');
 
 
 

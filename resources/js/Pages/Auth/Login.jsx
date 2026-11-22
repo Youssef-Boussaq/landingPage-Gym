@@ -1,8 +1,5 @@
 import Checkbox from '@/Components/Checkbox';
 import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
@@ -23,50 +20,75 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <GuestLayout>
-            <Head title="Log in" />
+            <Head title="Connexion" />
+
+            <div className="mb-6 text-center">
+                <h1 className="text-2xl font-normal uppercase tracking-[0.025em] text-[#000000]">
+                    Connexion
+                </h1>
+                <p className="mt-1 text-[13px] text-[#666666] tracking-[0.025em]">
+                    Accédez à votre espace sécurisé
+                </p>
+            </div>
 
             {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
+                <div className="mb-6 border border-emerald-300 bg-emerald-50 p-3 text-[12px] text-emerald-800">
                     {status}
                 </div>
             )}
 
-            <form onSubmit={submit}>
+            <form onSubmit={submit} className="space-y-5">
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <label className="block text-[12px] font-medium uppercase tracking-[0.025em] text-[#333333] mb-1.5">
+                        Adresse Email
+                    </label>
 
-                    <TextInput
+                    <input
                         id="email"
                         type="email"
                         name="email"
                         value={data.email}
-                        className="mt-1 block w-full"
+                        className="w-full rounded-[4px] border border-[#e5e7eb] px-3.5 py-2.5 text-sm text-[#000000] focus:border-[#000000] focus:outline-none focus:ring-0"
                         autoComplete="username"
-                        isFocused={true}
+                        autoFocus
+                        placeholder="exemple@domaine.com"
                         onChange={(e) => setData('email', e.target.value)}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email} className="mt-1.5 text-xs text-red-600" />
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-[12px] font-medium uppercase tracking-[0.025em] text-[#333333]">
+                            Mot de passe
+                        </label>
+                        {canResetPassword && (
+                            <Link
+                                href={route('password.request')}
+                                className="text-[11px] text-[#666666] uppercase tracking-[0.025em] hover:text-[#000000] hover:underline"
+                            >
+                                Oublié ?
+                            </Link>
+                        )}
+                    </div>
 
-                    <TextInput
+                    <input
                         id="password"
                         type="password"
                         name="password"
                         value={data.password}
-                        className="mt-1 block w-full"
+                        className="w-full rounded-[4px] border border-[#e5e7eb] px-3.5 py-2.5 text-sm text-[#000000] focus:border-[#000000] focus:outline-none focus:ring-0"
                         autoComplete="current-password"
+                        placeholder="••••••••"
                         onChange={(e) => setData('password', e.target.value)}
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password} className="mt-1.5 text-xs text-red-600" />
                 </div>
 
-                <div className="mt-4 block">
-                    <label className="flex items-center">
+                <div className="flex items-center justify-between pt-1">
+                    <label className="flex items-center cursor-pointer">
                         <Checkbox
                             name="remember"
                             checked={data.remember}
@@ -74,25 +96,20 @@ export default function Login({ status, canResetPassword }) {
                                 setData('remember', e.target.checked)
                             }
                         />
-                        <span className="ms-2 text-sm text-gray-600 dark:text-gray-400">
-                            Remember me
+                        <span className="ms-2 text-[12px] text-[#666666]">
+                            Se souvenir de moi
                         </span>
                     </label>
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
-                        >
-                            Forgot your password?
-                        </Link>
-                    )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
+                <div className="pt-2">
+                    <button
+                        type="submit"
+                        disabled={processing}
+                        className="filled-action-btn w-full py-3.5 text-center text-[12px] font-medium uppercase tracking-[0.025em] disabled:opacity-40"
+                    >
+                        {processing ? 'Connexion en cours...' : 'Se connecter'}
+                    </button>
                 </div>
             </form>
         </GuestLayout>

@@ -1,7 +1,7 @@
 
 import { useForm } from '@inertiajs/react';
 
-export default function useCheckout(checkoutMode = 'cart', isDigital = false) {
+export default function useCheckout(checkoutMode = 'cart', isDigital = false, user = null) {
     const {
         data,
         setData,
@@ -12,8 +12,8 @@ export default function useCheckout(checkoutMode = 'cart', isDigital = false) {
     } = useForm({
         checkout_mode: checkoutMode,
 
-        customer_name: '',
-        customer_email: '',
+        customer_name: user?.name || '',
+        customer_email: user?.email || '',
         customer_phone: '',
 
         shipping_address: isDigital ? 'Commande numérique (Livraison par email)' : '',
@@ -26,17 +26,30 @@ export default function useCheckout(checkoutMode = 'cart', isDigital = false) {
     const submit = (event) => {
         event.preventDefault();
 
+        const payload = { ...data };
+
         if (isDigital) {
-            data.payment_method = 'stripe';
-            if (!data.shipping_address) {
-                data.shipping_address = 'Commande numérique (Livraison par email)';
+            payload.payment_method = 'stripe';
+            if (!payload.shipping_address) {
+                payload.shipping_address = 'Commande numérique (Livraison par email)';
             }
-            if (!data.city) {
-                data.city = 'En ligne';
+            if (!payload.city) {
+                payload.city = 'En ligne';
             }
         }
 
-        post(route('checkout.store'));
+        // Keep form data synchronized
+        if (user?.name && !payload.customer_name) {
+            payload.customer_name = user.name;
+        }
+        if (user?.email && !payload.customer_email) {
+            payload.customer_email = user.email;
+        }
+
+        post(route('checkout.store'), {
+            data: payload,
+            preserveScroll: true,
+        });
     };
 
     return {

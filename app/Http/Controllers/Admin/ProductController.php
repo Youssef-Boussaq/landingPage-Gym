@@ -221,7 +221,7 @@ class ProductController extends Controller
                     $validated =
                         $request->validated();
 
-                    $product = Product::create([
+                    $productData = [
                         'title' =>
                             $validated['title'],
 
@@ -255,7 +255,21 @@ class ProductController extends Controller
 
                         'is_active' =>
                             $validated['is_active'],
-                    ]);
+
+                        'digital_download_link' =>
+                            $validated['digital_download_link']
+                            ?? null,
+                    ];
+
+                    if ($request->hasFile('digital_file')) {
+                        $digitalFile = $request->file('digital_file');
+                        $path = $digitalFile->store('digital_products', 'public');
+                        $productData['digital_file_path'] = $path;
+                        $productData['digital_file_name'] = $digitalFile->getClientOriginalName();
+                        $productData['digital_file_size'] = $digitalFile->getSize();
+                    }
+
+                    $product = Product::create($productData);
 
                     $product->categories()->sync(
                         $validated['category_ids']
@@ -393,7 +407,7 @@ class ProductController extends Controller
                     |--------------------------------------------------------------------------
                     */
 
-                    $product->update([
+                    $updateData = [
                         'title' =>
                             $validated['title'],
 
@@ -428,7 +442,31 @@ class ProductController extends Controller
 
                         'is_active' =>
                             $validated['is_active'],
-                    ]);
+
+                        'digital_download_link' =>
+                            $validated['digital_download_link']
+                            ?? null,
+                    ];
+
+                    if ($request->hasFile('digital_file')) {
+                        if ($product->digital_file_path && Storage::disk('public')->exists($product->digital_file_path)) {
+                            Storage::disk('public')->delete($product->digital_file_path);
+                        }
+                        $digitalFile = $request->file('digital_file');
+                        $path = $digitalFile->store('digital_products', 'public');
+                        $updateData['digital_file_path'] = $path;
+                        $updateData['digital_file_name'] = $digitalFile->getClientOriginalName();
+                        $updateData['digital_file_size'] = $digitalFile->getSize();
+                    } elseif ($request->boolean('remove_digital_file')) {
+                        if ($product->digital_file_path && Storage::disk('public')->exists($product->digital_file_path)) {
+                            Storage::disk('public')->delete($product->digital_file_path);
+                        }
+                        $updateData['digital_file_path'] = null;
+                        $updateData['digital_file_name'] = null;
+                        $updateData['digital_file_size'] = null;
+                    }
+
+                    $product->update($updateData);
 
                     /*
                     |--------------------------------------------------------------------------

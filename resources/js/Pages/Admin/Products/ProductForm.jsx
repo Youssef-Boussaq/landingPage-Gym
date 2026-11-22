@@ -3,6 +3,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import RichTextEditor from '@/Components/Admin/RichTextEditor';
 import ProductCategorySelector from '@/Components/Admin/Product/ProductCategorySelector';
+import { Download, FileText, Upload, Link as LinkIcon } from 'lucide-react';
 
 import { useEffect, useMemo, useState } from 'react';
 export default function ProductForm({
@@ -513,6 +514,154 @@ export default function ProductForm({
                     </>
                 )}
             </section>
+
+            {/* =========================================================
+                DIGITAL PRODUCT ASSETS / CONTENU NUMÉRIQUE
+            ========================================================= */}
+            {form.data.type === 'digital' && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2">
+                            <span className="flex h-7 w-7 items-center justify-center rounded-[4px] bg-[#000000] text-white">
+                                <Download size={15} />
+                            </span>
+                            <h2 className="text-lg font-semibold text-slate-900">
+                                Contenu et fichier numérique (E-Product)
+                            </h2>
+                        </div>
+                        <p className="mt-1 text-sm text-slate-500">
+                            Ajoutez le fichier téléchargeable (PDF, ZIP, ebook...) ou un lien d'accès externe pour vos clients après achat.
+                        </p>
+                    </div>
+
+                    <div className="space-y-6">
+                        {/* File Upload */}
+                        <div>
+                            <InputLabel
+                                htmlFor="digital_file_input"
+                                value="Téléverser le fichier du produit (PDF, ZIP, Vidéo, Document...)"
+                            />
+
+                            {/* Existing or selected file indicator */}
+                            {(form.data.digital_file || form.data.digital_file_name) && !form.data.remove_digital_file ? (
+                                <div className="mt-2 flex items-center justify-between border border-[#000000] bg-[#f0efe7] p-4 rounded-[4px]">
+                                    <div className="flex items-center gap-3">
+                                        <FileText className="h-6 w-6 text-[#000000]" />
+                                        <div>
+                                            <p className="text-sm font-bold text-[#000000]">
+                                                {form.data.digital_file?.name || form.data.digital_file_name}
+                                            </p>
+                                            <p className="text-xs text-[#666666]">
+                                                {form.data.digital_file 
+                                                    ? `${(form.data.digital_file.size / (1024 * 1024)).toFixed(2)} MB (Nouveau fichier prêt)`
+                                                    : 'Fichier existant attaché à ce produit'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <label
+                                            htmlFor="digital_file_input"
+                                            className="ghost-cta-btn cursor-pointer py-1.5 px-3 text-xs"
+                                        >
+                                            Remplacer
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                form.setData((prev) => ({
+                                                    ...prev,
+                                                    digital_file: null,
+                                                    remove_digital_file: true,
+                                                }));
+                                            }}
+                                            className="text-xs text-red-600 hover:underline px-2 py-1 font-medium"
+                                        >
+                                            Supprimer
+                                        </button>
+                                        <input
+                                            id="digital_file_input"
+                                            name="digital_file"
+                                            type="file"
+                                            className="sr-only"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                    form.setData((prev) => ({
+                                                        ...prev,
+                                                        digital_file: file,
+                                                        remove_digital_file: false,
+                                                    }));
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="mt-2 flex justify-center rounded-[4px] border-2 border-dashed border-[#e5e7eb] px-6 py-8 hover:border-[#000000] transition-colors">
+                                    <div className="text-center">
+                                        <Upload className="mx-auto h-8 w-8 text-[#999999]" strokeWidth={1.5} />
+                                        <div className="mt-3 flex text-sm text-[#333333] justify-center">
+                                            <label
+                                                htmlFor="digital_file_input"
+                                                className="relative cursor-pointer rounded-[4px] font-bold text-[#000000] underline focus-within:outline-none"
+                                            >
+                                                <span>Choisir un fichier</span>
+                                                <input
+                                                    id="digital_file_input"
+                                                    name="digital_file"
+                                                    type="file"
+                                                    className="sr-only"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            form.setData((prev) => ({
+                                                                ...prev,
+                                                                digital_file: file,
+                                                                remove_digital_file: false,
+                                                            }));
+                                                        }
+                                                    }}
+                                                />
+                                            </label>
+                                            <p className="pl-1 text-[#666666]">ou glisser-déposer ici</p>
+                                        </div>
+                                        <p className="text-xs text-[#999999] mt-1">
+                                            PDF, ZIP, MP4, MP3, EPUB jusqu'à 100 Mo
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <InputError message={form.errors.digital_file} className="mt-2" />
+                        </div>
+
+                        {/* External Link */}
+                        <div className="border-t border-[#e5e7eb] pt-5">
+                            <InputLabel
+                                htmlFor="digital_download_link"
+                                value="Lien de téléchargement externe (Optionnel)"
+                            />
+                            <div className="relative mt-2">
+                                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
+                                    <LinkIcon className="h-4 w-4" />
+                                </span>
+                                <input
+                                    id="digital_download_link"
+                                    type="url"
+                                    value={form.data.digital_download_link || ''}
+                                    onChange={(e) => form.setData('digital_download_link', e.target.value)}
+                                    placeholder="https://drive.google.com/... ou https://notion.so/..."
+                                    className="block w-full rounded-xl border-slate-300 pl-10 text-sm shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                                />
+                            </div>
+                            <p className="mt-1 text-xs text-slate-500">
+                                Utilisez ce champ si vos fichiers sont hébergés sur un service cloud tiers (Google Drive, Dropbox, Notion, plateforme de formation privée).
+                            </p>
+                            <InputError message={form.errors.digital_download_link} className="mt-2" />
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* =========================================================
                 DESCRIPTION

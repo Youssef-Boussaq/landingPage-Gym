@@ -1,17 +1,22 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Link } from '@inertiajs/react';
 
 export default function GuestLayout({ children }) {
     return (
-        <div className="flex min-h-screen flex-col items-center  pt-6 sm:justify-center sm:pt-0 ">
-            <div>
-                <Link href="/">
-                    <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" />
+        <div className="flex min-h-screen flex-col items-center justify-center bg-[#f0efe7] px-4 py-12 font-favorit">
+            <div className="mb-8">
+                <Link href="/" className="inline-block text-center">
+                    <span className="font-favorit text-3xl font-bold uppercase tracking-[0.075em] text-[#000000]">
+                        ADANOLA
+                    </span>
                 </Link>
             </div>
 
-            <div className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg dark:bg-gray-800">
+            <div className="w-full max-w-md border border-[#e5e7eb] bg-white p-8 sm:p-10 rounded-none shadow-none">
                 {children}
+            </div>
+
+            <div className="mt-8 text-center text-[11px] text-[#666666] uppercase tracking-[0.025em]">
+                <p>© {new Date().getFullYear()} ADANOLA. All rights reserved.</p>
             </div>
         </div>
     );

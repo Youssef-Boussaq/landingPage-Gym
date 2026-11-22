@@ -8,7 +8,7 @@ use Stripe\Stripe;
 
 class StripeCheckoutService
 {
-    public function createSession(Order $order, string $customerEmail): Session
+    public function createSession(Order $order, ?string $customerEmail = null): Session
     {
         Stripe::setApiKey(config('services.stripe.secret'));
 
@@ -43,10 +43,9 @@ class StripeCheckoutService
             ];
         }
 
-        return Session::create([
+        $sessionPayload = [
             'mode' => 'payment',
             'line_items' => $lineItems,
-            'customer_email' => $customerEmail,
             'success_url' => route('checkout.success', $order) . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('checkout.cancel', $order),
             'metadata' => [
@@ -59,6 +58,12 @@ class StripeCheckoutService
                     'order_number' => $order->order_number,
                 ],
             ],
-        ]);
+        ];
+
+        if (!empty($customerEmail)) {
+            $sessionPayload['customer_email'] = $customerEmail;
+        }
+
+        return Session::create($sessionPayload);
     }
 }

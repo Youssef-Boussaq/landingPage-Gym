@@ -11,7 +11,7 @@ export default function CheckoutForm({
     checkoutMode = 'cart',
     isDigital = false,
 }) {
-    const checkout = useCheckout(checkoutMode, isDigital);
+    const checkout = useCheckout(checkoutMode, isDigital, user);
 
     return (
         <form onSubmit={checkout.submit}>

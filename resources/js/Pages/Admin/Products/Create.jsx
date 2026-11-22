@@ -19,6 +19,8 @@ export default function ProductCreate({ categories, types }) {
         description: '',
         slug: '',
         type: types[0] || 'physical',
+        digital_file: null,
+        digital_download_link: '',
         price: '',
         sale_price: '',
         stock_quantity: '',
@@ -45,6 +47,10 @@ export default function ProductCreate({ categories, types }) {
         body.append('description', form.data.description ?? '');
         body.append('slug', form.data.slug ?? '');
         body.append('type', form.data.type ?? '');
+        if (form.data.digital_file instanceof File) {
+            body.append('digital_file', form.data.digital_file, form.data.digital_file.name);
+        }
+        body.append('digital_download_link', form.data.digital_download_link ?? '');
         body.append('price', String(form.data.price ?? ''));
         body.append('sale_price', String(form.data.sale_price ?? ''));
         body.append('stock_quantity', String(form.data.stock_quantity ?? ''));

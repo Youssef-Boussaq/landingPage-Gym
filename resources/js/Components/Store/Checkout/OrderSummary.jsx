@@ -1,3 +1,6 @@
+import React from 'react';
+import { Zap, ShieldCheck } from 'lucide-react';
+
 export default function OrderSummary({ cart = [], isDigital = false }) {
     const subtotal = cart.reduce(
         (total, item) =>
@@ -8,16 +11,19 @@ export default function OrderSummary({ cart = [], isDigital = false }) {
 
     const shipping = isDigital ? 0 : (subtotal > 250 ? 0 : 35);
     const totalAmount = subtotal + shipping;
-    const amountForFreeShipping = 250 - subtotal;
 
     return (
-        <aside className="rounded-2xl border border-slate-200 bg-white p-6">
+        <aside className="border border-[#e5e7eb] bg-white p-6 sm:p-8 rounded-none font-favorit">
+            <div className="mb-6 border-b border-[#e5e7eb] pb-4 flex items-center justify-between">
+                <h2 className="text-[14px] font-bold uppercase tracking-[0.025em] text-[#000000]">
+                    Récapitulatif
+                </h2>
+                <span className="text-[11px] text-[#666666] uppercase tracking-[0.05em]">
+                    {cart.length} produit(s)
+                </span>
+            </div>
 
-            <h2 className="mb-6 text-xl font-semibold">
-                Your Order
-            </h2>
-
-            <div className="space-y-5">
+            <div className="space-y-4">
                 {cart.map((item) => {
                     const itemTotal =
                         Number(item.price ?? 0) *
@@ -26,135 +32,94 @@ export default function OrderSummary({ cart = [], isDigital = false }) {
                     return (
                         <div
                             key={item.key}
-                            className="flex gap-4"
+                            className="flex gap-4 border-b border-[#e5e7eb] pb-4 last:border-b-0"
                         >
-                            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-100">
-
+                            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-none border border-[#e5e7eb] bg-[#f0efe7]">
                                 {item.image ? (
                                     <img
-                                        src={item.image}
+                                        src={
+                                            item.image.startsWith('/storage/')
+                                                ? item.image
+                                                : `/storage/${item.image}`
+                                        }
                                         alt={item.name}
-                                        className="h-full w-full object-cover"
+                                        className="h-full w-full object-contain"
                                     />
                                 ) : (
-                                    <div className="flex h-full items-center justify-center text-xs text-slate-400">
+                                    <div className="flex h-full items-center justify-center text-xs text-[#999999]">
                                         No image
                                     </div>
                                 )}
 
-                                <span className="absolute -right-1 -top-1 flex h-6 min-w-6 items-center justify-center rounded-full bg-slate-900 px-1.5 text-xs text-white">
+                                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-none bg-[#000000] px-1 text-[10px] font-bold text-white">
                                     {item.quantity}
                                 </span>
                             </div>
 
                             <div className="min-w-0 flex-1">
-
-                                <div className="flex justify-between gap-3">
-
+                                <div className="flex justify-between gap-2">
                                     <div>
-                                        <h3 className="font-medium">
+                                        <h3 className="text-[13px] font-medium uppercase tracking-[0.025em] text-[#000000] line-clamp-1">
                                             {item.name}
                                         </h3>
-
-                                        {item.variant_id && (
-                                            <p className="text-sm text-slate-500">
-                                                Variant #{item.variant_id}
-                                            </p>
-                                        )}
-
-                                        <p className="mt-1 text-sm text-slate-500">
-                                            {Number(item.price).toFixed(2)} DH
+                                        <p className="text-[11px] text-[#666666] mt-0.5">
+                                            {Number(item.price).toFixed(2)} DH / unité
                                         </p>
                                     </div>
 
-                                    <p className="font-semibold">
+                                    <p className="text-[13px] font-bold text-[#000000]">
                                         {itemTotal.toFixed(2)} DH
                                     </p>
-
                                 </div>
-
                             </div>
                         </div>
                     );
                 })}
             </div>
 
-            <div className="my-6 border-t border-slate-200" />
-
-            {/* Free Shipping UI or Digital Delivery UI */}
+            {/* Delivery / Digital Badge */}
             {isDigital ? (
-                <div className="mb-6 rounded-xl border border-emerald-100 bg-emerald-50 p-4">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-xl shadow-sm">
-                            ⚡
-                        </div>
-                        <div className="flex-1">
-                            <p className="font-bold text-emerald-800">
-                                Accès & Téléchargement immédiat
-                            </p>
-                            <p className="mt-0.5 text-xs text-emerald-600">
-                                Produit digital envoyé instantanément par email. Aucun frais de livraison.
-                            </p>
-                        </div>
+                <div className="my-6 border border-[#000000] bg-[#f0efe7] p-3.5 rounded-none">
+                    <div className="flex items-center gap-2">
+                        <Zap size={14} className="text-[#000000]" />
+                        <p className="text-[12px] font-bold uppercase tracking-[0.025em] text-[#000000]">
+                            Livraison numérique instantanée
+                        </p>
                     </div>
+                    <p className="text-[11px] text-[#666666] mt-1 leading-relaxed">
+                        Accès & téléchargements envoyés immédiatement après validation du paiement.
+                    </p>
                 </div>
             ) : (
-                <div className="mb-6 rounded-xl border border-slate-100 bg-slate-50 p-4">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-xl shadow-sm">
-                            {subtotal > 250 ? '🎉' : '🚚'}
-                        </div>
-                        <div className="flex-1">
-                            {subtotal > 250 ? (
-                                <p className="font-bold text-green-600">
-                                    Livraison gratuite offerte !
-                                </p>
-                            ) : (
-                                <>
-                                    <p className="font-bold text-slate-900">
-                                        Livraison 35 DH
-                                    </p>
-                                    <p className="mt-0.5 text-xs text-orange-500">
-                                        Ajoutez encore {amountForFreeShipping.toFixed(2)} DH pour profiter de la livraison gratuite.
-                                    </p>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                    {subtotal <= 250 && (
-                        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
-                            <div 
-                                className="h-full bg-slate-900 transition-all duration-500"
-                                style={{ width: `${Math.min((subtotal / 250) * 100, 100)}%` }}
-                            />
-                        </div>
-                    )}
+                <div className="my-6 border border-[#e5e7eb] bg-[#f0efe7] p-3.5 rounded-none text-[12px]">
+                    <p className="font-bold uppercase tracking-[0.025em] text-[#000000]">
+                        {shipping === 0 ? 'Livraison gratuite offerte' : 'Livraison standard : 35 DH'}
+                    </p>
+                    <p className="text-[11px] text-[#666666] mt-0.5">
+                        Expédié sous 24h à 48h partout au Maroc.
+                    </p>
                 </div>
             )}
 
-            <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Sous-total</span>
-                <span className="font-medium text-slate-900">
-                    {subtotal.toFixed(2)} DH
-                </span>
+            {/* Totals */}
+            <div className="space-y-2 border-t border-[#e5e7eb] pt-4 text-[13px]">
+                <div className="flex justify-between">
+                    <span className="text-[#666666] uppercase tracking-[0.025em]">Sous-total</span>
+                    <span className="font-medium text-[#000000]">{subtotal.toFixed(2)} DH</span>
+                </div>
+
+                <div className="flex justify-between">
+                    <span className="text-[#666666] uppercase tracking-[0.025em]">Livraison</span>
+                    <span className="font-medium text-[#000000]">
+                        {shipping === 0 ? 'Offerte' : `${shipping.toFixed(2)} DH`}
+                    </span>
+                </div>
+
+                <div className="mt-3 flex justify-between border-t border-[#000000] pt-3 text-[14px]">
+                    <span className="font-bold uppercase tracking-[0.025em] text-[#000000]">Total</span>
+                    <span className="text-xl font-bold text-[#000000]">{totalAmount.toFixed(2)} DH</span>
+                </div>
             </div>
-
-            <div className="mt-3 flex justify-between text-sm">
-                <span className="text-slate-500">Livraison</span>
-                <span className="font-medium text-slate-900">
-                    {isDigital ? 'Gratuit (Digital)' : (shipping === 0 ? 'Offerte' : `${shipping.toFixed(2)} DH`)}
-                </span>
-            </div>
-
-            <div className="my-4 border-t border-slate-200" />
-
-            <div className="flex justify-between text-lg font-bold">
-                <span className="text-slate-900">Total</span>
-                <span className="text-slate-900">
-                    {totalAmount.toFixed(2)} DH
-                </span>
-            </div>
-
         </aside>
     );
 }

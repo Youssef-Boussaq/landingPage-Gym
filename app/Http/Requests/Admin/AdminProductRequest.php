@@ -27,6 +27,7 @@ class AdminProductRequest extends FormRequest
         $this->merge([
             'manage_stock'   => $isDigital ? false : $this->boolean('manage_stock'),
             'stock_quantity' => $isDigital ? null : ($this->filled('stock_quantity') ? (int) $this->input('stock_quantity') : null),
+            'digital_download_link' => $this->filled('digital_download_link') ? trim($this->input('digital_download_link')) : null,
             'is_active'      => $this->boolean('is_active'),
 
             'category_ids' => array_values(
@@ -80,6 +81,18 @@ class AdminProductRequest extends FormRequest
             'type' => [
                 'required',
                 Rule::enum(ProductType::class),
+            ],
+
+            'digital_file' => [
+                'nullable',
+                'file',
+                'max:102400', // 100MB
+            ],
+
+            'digital_download_link' => [
+                'nullable',
+                'url',
+                'max:2000',
             ],
 
             /*

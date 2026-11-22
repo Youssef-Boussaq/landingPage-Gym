@@ -17,7 +17,19 @@ test('users can authenticate using the login screen', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('store.index', absolute: false));
+});
+
+test('admin is redirected to admin dashboard upon login', function () {
+    $admin = User::factory()->admin()->create();
+
+    $response = $this->post('/login', [
+        'email' => $admin->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticated();
+    $response->assertRedirect(route('admin.dashboard', absolute: false));
 });
 
 test('users can not authenticate with invalid password', function () {

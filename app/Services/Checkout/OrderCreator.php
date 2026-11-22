@@ -15,8 +15,8 @@ class OrderCreator
         array $calculation,
         ?int $userId,
         ?string $guestToken,
-        string $customerName,
-        string $customerEmail,
+        ?string $customerName = null,
+        ?string $customerEmail = null,
     ): Order {
         $order = Order::create([
             'user_id' => $userId,
@@ -28,7 +28,7 @@ class OrderCreator
             'shipping_fee' => $calculation['shipping_fee'],
             'payment_method' => $validated['payment_method'],
             'transaction_id' => null,
-            'customer_name' => $customerName,
+            'customer_name' => $customerName ?? ($customerEmail ? explode('@', $customerEmail)[0] : 'Client'),
             'customer_email' => $customerEmail,
             'customer_phone' => $validated['customer_phone'] ?? 'N/A',
             'shipping_address' => $validated['shipping_address'] ?? 'Commande numérique (Livraison par email)',

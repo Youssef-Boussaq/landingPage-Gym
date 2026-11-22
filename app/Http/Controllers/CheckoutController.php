@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Services\Checkout\CheckoutService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use App\Models\Product;
 
@@ -470,5 +471,42 @@ public function buyNow(Request $request)
     }
 }
 
+    public function downloadDigitalProduct(Request $request, Order $order, Product $product)
+    {
+        if (auth()->check()) {
+            if ($order->user_id !== auth()->id() && auth()->user()->role !== 'admin') {
+                abort(403, 'Accès non autorisé.');
+            }
+        } else {
+            $guestToken = $order->guest_token;
+            if (!$guestToken || $request->cookie('guest_token') !== $guestToken) {
+                $sessionId = $request->query('session_id');
+                if (!$sessionId || ($order->stripe_session_id !== $sessionId && $order->transaction_id !== $sessionId)) {
+                    abort(403, 'Accès non autorisé.');
+                }
+            }
+        }
+
+        if ($order->status !== OrderStatus::PAID && $order->payment_status !== \App\Enums\PaymentStatus::PAID) {
+            abort(403, 'Cette commande n\'est pas encore confirmée ou payée.');
+        }
+
+        $orderItem = $order->items()->where('product_id', $product->id)->first();
+        if (!$orderItem) {
+            abort(404, 'Produit introuvable dans cette commande.');
+        }
+
+        if (!empty($product->digital_download_link)) {
+            return redirect()->away($product->digital_download_link);
+        }
+
+        if (!empty($product->digital_file_path) && Storage::disk('public')->exists($product->digital_file_path)) {
+            $fullPath = Storage::disk('public')->path($product->digital_file_path);
+            $fileName = $product->digital_file_name ?: basename($product->digital_file_path);
+            return response()->download($fullPath, $fileName);
+        }
+
+        return back()->withErrors(['error' => 'Le fichier de ce produit numérique n\'est pas disponible pour le moment.']);
+    }
 
 }

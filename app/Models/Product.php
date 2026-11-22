@@ -27,12 +27,21 @@ use HasFactory, SoftDeletes;
         'slug',
         'description',
         'type',
+        'digital_file_path',
+        'digital_file_name',
+        'digital_file_size',
+        'digital_download_link',
         'price',
         'sale_price',
         'stock_quantity',
         'reserved_quantity',
         'manage_stock',
         'is_active',
+    ];
+
+    protected $appends = [
+        'has_digital_content',
+        'formatted_file_size',
     ];
 
     protected function casts(): array
@@ -43,9 +52,32 @@ use HasFactory, SoftDeletes;
             'sale_price' => 'decimal:2',
             'stock_quantity' => 'integer',
             'reserved_quantity' => 'integer',
+            'digital_file_size' => 'integer',
             'manage_stock' => 'boolean',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function getHasDigitalContentAttribute(): bool
+    {
+        return !empty($this->digital_file_path) || !empty($this->digital_download_link);
+    }
+
+    public function getFormattedFileSizeAttribute(): ?string
+    {
+        if (!$this->digital_file_size) {
+            return null;
+        }
+
+        $bytes = (int) $this->digital_file_size;
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $i = 0;
+        while ($bytes >= 1024 && $i < count($units) - 1) {
+            $bytes /= 1024;
+            $i++;
+        }
+
+        return round($bytes, 1) . ' ' . $units[$i];
     }
 
     public function getAvailableStockAttribute(): int
@@ -77,12 +109,6 @@ public function primaryImage(): HasOne
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
-    }
-
-    // Fichier digital associé (si produit digital)
-    public function digitalDeliverable(): HasOne
-    {
-        return $this->hasOne(DigitalDeliverable::class);
     }
 
     // Tous les avis
