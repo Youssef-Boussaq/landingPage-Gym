@@ -135,11 +135,11 @@ export default function Edit({ mustVerifyEmail, status, orders = [] }) {
                         </div>
 
                         {/* Navigation Tabs */}
-                        <div className="mt-8 flex flex-wrap gap-2 border-t border-[#e5e7eb] pt-6">
+                        <div className="mt-8 flex items-center gap-2 border-t border-[#e5e7eb] pt-6 overflow-x-auto no-scrollbar flex-nowrap sm:flex-wrap pb-1">
                             <button
                                 type="button"
                                 onClick={() => setActiveTab('orders')}
-                                className={`px-4 py-2 text-xs font-bold uppercase tracking-[0.05em] transition-colors ${
+                                className={`shrink-0 whitespace-nowrap px-4 py-2.5 text-xs font-bold uppercase tracking-[0.05em] transition-colors ${
                                     activeTab === 'orders'
                                         ? 'bg-black text-white'
                                         : 'bg-[#f0efe7] text-black hover:bg-black/10'
@@ -154,7 +154,7 @@ export default function Edit({ mustVerifyEmail, status, orders = [] }) {
                             <button
                                 type="button"
                                 onClick={() => setActiveTab('profile')}
-                                className={`px-4 py-2 text-xs font-bold uppercase tracking-[0.05em] transition-colors ${
+                                className={`shrink-0 whitespace-nowrap px-4 py-2.5 text-xs font-bold uppercase tracking-[0.05em] transition-colors ${
                                     activeTab === 'profile'
                                         ? 'bg-black text-white'
                                         : 'bg-[#f0efe7] text-black hover:bg-black/10'
@@ -169,7 +169,7 @@ export default function Edit({ mustVerifyEmail, status, orders = [] }) {
                             <button
                                 type="button"
                                 onClick={() => setActiveTab('security')}
-                                className={`px-4 py-2 text-xs font-bold uppercase tracking-[0.05em] transition-colors ${
+                                className={`shrink-0 whitespace-nowrap px-4 py-2.5 text-xs font-bold uppercase tracking-[0.05em] transition-colors ${
                                     activeTab === 'security'
                                         ? 'bg-black text-white'
                                         : 'bg-[#f0efe7] text-black hover:bg-black/10'

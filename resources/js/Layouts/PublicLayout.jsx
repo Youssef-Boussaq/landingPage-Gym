@@ -1,16 +1,7 @@
 import { usePage } from '@inertiajs/react';
-import Navbar from '@/Components/Nafication/Navbar';
-import Header from '@/Components/Landing/Header';
-import MobileHeader from '@/Components/Landing/MobileHeader';
-
+import Header from '@/Components/Landing/header';
 import CartDrawer from '@/Components/Store/Cart/CartDrawer';
-
-import {
-    CartProvider,
-    useCart,
-} from '@/context/CartContext';
-
-import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { CartProvider, useCart } from '@/context/CartContext';
 
 function PublicLayoutContent({ children }) {
     const { auth } = usePage().props;
@@ -24,24 +15,12 @@ function PublicLayoutContent({ children }) {
         closeCart,
     } = useCart();
 
-    const isDesktop = useIsDesktop();
-
     return (
-        <div>
-            <Navbar />
-
-            {isDesktop ? (
-                <Header
-                    user={user}
-                    onOpenCart={openCart}
-                />
-            ) : (
-                <MobileHeader
-                    user={user}
-                    cartCount={cartCount}
-                    onOpenCart={openCart}
-                />
-            )}
+        <div className="min-h-screen bg-white font-favorit">
+            <Header
+                user={user}
+                onOpenCart={openCart}
+            />
 
             {children}
 

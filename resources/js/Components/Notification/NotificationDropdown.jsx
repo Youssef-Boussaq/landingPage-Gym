@@ -6,7 +6,7 @@ export default function NotificationDropdown({ notifications, onClose }) {
     const unreadCount = notifications.filter((n) => n.read_at === null).length;
 
     return (
-        <div className="font-favorit absolute right-0 top-full z-[9999] mt-2 w-[380px] max-w-[calc(100vw-2rem)] overflow-hidden border border-black bg-white shadow-[0_20px_50px_rgba(0,0,0,0.25)] rounded-none opacity-100">
+        <div className="font-favorit absolute -right-10 sm:right-0 top-full z-[9999] mt-2 w-[360px] max-w-[calc(100vw-1.5rem)] overflow-hidden border border-black bg-white shadow-[0_20px_50px_rgba(0,0,0,0.25)] rounded-none opacity-100">
             {/* HEADER */}
             <div className="flex items-center justify-between border-b border-black bg-white px-4 py-3">
                 <div>
