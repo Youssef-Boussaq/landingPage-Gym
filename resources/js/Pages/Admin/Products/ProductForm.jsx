@@ -243,6 +243,12 @@ export default function ProductForm({
 
     return (
         <div className="space-y-8">
+            {form.errors?.error && (
+                <div className="border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-700">
+                    {form.errors.error}
+                </div>
+            )}
+
             {/* =========================================================
                 BASIC INFORMATION
             ========================================================= */}

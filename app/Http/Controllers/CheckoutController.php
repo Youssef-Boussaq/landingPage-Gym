@@ -150,10 +150,21 @@ public function index(Request $request)
             'buy_now_before'=> session('buy_now'),
         ]);
 
-        $result = $this->checkoutService->process(
-            $request,
-            $validated
-        );
+        try {
+            $result = $this->checkoutService->process(
+                $request,
+                $validated
+            );
+        } catch (\Throwable $e) {
+            Log::error('[CHECKOUT] Error processing order: ' . $e->getMessage(), [
+                'exception' => $e,
+                'checkout_mode' => $checkoutMode,
+            ]);
+
+            return back()->withErrors([
+                'error' => $e->getMessage() ?: 'Une erreur est survenue lors de la validation de votre commande. Veuillez réessayer.',
+            ])->withInput();
+        }
 
         // ── Nettoyage de la bonne session selon le mode ──────────────────────
         // On mémorise le mode dans la session pour que success() puisse
@@ -405,47 +416,58 @@ public function buyNow(Request $request)
         'variant_id' => ['nullable', 'integer'],
     ]);
 
-    $product = Product::findOrFail($validated['product_id']);
+    try {
+        $product = Product::findOrFail($validated['product_id']);
 
-    if (!$product->is_active) {
+        if (!$product->is_active) {
+            return back()->withErrors([
+                'product' => "Ce produit n'est plus disponible.",
+            ]);
+        }
+
+        $quantity = (int) $validated['quantity'];
+
+        if ($product->manage_stock) {
+            $availableStock = max(
+                0,
+                (int) $product->stock_quantity -
+                (int) $product->reserved_quantity
+            );
+
+            if ($availableStock <= 0) {
+                return back()->withErrors([
+                    'quantity' => "Ce produit n'est plus disponible.",
+                ]);
+            }
+
+            if ($quantity > $availableStock) {
+                return back()->withErrors([
+                    'quantity' => "Nous avons seulement {$availableStock} produit(s) disponible(s).",
+                ]);
+            }
+        }
+
+        // Stockage dans session dédiée — ne touche PAS session('cart')
+        session()->put('buy_now', [
+            'product_id' => $product->id,
+            'quantity'   => $quantity,
+            'variant_id' => $validated['variant_id'] ?? null,
+        ]);
+
+        // Redirect sans query params (product_id/quantity ne passent pas dans l'URL)
+        return redirect()->route('checkout.index', [
+            'mode' => 'buy_now',
+        ]);
+    } catch (\Throwable $e) {
+        Log::error('[BUY NOW] Error in buyNow: ' . $e->getMessage(), [
+            'exception' => $e,
+            'payload' => $validated,
+        ]);
+
         return back()->withErrors([
-            'product' => "Ce produit n'est plus disponible.",
+            'error' => "Impossible d'initier la commande immédiate. Veuillez réessayer.",
         ]);
     }
-
-    $quantity = (int) $validated['quantity'];
-
-    if ($product->manage_stock) {
-        $availableStock = max(
-            0,
-            (int) $product->stock_quantity -
-            (int) $product->reserved_quantity
-        );
-
-        if ($availableStock <= 0) {
-            return back()->withErrors([
-                'quantity' => "Ce produit n'est plus disponible.",
-            ]);
-        }
-
-        if ($quantity > $availableStock) {
-            return back()->withErrors([
-                'quantity' => "Nous avons seulement {$availableStock} produit(s) disponible(s).",
-            ]);
-        }
-    }
-
-    // Stockage dans session dédiée — ne touche PAS session('cart')
-    session()->put('buy_now', [
-        'product_id' => $product->id,
-        'quantity'   => $quantity,
-        'variant_id' => $validated['variant_id'] ?? null,
-    ]);
-
-    // Redirect sans query params (product_id/quantity ne passent pas dans l'URL)
-    return redirect()->route('checkout.index', [
-        'mode' => 'buy_now',
-    ]);
 }
 
 

@@ -15,6 +15,12 @@ export default function CheckoutForm({
 
     return (
         <form onSubmit={checkout.submit}>
+            {checkout.errors.error && (
+                <div className="mb-6 border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-700">
+                    {checkout.errors.error}
+                </div>
+            )}
+
             <CustomerInformation
                 isAuthenticated={isAuthenticated}
                 user={user}

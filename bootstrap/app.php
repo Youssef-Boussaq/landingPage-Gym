@@ -54,8 +54,26 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
 
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*'),
+            fn (Request $request) => $request->is('api/*') || $request->is('webhooks/*') || $request->is('stripe/*'),
         );
+
+        $exceptions->render(function (\Stripe\Exception\ApiErrorException $e, Request $request) {
+            \Illuminate\Support\Facades\Log::error('[STRIPE API ERROR] ' . $e->getMessage(), [
+                'exception' => $e,
+                'path' => $request->path(),
+            ]);
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'error' => 'Erreur de communication avec le service de paiement.',
+                    'message' => $e->getMessage(),
+                ], 502);
+            }
+
+            return back()->withErrors([
+                'error' => 'Erreur avec le service de paiement : ' . $e->getMessage(),
+            ]);
+        });
     })
 
     ->create();

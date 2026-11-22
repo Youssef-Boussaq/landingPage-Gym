@@ -11,13 +11,25 @@ class AmeexWebhookController extends Controller
         Request $request,
         AmeexWebhookService $service
     ): JsonResponse {
-        $service->handle(
-            $request
-        );
+        try {
+            $service->handle(
+                $request
+            );
 
-        return response()->json([
-            'success' => true,
-        ]);
+            return response()->json([
+                'success' => true,
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('[AMEEX WEBHOOK ERROR] ' . $e->getMessage(), [
+                'exception' => $e,
+                'payload' => $request->all(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du traitement du webhook AMEEX',
+            ], 400);
+        }
     }
 }
 

@@ -214,81 +214,93 @@ class ProductController extends Controller
     public function store(
         AdminProductRequest $request
     ): RedirectResponse {
-        $product = DB::transaction(
-            function () use ($request) {
+        try {
+            $product = DB::transaction(
+                function () use ($request) {
 
-                $validated =
-                    $request->validated();
+                    $validated =
+                        $request->validated();
 
-                $product = Product::create([
-                    'title' =>
-                        $validated['title'],
+                    $product = Product::create([
+                        'title' =>
+                            $validated['title'],
 
-                    'description' =>
-                        $validated['description']
-                        ?? null,
+                        'description' =>
+                            $validated['description']
+                            ?? null,
 
-                    'slug' =>
-                        $this->uniqueSlug(
-                            $validated['slug']
-                                ?? null,
-                            $validated['title']
-                        ),
+                        'slug' =>
+                            $this->uniqueSlug(
+                                $validated['slug']
+                                    ?? null,
+                                $validated['title']
+                            ),
 
-                    'type' =>
-                        $validated['type'],
+                        'type' =>
+                            $validated['type'],
 
-                    'price' =>
-                        $validated['price'],
+                        'price' =>
+                            $validated['price'],
 
-                    'sale_price' =>
-                        $validated['sale_price']
-                        ?? null,
+                        'sale_price' =>
+                            $validated['sale_price']
+                            ?? null,
 
-                    'stock_quantity' =>
-                        $validated['stock_quantity']
-                        ?? null,
+                        'stock_quantity' =>
+                            $validated['stock_quantity']
+                            ?? null,
 
-                    'manage_stock' =>
-                        $validated['manage_stock'],
+                        'manage_stock' =>
+                            $validated['manage_stock'],
 
-                    'is_active' =>
-                        $validated['is_active'],
-                ]);
+                        'is_active' =>
+                            $validated['is_active'],
+                    ]);
 
-                $product->categories()->sync(
-                    $validated['category_ids']
-                );
+                    $product->categories()->sync(
+                        $validated['category_ids']
+                    );
 
-                $this->storeImages(
-                    $product,
-                    $request->file('images', []) ?? [],
-                    null,
-                    $request->input('primary_index') !== null
-                        ? (int) $request->input('primary_index')
-                        : null
-                );
+                    $this->storeImages(
+                        $product,
+                        $request->file('images', []) ?? [],
+                        null,
+                        $request->input('primary_index') !== null
+                            ? (int) $request->input('primary_index')
+                            : null
+                    );
 
-                $this->finalizeDescriptionImages(
-                    $product,
-                    $request->input(
-                        'upload_token'
-                    )
-                );
+                    $this->finalizeDescriptionImages(
+                        $product,
+                        $request->input(
+                            'upload_token'
+                        )
+                    );
 
-                return $product;
-            }
-        );
-
-        return redirect()
-            ->route(
-                'admin.products.show',
-                $product
-            )
-            ->with(
-                'success',
-                'Produit créé.'
+                    return $product;
+                }
             );
+
+            return redirect()
+                ->route(
+                    'admin.products.show',
+                    $product
+                )
+                ->with(
+                    'success',
+                    'Produit créé.'
+                );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('[ADMIN PRODUCT STORE] ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+
+            return back()
+                ->withErrors([
+                    'error' => 'Erreur lors de la création du produit : ' . $e->getMessage(),
+                ])
+                ->withInput();
+        }
     }
 
     /*
@@ -365,166 +377,179 @@ class ProductController extends Controller
         AdminProductRequest $request,
         Product $product
     ): RedirectResponse {
-        DB::transaction(
-            function () use (
-                $request,
-                $product
-            ) {
+        try {
+            DB::transaction(
+                function () use (
+                    $request,
+                    $product
+                ) {
 
-                $validated =
-                    $request->validated();
+                    $validated =
+                        $request->validated();
 
-                /*
-                |--------------------------------------------------------------------------
-                | Product
-                |--------------------------------------------------------------------------
-                */
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Product
+                    |--------------------------------------------------------------------------
+                    */
 
-                $product->update([
-                    'title' =>
-                        $validated['title'],
-
-                    'slug' =>
-                        $this->uniqueSlug(
-                            $validated['slug']
-                                ?? null,
+                    $product->update([
+                        'title' =>
                             $validated['title'],
-                            $product->getKey()
-                        ),
 
-                    'description' =>
-                        $validated['description']
-                        ?? null,
-
-                    'type' =>
-                        $validated['type'],
-
-                    'price' =>
-                        $validated['price'],
-
-                    'sale_price' =>
-                        $validated['sale_price']
-                        ?? null,
-
-                    'stock_quantity' =>
-                        $validated['stock_quantity']
-                        ?? null,
-
-                    'manage_stock' =>
-                        $validated['manage_stock'],
-
-                    'is_active' =>
-                        $validated['is_active'],
-                ]);
-
-                /*
-                |--------------------------------------------------------------------------
-                | Categories
-                |--------------------------------------------------------------------------
-                */
-
-                $product->categories()->sync(
-                    $validated['category_ids']
-                );
-
-                /*
-                |--------------------------------------------------------------------------
-                | Remove existing images
-                |--------------------------------------------------------------------------
-                */
-
-                $removedPaths =
-                    $validated[
-                        'removed_image_paths'
-                    ] ?? [];
-
-                if ($removedPaths !== []) {
-
-                    $imagesToDelete =
-                        $product
-                            ->images()
-                            ->whereIn(
-                                'path',
-                                $removedPaths
-                            )
-                            ->get();
-
-                    foreach (
-                        $imagesToDelete
-                        as $image
-                    ) {
-
-                        Storage::disk('public')
-                            ->delete(
-                                $image->path
-                            );
-
-                        ProductImage::query()
-                            ->where(
-                                'product_id',
+                        'slug' =>
+                            $this->uniqueSlug(
+                                $validated['slug']
+                                    ?? null,
+                                $validated['title'],
                                 $product->getKey()
-                            )
-                            ->where(
-                                'path',
-                                $image->path
-                            )
-                            ->delete();
+                            ),
+
+                        'description' =>
+                            $validated['description']
+                            ?? null,
+
+                        'type' =>
+                            $validated['type'],
+
+                        'price' =>
+                            $validated['price'],
+
+                        'sale_price' =>
+                            $validated['sale_price']
+                            ?? null,
+
+                        'stock_quantity' =>
+                            $validated['stock_quantity']
+                            ?? null,
+
+                        'manage_stock' =>
+                            $validated['manage_stock'],
+
+                        'is_active' =>
+                            $validated['is_active'],
+                    ]);
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Categories
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $product->categories()->sync(
+                        $validated['category_ids']
+                    );
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Remove existing images
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $removedPaths =
+                        $validated[
+                            'removed_image_paths'
+                        ] ?? [];
+
+                    if ($removedPaths !== []) {
+
+                        $imagesToDelete =
+                            $product
+                                ->images()
+                                ->whereIn(
+                                    'path',
+                                    $removedPaths
+                                )
+                                ->get();
+
+                        foreach (
+                            $imagesToDelete
+                            as $image
+                        ) {
+
+                            Storage::disk('public')
+                                ->delete(
+                                    $image->path
+                                );
+
+                            ProductImage::query()
+                                ->where(
+                                    'product_id',
+                                    $product->getKey()
+                                )
+                                ->where(
+                                    'path',
+                                    $image->path
+                                )
+                                ->delete();
+                        }
                     }
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | New images
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $newFiles =
+                        $request->file(
+                            'images',
+                            []
+                        ) ?? [];
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Store images
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $this->storeImages(
+                        $product->fresh('images'),
+                        $newFiles,
+                        $request->input('existing_primary_id') !== null
+                            ? (int) $request->input('existing_primary_id')
+                            : null,
+                        $request->input('primary_index') !== null
+                            ? (int) $request->input('primary_index')
+                            : null
+                    );
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Description images
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $this->finalizeDescriptionImages(
+                        $product->fresh(),
+                        $request->input(
+                            'upload_token'
+                        )
+                    );
                 }
-
-                /*
-                |--------------------------------------------------------------------------
-                | New images
-                |--------------------------------------------------------------------------
-                */
-
-                $newFiles =
-                    $request->file(
-                        'images',
-                        []
-                    ) ?? [];
-
-                /*
-                |--------------------------------------------------------------------------
-                | Store images
-                |--------------------------------------------------------------------------
-                */
-
-                $this->storeImages(
-                    $product->fresh('images'),
-                    $newFiles,
-                    $request->input('existing_primary_id') !== null
-                        ? (int) $request->input('existing_primary_id')
-                        : null,
-                    $request->input('primary_index') !== null
-                        ? (int) $request->input('primary_index')
-                        : null
-                );
-
-                /*
-                |--------------------------------------------------------------------------
-                | Description images
-                |--------------------------------------------------------------------------
-                */
-
-                $this->finalizeDescriptionImages(
-                    $product->fresh(),
-                    $request->input(
-                        'upload_token'
-                    )
-                );
-            }
-        );
-
-        return redirect()
-            ->route(
-                'admin.products.show',
-                $product
-            )
-            ->with(
-                'success',
-                'Produit mis à jour.'
             );
+
+            return redirect()
+                ->route(
+                    'admin.products.show',
+                    $product
+                )
+                ->with(
+                    'success',
+                    'Produit mis à jour.'
+                );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('[ADMIN PRODUCT UPDATE] ' . $e->getMessage(), [
+                'exception' => $e,
+                'product_id' => $product->id,
+            ]);
+
+            return back()
+                ->withErrors([
+                    'error' => 'Erreur lors de la mise à jour du produit : ' . $e->getMessage(),
+                ])
+                ->withInput();
+        }
     }
 
     /*

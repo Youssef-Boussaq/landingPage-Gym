@@ -154,14 +154,25 @@ class OrderController extends Controller
         AdminOrderStatusRequest $request,
         Order $order
     ): RedirectResponse {
-        OrderStatusTransition::change(
-            $order,
-            $request->enum('status', OrderStatus::class)
-        );
+        try {
+            OrderStatusTransition::change(
+                $order,
+                $request->enum('status', OrderStatus::class)
+            );
 
-        return back()->with(
-            'success',
-            'Statut de la commande mis à jour.'
-        );
+            return back()->with(
+                'success',
+                'Statut de la commande mis à jour.'
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('[ADMIN ORDER STATUS] ' . $e->getMessage(), [
+                'exception' => $e,
+                'order_id' => $order->id,
+            ]);
+
+            return back()->withErrors([
+                'status' => 'Impossible de mettre à jour le statut : ' . $e->getMessage(),
+            ]);
+        }
     }
 }
