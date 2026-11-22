@@ -86,12 +86,20 @@ class ProductController extends Controller
         |
         */
 
+        $withReviewStats = function ($query) {
+            $query->withCount([
+                'approvedReviews as reviews_count',
+                'approvedRatings as ratings_count',
+            ])->withAvg('approvedRatings as average_rating', 'rating');
+        };
+
         $productsQuery = Product::query()
             ->where('is_active', true)
             ->with([
                 'categories',
                 'images',
             ]);
+        $withReviewStats($productsQuery);
 
         if ($categorySlug) {
 
@@ -162,7 +170,7 @@ class ProductController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $offers = Product::query()
+        $offersQuery = Product::query()
             ->where('is_active', true)
             ->whereNotNull('sale_price')
             ->whereColumn('sale_price', '<', 'price')
@@ -170,8 +178,9 @@ class ProductController extends Controller
                 'categories',
                 'images',
             ])
-            ->orderBy('sale_price')
-            ->get();
+            ->orderBy('sale_price');
+        $withReviewStats($offersQuery);
+        $offers = $offersQuery->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -179,7 +188,7 @@ class ProductController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $bestSellers = Product::query()
+        $bestSellersQuery = Product::query()
             ->where('is_active', true)
             ->with([
                 'categories',
@@ -187,8 +196,9 @@ class ProductController extends Controller
             ])
             ->withSum('orderItems', 'quantity')
             ->orderByDesc('order_items_sum_quantity')
-            ->take(10)
-            ->get();
+            ->take(10);
+        $withReviewStats($bestSellersQuery);
+        $bestSellers = $bestSellersQuery->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -196,15 +206,16 @@ class ProductController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $trendingProducts = Product::query()
+        $trendingProductsQuery = Product::query()
             ->where('is_active', true)
             ->with([
                 'categories',
                 'images',
             ])
             ->latest()
-            ->take(10)
-            ->get();
+            ->take(10);
+        $withReviewStats($trendingProductsQuery);
+        $trendingProducts = $trendingProductsQuery->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -241,12 +252,37 @@ class ProductController extends Controller
         $product = Product::with([
             'categories',
             'images',
+            'approvedReviews' => function ($q) {
+                $q->latest('created_at');
+            },
         ])->findOrFail($id);
 
-        
+        $reviewStats = $product->review_stats;
+
+        $reviews = $product->approvedReviews->map(function ($review) {
+            return [
+                'id'                   => $review->id,
+                'author'               => $review->reviewer_name,
+                'rating'               => $review->rating,
+                'title'                => $review->title,
+                'content'              => $review->comment,
+                'date'                 => $review->created_at?->diffForHumans() ?? '',
+                'created_at'           => $review->created_at?->toIso8601String(),
+                'is_verified_purchase' => (bool) $review->is_verified_purchase,
+                'admin_reply'          => $review->admin_reply,
+                'admin_replied_at'     => $review->admin_replied_at?->diffForHumans(),
+            ];
+        })->values();
+
+        $productData = $product->toArray();
+        $productData['reviews'] = $reviews;
+        $productData['review_stats'] = $reviewStats;
+        $productData['average_rating'] = $reviewStats['average_rating'];
+        $productData['reviews_count'] = $reviewStats['total_reviews'];
+        $productData['ratings_count'] = $reviewStats['ratings_count'];
 
         return Inertia::render('Store/Products/Show', [
-            'product' => $product,
+            'product' => $productData,
         ]);
     }
 }

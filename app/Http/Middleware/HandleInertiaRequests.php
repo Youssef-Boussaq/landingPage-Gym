@@ -75,6 +75,9 @@ public function share(Request $request): array
                 'pendingOrdersCount' => Order::query()
                     ->where('status', OrderStatus::PENDING)
                     ->count(),
+                'pendingProductReviewsCount' => \App\Models\ProductReview::query()
+                    ->where('status', 'pending')
+                    ->count(),
                 'unreadNotificationsCount' => $user->unreadNotifications()->count(),
                 'lowStockCount' => Product::query()
                     ->where('manage_stock', true)

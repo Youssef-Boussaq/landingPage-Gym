@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ShoppingBag, ArrowUpRight } from 'lucide-react';
+import { ShoppingBag, ArrowUpRight, Star, MessageSquare } from 'lucide-react';
 
 export default function ProductCard({ product, preview = false }) {
     // Safe image fallback
@@ -48,6 +48,24 @@ export default function ProductCard({ product, preview = false }) {
                     <h3 className="text-base font-bold text-slate-900 transition-colors group-hover:text-slate-950 line-clamp-1">
                         {product.title}
                     </h3>
+
+                    {/* Ratings & Customer Feedback indicator (only when actual feedback exists) */}
+                    {product.ratings_count > 0 && product.average_rating > 0 ? (
+                        <div className="flex items-center gap-1.5 mt-1 text-xs">
+                            <span className="flex items-center text-amber-500 font-bold">
+                                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 mr-0.5" />
+                                {Number(product.average_rating).toFixed(1)}
+                            </span>
+                            <span className="text-slate-400">
+                                ({product.reviews_count})
+                            </span>
+                        </div>
+                    ) : product.reviews_count > 0 ? (
+                        <div className="flex items-center gap-1 mt-1 text-xs text-slate-500">
+                            <MessageSquare className="w-3 h-3 text-lime-600" />
+                            <span>{product.reviews_count} {product.reviews_count > 1 ? 'avis' : 'avis'}</span>
+                        </div>
+                    ) : null}
                 </div>
 
                 {/* Price & Cart CTA Row */}

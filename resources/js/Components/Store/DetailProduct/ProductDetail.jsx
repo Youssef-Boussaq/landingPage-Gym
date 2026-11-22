@@ -49,6 +49,9 @@ export default function ProductDetail({ product }) {
                 price={product.price}
                 sale_price={product.sale_price}
                 originalPrice={product.original_price}
+                rating={product.average_rating}
+                count={product.reviews_count ?? (product.reviews?.length ?? 0)}
+                ratingsCount={product.ratings_count ?? (product.review_stats?.ratings_count ?? 0)}
             />
             <ProductTags tags={product.categories} />
         </>
@@ -77,7 +80,13 @@ export default function ProductDetail({ product }) {
         </div>
     );
 
-    const reviewsComponent = <ProductReviews />;
+    const reviewsComponent = (
+        <ProductReviews
+            product={product}
+            reviews={product.reviews ?? []}
+            stats={product.review_stats ?? {}}
+        />
+    );
 
     return (
         <ProductDetailLayout

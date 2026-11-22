@@ -8,6 +8,7 @@ import {
     Images,
     LayoutDashboard,
     Megaphone,
+    MessageSquareQuote,
     Package,
     PanelsTopLeft,
     Settings,
@@ -29,6 +30,7 @@ const sections = [
         items: [
             { label: 'Orders', href: 'admin.orders.index', icon: ShoppingBag, badge: 'pendingOrdersCount', match: 'admin.orders.*' },
             { label: 'Products', href: 'admin.products.index', icon: Package, badge: 'lowStockCount', match: 'admin.products.*' },
+            { label: 'Product Reviews', href: 'admin.product-reviews.index', icon: MessageSquareQuote, badge: 'pendingProductReviewsCount', match: 'admin.product-reviews.*' },
             { label: 'Categories', href: 'admin.categories.index', icon: FolderTree, match: 'admin.categories.*' },
             { label: 'Customers', href: 'admin.customers.index', icon: Users, match: 'admin.customers.*' },
         ],

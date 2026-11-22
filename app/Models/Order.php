@@ -68,6 +68,11 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
     // Métadonnées d'attribution marketing
     public function attribution(): HasOne
     {
@@ -104,4 +109,9 @@ class Order extends Model
         'id'
     );
 }
+
+    public function productReviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class);
+    }
 }

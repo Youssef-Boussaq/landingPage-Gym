@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\ProductImage;
+use App\Models\ProductReview;
 
 
 class Product extends Model
@@ -82,5 +83,73 @@ public function primaryImage(): HasOne
     public function digitalDeliverable(): HasOne
     {
         return $this->hasOne(DigitalDeliverable::class);
+    }
+
+    // Tous les avis
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class);
+    }
+
+    // Avis approuvés uniquement
+    public function approvedReviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class)
+            ->where('status', 'approved')
+            ->latest();
+    }
+
+    // Avis approuvés avec une note chiffrée
+    public function approvedRatings(): HasMany
+    {
+        return $this->hasMany(ProductReview::class)
+            ->where('status', 'approved')
+            ->whereNotNull('rating');
+    }
+
+    /**
+     * Statistiques complètes des avis approuvés.
+     * Prend en compte les avis sans note (message uniquement)
+     * sans fausser la moyenne ni afficher un 0.0 artificiel.
+     */
+    public function getReviewStatsAttribute(): array
+    {
+        $approved = $this->relationLoaded('approvedReviews')
+            ? $this->approvedReviews
+            : $this->approvedReviews()->get();
+
+        $totalReviews = $approved->count();
+        $ratedReviews = $approved->whereNotNull('rating');
+        $ratingsCount = $ratedReviews->count();
+        $unratedCount = $totalReviews - $ratingsCount;
+
+        $averageRating = $ratingsCount > 0
+            ? round((float) $ratedReviews->avg('rating'), 1)
+            : null;
+
+        $distribution = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+        foreach ($ratedReviews as $rev) {
+            $r = (int) $rev->rating;
+            if (isset($distribution[$r])) {
+                $distribution[$r]++;
+            }
+        }
+
+        $distributionPercentages = [];
+        foreach ($distribution as $star => $count) {
+            $distributionPercentages[$star] = $ratingsCount > 0
+                ? (int) round(($count / $ratingsCount) * 100)
+                : 0;
+        }
+
+        return [
+            'total_reviews'            => $totalReviews,
+            'ratings_count'            => $ratingsCount,
+            'unrated_count'            => $unratedCount,
+            'average_rating'           => $averageRating,
+            'has_ratings'              => $ratingsCount > 0,
+            'distribution'             => $distribution,
+            'distribution_percentages' => $distributionPercentages,
+        ];
     }
 }

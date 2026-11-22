@@ -8,8 +8,9 @@ export default function ProductInfo({
     price,
     sale_price,
     description,
-    rating = 0,
+    rating = null,
     count = 0,
+    ratingsCount = 0,
 }) {
     return (
         <div className="flex flex-col space-y-4">
@@ -24,7 +25,7 @@ export default function ProductInfo({
                 </h1>
             </div>
 
-            <ProductRating rating={rating} count={count} />
+            <ProductRating rating={rating} count={count} ratingsCount={ratingsCount} />
 
             <ProductPrice
                 price={price}

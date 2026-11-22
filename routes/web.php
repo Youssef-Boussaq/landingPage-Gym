@@ -43,6 +43,10 @@ Route::get('/store/cart', [CartController::class, 'index'])
 Route::get('/store/products/{id}', [App\Http\Controllers\ProductController::class, 'show'])
     ->name('store.products.show');
 
+Route::post('/store/products/{product}/reviews', [App\Http\Controllers\Store\ProductReviewController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('store.products.reviews.store');
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -180,6 +184,15 @@ Route::patch('/settings/appearance', [
             ->name('customers.index');
         Route::get('/customers/{user}', [App\Http\Controllers\Admin\CustomerController::class, 'show'])
             ->name('customers.show');
+
+        Route::get('/product-reviews', [App\Http\Controllers\Admin\ProductReviewController::class, 'index'])
+            ->name('product-reviews.index');
+        Route::patch('/product-reviews/{review}/status', [App\Http\Controllers\Admin\ProductReviewController::class, 'updateStatus'])
+            ->name('product-reviews.status');
+        Route::post('/product-reviews/{review}/reply', [App\Http\Controllers\Admin\ProductReviewController::class, 'reply'])
+            ->name('product-reviews.reply');
+        Route::delete('/product-reviews/{review}', [App\Http\Controllers\Admin\ProductReviewController::class, 'destroy'])
+            ->name('product-reviews.destroy');
 
         Route::get('/notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])
             ->name('notifications.index');
