@@ -1,4 +1,4 @@
-export default function OrderSummary({ cart = [] }) {
+export default function OrderSummary({ cart = [], isDigital = false }) {
     const subtotal = cart.reduce(
         (total, item) =>
             total +
@@ -6,7 +6,7 @@ export default function OrderSummary({ cart = [] }) {
         0
     );
 
-    const shipping = subtotal > 250 ? 0 : 35;
+    const shipping = isDigital ? 0 : (subtotal > 250 ? 0 : 35);
     const totalAmount = subtotal + shipping;
     const amountForFreeShipping = 250 - subtotal;
 
@@ -81,38 +81,56 @@ export default function OrderSummary({ cart = [] }) {
 
             <div className="my-6 border-t border-slate-200" />
 
-            {/* Free Shipping UI */}
-            <div className="mb-6 rounded-xl border border-slate-100 bg-slate-50 p-4">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-xl shadow-sm">
-                        {subtotal > 250 ? '🎉' : '🚚'}
-                    </div>
-                    <div className="flex-1">
-                        {subtotal > 250 ? (
-                            <p className="font-bold text-green-600">
-                                Livraison gratuite offerte !
+            {/* Free Shipping UI or Digital Delivery UI */}
+            {isDigital ? (
+                <div className="mb-6 rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-xl shadow-sm">
+                            ⚡
+                        </div>
+                        <div className="flex-1">
+                            <p className="font-bold text-emerald-800">
+                                Accès & Téléchargement immédiat
                             </p>
-                        ) : (
-                            <>
-                                <p className="font-bold text-slate-900">
-                                    Livraison 35 DH
-                                </p>
-                                <p className="mt-0.5 text-xs text-orange-500">
-                                    Ajoutez encore {amountForFreeShipping.toFixed(2)} DH pour profiter de la livraison gratuite.
-                                </p>
-                            </>
-                        )}
+                            <p className="mt-0.5 text-xs text-emerald-600">
+                                Produit digital envoyé instantanément par email. Aucun frais de livraison.
+                            </p>
+                        </div>
                     </div>
                 </div>
-                {subtotal <= 250 && (
-                    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
-                        <div 
-                            className="h-full bg-slate-900 transition-all duration-500"
-                            style={{ width: `${Math.min((subtotal / 250) * 100, 100)}%` }}
-                        />
+            ) : (
+                <div className="mb-6 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-xl shadow-sm">
+                            {subtotal > 250 ? '🎉' : '🚚'}
+                        </div>
+                        <div className="flex-1">
+                            {subtotal > 250 ? (
+                                <p className="font-bold text-green-600">
+                                    Livraison gratuite offerte !
+                                </p>
+                            ) : (
+                                <>
+                                    <p className="font-bold text-slate-900">
+                                        Livraison 35 DH
+                                    </p>
+                                    <p className="mt-0.5 text-xs text-orange-500">
+                                        Ajoutez encore {amountForFreeShipping.toFixed(2)} DH pour profiter de la livraison gratuite.
+                                    </p>
+                                </>
+                            )}
+                        </div>
                     </div>
-                )}
-            </div>
+                    {subtotal <= 250 && (
+                        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                            <div 
+                                className="h-full bg-slate-900 transition-all duration-500"
+                                style={{ width: `${Math.min((subtotal / 250) * 100, 100)}%` }}
+                            />
+                        </div>
+                    )}
+                </div>
+            )}
 
             <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Sous-total</span>
@@ -124,7 +142,7 @@ export default function OrderSummary({ cart = [] }) {
             <div className="mt-3 flex justify-between text-sm">
                 <span className="text-slate-500">Livraison</span>
                 <span className="font-medium text-slate-900">
-                    {shipping === 0 ? 'Offerte' : `${shipping.toFixed(2)} DH`}
+                    {isDigital ? 'Gratuit (Digital)' : (shipping === 0 ? 'Offerte' : `${shipping.toFixed(2)} DH`)}
                 </span>
             </div>
 

@@ -58,6 +58,20 @@ class ProductImageSeeder extends Seeder
                     ['file' => 'front.webp', 'primary' => false],
                 ],
             ],
+
+            'programme-transformation-12-semaines-digital' => [
+                'custom_paths' => [
+                    ['path' => 'images/tran1.jpeg', 'primary' => true],
+                    ['path' => 'images/tran1after.jpeg', 'primary' => false],
+                ],
+            ],
+
+            'guide-nutrition-recettes-fitness' => [
+                'custom_paths' => [
+                    ['path' => 'images/nutrition.jpg', 'primary' => true],
+                    ['path' => 'images/1.jpg', 'primary' => false],
+                ],
+            ],
         ];
 
         foreach ($products as $slug => $data) {
@@ -65,6 +79,19 @@ class ProductImageSeeder extends Seeder
             $product = Product::where('slug', $slug)->first();
 
             if (!$product) {
+                continue;
+            }
+
+            if (!empty($data['custom_paths'])) {
+                foreach ($data['custom_paths'] as $index => $img) {
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'path' => $img['path'],
+                        'alt_text' => $product->title . ' - image ' . ($index + 1),
+                        'sort_order' => $index,
+                        'is_primary' => $img['primary'],
+                    ]);
+                }
                 continue;
             }
 

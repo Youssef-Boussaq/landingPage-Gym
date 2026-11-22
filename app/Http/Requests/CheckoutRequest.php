@@ -45,12 +45,33 @@ class CheckoutRequest extends FormRequest
         ]);
     }
 
+    public function isDigitalCheckout(): bool
+    {
+        $mode = $this->input('checkout_mode');
+        if ($mode === 'buy_now') {
+            $buyNow = session('buy_now');
+            if ($buyNow && !empty($buyNow['product_id'])) {
+                $product = \App\Models\Product::find($buyNow['product_id']);
+                return $product && $product->type === \App\Enums\ProductType::DIGITAL;
+            }
+        } else {
+            $cart = session('cart', []);
+            if (!empty($cart)) {
+                $ids = collect($cart)->pluck('id');
+                $products = \App\Models\Product::whereIn('id', $ids)->get();
+                return $products->isNotEmpty() && $products->every(fn ($p) => $p->type === \App\Enums\ProductType::DIGITAL);
+            }
+        }
+        return false;
+    }
+
     /**
      * Validation rules.
      */
     public function rules(): array
     {
         $identity = CustomerIdentity::resolve($this);
+        $isDigital = $this->isDigitalCheckout();
 
         return [
             /*
@@ -59,14 +80,14 @@ class CheckoutRequest extends FormRequest
             |--------------------------------------------------------------------------
             */
 
-           'checkout_mode' => [
-    'required',
-    'string',
-    Rule::in([
-        'cart',
-        'buy_now',
-    ]),
-],
+            'checkout_mode' => [
+                'required',
+                'string',
+                Rule::in([
+                    'cart',
+                    'buy_now',
+                ]),
+            ],
 
             'customer_name' => [
                 $identity->isGuest() ? 'required' : 'nullable',
@@ -76,13 +97,13 @@ class CheckoutRequest extends FormRequest
             ],
 
             'customer_email' => [
-                'nullable',
+                $isDigital ? 'required' : 'nullable',
                 'email:rfc',
                 'max:255',
             ],
 
             'customer_phone' => [
-                $identity->isGuest() ? 'required' : 'nullable',
+                (!$isDigital && $identity->isGuest()) ? 'required' : 'nullable',
                 'string',
                 'min:8',
                 'max:30',
@@ -95,9 +116,9 @@ class CheckoutRequest extends FormRequest
             */
 
             'shipping_address' => [
-                'required',
+                $isDigital ? 'nullable' : 'required',
                 'string',
-                'min:5',
+                $isDigital ? 'max:500' : 'min:5',
                 'max:500',
             ],
 
@@ -123,7 +144,7 @@ class CheckoutRequest extends FormRequest
             'payment_method' => [
                 'required',
                 'string',
-                Rule::in([
+                Rule::in($isDigital ? ['stripe'] : [
                     'cash',
                     'stripe',
                 ]),

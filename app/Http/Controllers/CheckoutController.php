@@ -93,6 +93,7 @@ public function index(Request $request)
             'isAuthenticated' => auth()->check(),
             'user'            => auth()->user(),
             'checkoutMode'    => 'buy_now',
+            'isDigital'       => $product->type === \App\Enums\ProductType::DIGITAL,
         ]);
     }
 
@@ -110,23 +111,27 @@ public function index(Request $request)
             ->with('error', 'Votre panier est vide.');
     }
 
-    return Inertia::render('Store/Checkout/Index', [
-        'cart' => collect($cart)
-            ->map(fn ($item) => [
-                'key'        => $item['id'],
-                'product_id' => $item['id'],
-                'name'       => $item['title'],
-                'price'      => $item['price'],
-                'quantity'   => (int) $item['quantity'],
-                'type'       => $item['type'],
-                'variant_id' => $item['variant_id'] ?? null,
-                'image'      => $item['image'] ?? null,
-            ])
-            ->values(),
+    $cartItems = collect($cart)
+        ->map(fn ($item) => [
+            'key'        => $item['id'],
+            'product_id' => $item['id'],
+            'name'       => $item['title'],
+            'price'      => $item['price'],
+            'quantity'   => (int) $item['quantity'],
+            'type'       => $item['type'],
+            'variant_id' => $item['variant_id'] ?? null,
+            'image'      => $item['image'] ?? null,
+        ])
+        ->values();
 
+    $isDigital = $cartItems->isNotEmpty() && $cartItems->every(fn ($item) => ($item['type'] ?? '') === 'digital');
+
+    return Inertia::render('Store/Checkout/Index', [
+        'cart'            => $cartItems,
         'isAuthenticated' => auth()->check(),
         'user'            => auth()->user(),
         'checkoutMode'    => 'cart',
+        'isDigital'       => $isDigital,
     ]);
 }
 
@@ -190,9 +195,15 @@ public function index(Request $request)
             abort(403);
         }
     } else {
+        $sessionId = $request->query('session_id');
+        $hasValidStripeSession = $sessionId && (
+            $order->stripe_session_id === $sessionId ||
+            $order->transaction_id === $sessionId
+        );
+
         if (
-            !$order->guest_token ||
-            $request->cookie('guest_token') !== $order->guest_token
+            !$hasValidStripeSession &&
+            (!$order->guest_token || $request->cookie('guest_token') !== $order->guest_token)
         ) {
             abort(403);
         }
@@ -208,7 +219,39 @@ public function index(Request $request)
 
     /*
     |--------------------------------------------------------------------------
-    | Stripe still waiting for webhook
+    | Verify Stripe session directly if payment webhook hasn't arrived yet
+    |--------------------------------------------------------------------------
+    */
+
+    if ($isStripe && $order->status !== OrderStatus::PAID) {
+        $sessionId = $request->query('session_id') ?? $order->stripe_session_id ?? $order->transaction_id;
+
+        if ($sessionId) {
+            try {
+                \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+                $stripeSession = \Stripe\Checkout\Session::retrieve($sessionId);
+
+                if ($stripeSession && $stripeSession->payment_status === 'paid') {
+                    app(\App\Services\Orders\OrderPaymentService::class)->markPaid(
+                        $order->id,
+                        $stripeSession->id,
+                        $stripeSession->payment_intent
+                    );
+                    $order->refresh();
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[CHECKOUT] Could not synchronously verify Stripe session', [
+                    'order_id' => $order->id,
+                    'session_id' => $sessionId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Stripe still waiting for payment confirmation
     |--------------------------------------------------------------------------
     */
 
@@ -312,11 +355,37 @@ public function index(Request $request)
             abort(403);
         }
     } else {
+        $sessionId = $request->query('session_id');
+        $hasValidStripeSession = $sessionId && (
+            $order->stripe_session_id === $sessionId ||
+            $order->transaction_id === $sessionId
+        );
+
         if (
-            !$order->guest_token ||
-            $request->cookie('guest_token') !== $order->guest_token
+            !$hasValidStripeSession &&
+            (!$order->guest_token || $request->cookie('guest_token') !== $order->guest_token)
         ) {
             abort(403);
+        }
+    }
+
+    if ($order->payment_method === 'stripe' && $order->status !== OrderStatus::PAID) {
+        $sessionId = $request->query('session_id') ?? $order->stripe_session_id ?? $order->transaction_id;
+        if ($sessionId) {
+            try {
+                \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+                $stripeSession = \Stripe\Checkout\Session::retrieve($sessionId);
+                if ($stripeSession && $stripeSession->payment_status === 'paid') {
+                    app(\App\Services\Orders\OrderPaymentService::class)->markPaid(
+                        $order->id,
+                        $stripeSession->id,
+                        $stripeSession->payment_intent
+                    );
+                    $order->refresh();
+                }
+            } catch (\Throwable $e) {
+                // Ignore polling errors
+            }
         }
     }
 

@@ -30,9 +30,9 @@ class OrderCreator
             'transaction_id' => null,
             'customer_name' => $customerName,
             'customer_email' => $customerEmail,
-            'customer_phone' => $validated['customer_phone'],
-            'shipping_address' => $validated['shipping_address'],
-            'city' => $validated['city'],
+            'customer_phone' => $validated['customer_phone'] ?? 'N/A',
+            'shipping_address' => $validated['shipping_address'] ?? 'Commande numérique (Livraison par email)',
+            'city' => $validated['city'] ?? 'En ligne',
             'postal_code' => $validated['postal_code'] ?? null,
         ]);
 

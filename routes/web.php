@@ -71,6 +71,8 @@ Route::post('/checkout', [CheckoutController::class, 'store'])
     ->name('checkout.store');
 Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])
     ->name('checkout.success');
+Route::get('/checkout/success/{order}/status', [CheckoutController::class, 'status'])
+    ->name('checkout.status');
 Route::post('/checkout/buy-now', [CheckoutController::class, 'buyNow'])
     ->name('checkout.buy-now');
 
@@ -111,6 +113,8 @@ Route::middleware(['auth', 'admin'])
     ->group(function () {
         Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
             ->name('dashboard');
+        Route::get('/export', [App\Http\Controllers\Admin\DashboardController::class, 'export'])
+            ->name('export');
 
         Route::resource(
     'store-promotions',

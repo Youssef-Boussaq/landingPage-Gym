@@ -8,16 +8,19 @@ import {
     AlertTriangle,
     ArrowUpRight,
     Banknote,
+    Calendar,
     CheckCircle2,
     CircleDollarSign,
     Clock3,
     Download,
+    FileSpreadsheet,
     Package,
     RefreshCw,
     ShoppingBag,
     Truck,
     Users,
     Wallet,
+    X,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -263,6 +266,14 @@ export default function Dashboard({
     const [activeTab, setActiveTab] = useState('sales');
     const [trendMetric, setTrendMetric] = useState('both');
     const [loading, setLoading] = useState(false);
+    const [showExportModal, setShowExportModal] = useState(false);
+    const [exportRange, setExportRange] = useState('30_days');
+
+    const handleExport = () => {
+        window.location.href = route('admin.export', { range: exportRange });
+        setShowExportModal(false);
+    };
+
     const { errors = {} } = usePage().props;
 
     const safeStats = {
@@ -343,10 +354,18 @@ export default function Dashboard({
                         </button>
                         <button
                             type="button"
-                            onClick={() => window.print()}
+                            onClick={() => setShowExportModal(true)}
                             className="inline-flex h-11 items-center gap-2 rounded-xl bg-stone-950 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-stone-800"
                         >
-                            <Download size={16} /> Imprimer / PDF
+                            <FileSpreadsheet size={16} /> Exporter (CSV / Excel)
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => window.print()}
+                            className="inline-flex h-11 items-center gap-2 rounded-xl border border-stone-200 bg-white px-3.5 text-sm font-semibold text-stone-700 shadow-sm transition hover:bg-stone-50"
+                            title="Imprimer ou enregistrer en PDF"
+                        >
+                            <Download size={15} /> PDF
                         </button>
                     </div>
                 </header>
@@ -918,6 +937,91 @@ export default function Dashboard({
                     Tableau de bord administrateur · Connecté aux données Laravel en direct · Rapprochement bancaire COD soumis à intégration future des bordereaux transporteur.
                 </footer>
             </div>
+
+            {/* Modal Exportation CSV / Excel */}
+            {showExportModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 p-4 backdrop-blur-sm">
+                    <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl transition-all">
+                        <div className="flex items-center justify-between border-b border-stone-100 pb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-lime-100 text-lime-800">
+                                    <FileSpreadsheet size={22} />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-stone-900">Exporter les données</h3>
+                                    <p className="text-xs text-stone-500">Générer un fichier CSV compatible Excel</p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setShowExportModal(false)}
+                                className="rounded-xl p-2 text-stone-400 transition hover:bg-stone-100 hover:text-stone-700"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        <div className="mt-5 space-y-4">
+                            <p className="text-sm font-semibold text-stone-800">Sélectionnez la période des données :</p>
+                            <div className="space-y-2.5">
+                                {[
+                                    { id: '15_days', label: '15 derniers jours', desc: 'Commandes créées lors des 15 derniers jours' },
+                                    { id: '30_days', label: '30 derniers jours', desc: 'Commandes créées lors des 30 derniers jours' },
+                                    { id: 'last_month', label: 'Le mois dernier', desc: 'Mois calendaire précédent complet' },
+                                    { id: 'last_2_months', label: 'Les 2 derniers mois', desc: 'Commandes des deux derniers mois' },
+                                    { id: 'all', label: 'Toutes les données', desc: 'Historique complet des commandes' },
+                                ].map((option) => (
+                                    <label
+                                        key={option.id}
+                                        className={`flex cursor-pointer items-center justify-between rounded-2xl border p-3.5 transition ${
+                                            exportRange === option.id
+                                                ? 'border-lime-600 bg-lime-50/60 text-stone-950 shadow-sm'
+                                                : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <input
+                                                type="radio"
+                                                name="exportRange"
+                                                value={option.id}
+                                                checked={exportRange === option.id}
+                                                onChange={(e) => setExportRange(e.target.value)}
+                                                className="h-4 w-4 text-lime-600 focus:ring-lime-500 border-stone-300"
+                                            />
+                                            <div>
+                                                <p className="text-sm font-bold">{option.label}</p>
+                                                <p className="text-xs text-stone-500">{option.desc}</p>
+                                            </div>
+                                        </div>
+                                        <Calendar size={16} className={exportRange === option.id ? 'text-lime-700' : 'text-stone-400'} />
+                                    </label>
+                                ))}
+                            </div>
+
+                            <div className="rounded-2xl border border-stone-100 bg-stone-50/80 p-3.5 text-xs text-stone-500">
+                                <span className="font-bold text-stone-700">Format d’export :</span> Fichier CSV (séparateur point-virgule, UTF-8 BOM). Compatible directement avec Microsoft Excel, Apple Numbers et Google Sheets sans conversion.
+                            </div>
+                        </div>
+
+                        <div className="mt-6 flex items-center justify-end gap-3 border-t border-stone-100 pt-4">
+                            <button
+                                type="button"
+                                onClick={() => setShowExportModal(false)}
+                                className="rounded-xl border border-stone-200 px-4 py-2.5 text-sm font-semibold text-stone-600 transition hover:bg-stone-50"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleExport}
+                                className="inline-flex items-center gap-2 rounded-xl bg-stone-950 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-stone-800"
+                            >
+                                <Download size={16} /> Télécharger CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AdminLayout>
     );
 }

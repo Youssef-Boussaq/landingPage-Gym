@@ -18,10 +18,12 @@ export default function AdminProductPreview({ product }) {
                 </div>
                 <div className="mt-2 flex items-center justify-between">
                     <span className="text-slate-500">Stock</span>
-                    <span className={`font-semibold ${inStock ? 'text-emerald-700' : 'text-rose-700'}`}>
-                        {product.manage_stock
-                            ? `${product.stock_quantity ?? 0} ${inStock ? 'en stock' : 'rupture'}`
-                            : 'Non géré'}
+                    <span className={`font-semibold ${product.type === 'digital' ? 'text-emerald-700' : (inStock ? 'text-emerald-700' : 'text-rose-700')}`}>
+                        {product.type === 'digital'
+                            ? 'Illimité (Digital)'
+                            : (product.manage_stock
+                                ? `${product.stock_quantity ?? 0} ${inStock ? 'en stock' : 'rupture'}`
+                                : 'Non géré')}
                     </span>
                 </div>
                 <div className="mt-2 flex items-center justify-between">

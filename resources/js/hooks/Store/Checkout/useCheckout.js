@@ -1,7 +1,7 @@
 
 import { useForm } from '@inertiajs/react';
 
-export default function useCheckout(checkoutMode = 'cart') {
+export default function useCheckout(checkoutMode = 'cart', isDigital = false) {
     const {
         data,
         setData,
@@ -16,8 +16,8 @@ export default function useCheckout(checkoutMode = 'cart') {
         customer_email: '',
         customer_phone: '',
 
-        shipping_address: '',
-        city: '',
+        shipping_address: isDigital ? 'Commande numérique (Livraison par email)' : '',
+        city: isDigital ? 'En ligne' : '',
         postal_code: '',
 
         payment_method: 'stripe',
@@ -25,6 +25,16 @@ export default function useCheckout(checkoutMode = 'cart') {
 
     const submit = (event) => {
         event.preventDefault();
+
+        if (isDigital) {
+            data.payment_method = 'stripe';
+            if (!data.shipping_address) {
+                data.shipping_address = 'Commande numérique (Livraison par email)';
+            }
+            if (!data.city) {
+                data.city = 'En ligne';
+            }
+        }
 
         post(route('checkout.store'));
     };

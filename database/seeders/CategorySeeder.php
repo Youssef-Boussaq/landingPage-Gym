@@ -114,5 +114,28 @@ class CategorySeeder extends Seeder
             'name' => 'Lifting Belts',
             'slug' => 'lifting-belts',
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Digital Programs
+        |--------------------------------------------------------------------------
+        */
+
+        $programsCategory = Category::create([
+            'name' => 'Programmes Digitaux',
+            'slug' => 'programmes-digitaux',
+        ]);
+
+        Category::create([
+            'parent_id' => $programsCategory->id,
+            'name' => 'E-books & Guides',
+            'slug' => 'ebooks-guides',
+        ]);
+
+        Category::create([
+            'parent_id' => $programsCategory->id,
+            'name' => 'Plans Entraînement',
+            'slug' => 'plans-entrainement',
+        ]);
     }
 }

@@ -44,6 +44,7 @@ class CartCalculator
             }
 
             if (
+                $product->type !== \App\Enums\ProductType::DIGITAL &&
                 $product->manage_stock &&
                 $product->available_stock < $quantity
             ) {
@@ -59,13 +60,15 @@ class CartCalculator
             $subtotal += (float) $unitPrice * $quantity;
         }
 
-        $shippingFee = $subtotal > 250 ? 0 : 35;
+        $allDigital = $products->isNotEmpty() && $products->every(fn (Product $p) => $p->type === \App\Enums\ProductType::DIGITAL);
+        $shippingFee = $allDigital ? 0 : ($subtotal > 250 ? 0 : 35);
 
         return [
             'products' => $products,
             'subtotal' => $subtotal,
             'shipping_fee' => $shippingFee,
             'total' => $subtotal + $shippingFee,
+            'all_digital' => $allDigital,
         ];
     }
 }

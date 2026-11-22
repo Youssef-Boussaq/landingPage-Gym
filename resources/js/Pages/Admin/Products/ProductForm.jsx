@@ -298,12 +298,19 @@ export default function ProductForm({
                             <select
                                 id="type"
                                 value={form.data.type}
-                                onChange={(event) =>
-                                    form.setData(
-                                        'type',
-                                        event.target.value
-                                    )
-                                }
+                                onChange={(event) => {
+                                    const nextType = event.target.value;
+                                    if (nextType === 'digital') {
+                                        form.setData({
+                                            ...form.data,
+                                            type: 'digital',
+                                            stock_quantity: '',
+                                            manage_stock: false,
+                                        });
+                                    } else {
+                                        form.setData('type', nextType);
+                                    }
+                                }}
                                 className="mt-2 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                             >
                                 {types.map((type) => (
@@ -352,15 +359,17 @@ export default function ProductForm({
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="mb-6">
                     <h2 className="text-lg font-semibold text-slate-900">
-                        Prix et stock
+                        {form.data.type === 'digital' ? 'Tarification' : 'Prix et stock'}
                     </h2>
 
                     <p className="mt-1 text-sm text-slate-500">
-                        Définissez le prix et la disponibilité du produit.
+                        {form.data.type === 'digital'
+                            ? 'Définissez le prix du produit digital (accès immédiat, aucun stock physique nécessaire).'
+                            : 'Définissez le prix et la disponibilité du produit.'}
                     </p>
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-3">
+                <div className={`grid gap-6 ${form.data.type === 'digital' ? 'md:grid-cols-2' : 'md:grid-cols-3'}`}>
                     {/* Price */}
                     <div>
                         <InputLabel
@@ -433,64 +442,70 @@ export default function ProductForm({
                         />
                     </div>
 
-                    {/* Stock */}
-                    <div>
-                        <InputLabel
-                            htmlFor="stock_quantity"
-                            value="Stock"
-                        />
+                    {/* Stock - HIDDEN for digital products */}
+                    {form.data.type !== 'digital' && (
+                        <div>
+                            <InputLabel
+                                htmlFor="stock_quantity"
+                                value="Stock"
+                            />
 
-                        <input
-                            id="stock_quantity"
-                            type="number"
-                            min="0"
-                            value={
-                                form.data.stock_quantity ?? ''
-                            }
-                            onChange={(event) =>
-                                form.setData(
-                                    'stock_quantity',
-                                    event.target.value
-                                )
-                            }
-                            className="mt-2 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
-                            placeholder="0"
-                        />
+                            <input
+                                id="stock_quantity"
+                                type="number"
+                                min="0"
+                                value={
+                                    form.data.stock_quantity ?? ''
+                                }
+                                onChange={(event) =>
+                                    form.setData(
+                                        'stock_quantity',
+                                        event.target.value
+                                    )
+                                }
+                                className="mt-2 block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                                placeholder="0"
+                            />
 
-                        <InputError
-                            message={
-                                form.errors.stock_quantity
-                            }
-                            className="mt-2"
-                        />
-                    </div>
+                            <InputError
+                                message={
+                                    form.errors.stock_quantity
+                                }
+                                className="mt-2"
+                            />
+                        </div>
+                    )}
                 </div>
 
-                {/* Manage stock */}
-                <label className="mt-6 flex cursor-pointer items-center gap-3">
-                    <input
-                        type="checkbox"
-                        checked={
-                            Boolean(form.data.manage_stock)
-                        }
-                        onChange={(event) =>
-                            form.setData(
-                                'manage_stock',
-                                event.target.checked
-                            )
-                        }
-                        className="h-4 w-4 rounded border-slate-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
-                    />
+                {/* Manage stock - HIDDEN for digital products */}
+                {form.data.type !== 'digital' && (
+                    <>
+                        <label className="mt-6 flex cursor-pointer items-center gap-3">
+                            <input
+                                type="checkbox"
+                                checked={
+                                    Boolean(form.data.manage_stock)
+                                }
+                                onChange={(event) =>
+                                    form.setData(
+                                        'manage_stock',
+                                        event.target.checked
+                                    )
+                                }
+                                className="h-4 w-4 rounded border-slate-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                            />
 
-                    <span className="text-sm font-medium text-slate-700">
-                        Gérer le stock
-                    </span>
-                </label>
+                            <span className="text-sm font-medium text-slate-700">
+                                Gérer le stock
+                            </span>
+                        </label>
 
-                <InputError
-                    message={form.errors.manage_stock}
-                    className="mt-2"
-                />
+                        <InputError
+                            message={form.errors.manage_stock}
+                            className="mt-2"
+                        />
+                    </>
+                )}
             </section>
 
             {/* =========================================================

@@ -22,9 +22,12 @@ class AdminProductRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $isDigital = $this->input('type') === ProductType::DIGITAL->value;
+
         $this->merge([
-            'manage_stock' => $this->boolean('manage_stock'),
-            'is_active'    => $this->boolean('is_active'),
+            'manage_stock'   => $isDigital ? false : $this->boolean('manage_stock'),
+            'stock_quantity' => $isDigital ? null : ($this->filled('stock_quantity') ? (int) $this->input('stock_quantity') : null),
+            'is_active'      => $this->boolean('is_active'),
 
             'category_ids' => array_values(
                 array_filter(

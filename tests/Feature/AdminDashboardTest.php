@@ -68,9 +68,9 @@ test('dashboard analytics apply date and payment filters and exclude cancelled o
             ->where('stats.total_revenue', 200)
             ->where('stats.paid_orders', 1)
             ->where('stats.average_order_value', 200)
-            ->where('comparisons.total_revenue', 100.0)
-            ->where('revenueOverview', fn (array $rows) => count($rows) === 7 && array_sum(array_column($rows, 'orders')) === 2)
-            ->where('recentOrders', fn (array $orders) => count($orders) === 2)
+            ->where('comparisons.total_revenue', fn ($val) => (float) $val === 100.0)
+            ->where('revenueOverview', fn ($rows) => count($rows) === 7 && collect($rows)->sum('orders') === 2)
+            ->where('recentOrders', fn ($orders) => count($orders) === 2)
         );
 });
 
@@ -143,7 +143,7 @@ test('dashboard category analytics count and rank only paid items in the selecte
             ->where('stats.total_orders', 1)
             ->where('stats.total_revenue', 200)
             ->where('stats.products_sold', 2)
-            ->where('topProducts', fn (array $products) => count($products) === 1 && $products[0]['id'] === $selectedProduct->id)
+            ->where('topProducts', fn ($products) => count($products) === 1 && (is_array($products) ? $products[0]['id'] : $products->first()['id']) === $selectedProduct->id)
         );
 });
 
