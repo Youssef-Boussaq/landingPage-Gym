@@ -24,6 +24,14 @@ use App\Http\Controllers\Admin\LandingTransformationController;
 
 Route::get('/', [HomeController::class, 'index'])
     ->name('home');
+
+Route::get('/sitemap.xml', function () {
+    $path = public_path('sitemap.xml');
+    if (file_exists($path)) {
+        return response(file_get_contents($path), 200, ['Content-Type' => 'application/xml']);
+    }
+    abort(404);
+});
  
 use App\Http\Controllers\AmeexWebhookController;
 

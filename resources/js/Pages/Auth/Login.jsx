@@ -111,6 +111,18 @@ export default function Login({ status, canResetPassword }) {
                         {processing ? 'Connexion en cours...' : 'Se connecter'}
                     </button>
                 </div>
+
+                <div className="mt-6 border-t border-[#e5e7eb] pt-6 text-center">
+                    <p className="text-[12px] text-[#666666] tracking-[0.025em]">
+                        Vous n'avez pas encore de compte ?
+                    </p>
+                    <Link
+                        href={route('register')}
+                        className="mt-3 block w-full border border-black bg-white py-3 text-center text-[11px] font-bold uppercase tracking-[0.05em] text-black hover:bg-black hover:text-white transition-colors"
+                    >
+                        Créer un compte (Inscription)
+                    </Link>
+                </div>
             </form>
         </GuestLayout>
     );

@@ -11,44 +11,61 @@ if (typeof window !== 'undefined') {
 
 export default function SmoothScroll({ children }) {
     useEffect(() => {
-        // Respect prefers-reduced-motion
+        let lenis = null;
+        let updateTicker = null;
+
+        // Respect prefers-reduced-motion for smooth scrolling
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (prefersReducedMotion) {
-            return;
+
+        if (!prefersReducedMotion) {
+            // Initialize Lenis
+            lenis = new Lenis({
+                duration: 1.1,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                orientation: 'vertical',
+                gestureOrientation: 'vertical',
+                smoothWheel: true,
+                touchMultiplier: 1.5,
+            });
+
+            // Synchronize Lenis with GSAP ScrollTrigger
+            lenis.on('scroll', ScrollTrigger.update);
+
+            updateTicker = (time) => {
+                lenis.raf(time * 1000);
+            };
+
+            gsap.ticker.add(updateTicker);
+            gsap.ticker.lagSmoothing(0);
         }
 
-        // Initialize Lenis
-        const lenis = new Lenis({
-            duration: 1.1,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            orientation: 'vertical',
-            gestureOrientation: 'vertical',
-            smoothWheel: true,
-            touchMultiplier: 1.5,
-        });
+        // Auto-scroll to top on every navigation
+        const handleScrollToTop = () => {
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
 
-        // Synchronize Lenis with GSAP ScrollTrigger
-        lenis.on('scroll', ScrollTrigger.update);
+            if (lenis) {
+                lenis.scrollTo(0, { immediate: true });
+            }
 
-        const updateTicker = (time) => {
-            lenis.raf(time * 1000);
-        };
-
-        gsap.ticker.add(updateTicker);
-        gsap.ticker.lagSmoothing(0);
-
-        // Reset scroll and recalculate ScrollTrigger on Inertia navigation
-        const removeNavigateListener = router.on('navigate', () => {
-            lenis.scrollTo(0, { immediate: true });
             setTimeout(() => {
                 ScrollTrigger.refresh();
-            }, 50);
-        });
+            }, 60);
+        };
+
+        const removeNavigateListener = router.on('navigate', handleScrollToTop);
+        const removeFinishListener = router.on('finish', handleScrollToTop);
 
         return () => {
             removeNavigateListener();
-            gsap.ticker.remove(updateTicker);
-            lenis.destroy();
+            removeFinishListener();
+            if (updateTicker) {
+                gsap.ticker.remove(updateTicker);
+            }
+            if (lenis) {
+                lenis.destroy();
+            }
         };
     }, []);
 

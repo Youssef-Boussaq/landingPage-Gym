@@ -5,7 +5,7 @@ export default function ProductGallery({
     images = [],
     activeImage,
     onImageClick,
-    title = 'Product',
+    title = 'Produit Fit Youness',
 }) {
     if (!images || images.length === 0) return null;
 
@@ -21,24 +21,39 @@ export default function ProductGallery({
     const currentImageUrl =
         getImageUrl(images[currentIndex]) || activeImage || '/placeholder.svg';
 
+    const handleSelectImage = (url) => {
+        onImageClick(url);
+        // Auto scroll up to gallery
+        const galleryEl = document.getElementById('product-gallery');
+        if (galleryEl) {
+            const rect = galleryEl.getBoundingClientRect();
+            if (rect.top < 0 || rect.top > 250) {
+                galleryEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    };
+
     // Navigation
     const goPrev = () => {
         const prevIndex = (currentIndex - 1 + images.length) % images.length;
-        onImageClick(getImageUrl(images[prevIndex]));
+        handleSelectImage(getImageUrl(images[prevIndex]));
     };
 
     const goNext = () => {
         const nextIndex = (currentIndex + 1) % images.length;
-        onImageClick(getImageUrl(images[nextIndex]));
+        handleSelectImage(getImageUrl(images[nextIndex]));
     };
 
     return (
-        <div className="flex w-full flex-col gap-4">
+        <div id="product-gallery" className="flex w-full flex-col gap-4 font-favorit">
             {/* Conteneur d'image principale - Lookbook 0px */}
             <div className="group relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-none border border-[#e5e7eb] bg-white p-6 sm:p-10 transition-colors">
                 <img
                     src={currentImageUrl}
                     alt={title}
+                    width="600"
+                    height="600"
+                    decoding="async"
                     className="h-full w-full object-contain transition-transform duration-500 ease-out group-hover:scale-105"
                 />
 
@@ -84,17 +99,22 @@ export default function ProductGallery({
                             <button
                                 key={index}
                                 type="button"
-                                onClick={() => onImageClick(url)}
+                                onClick={() => handleSelectImage(url)}
                                 aria-label={`Voir image ${index + 1}`}
                                 aria-current={isActive}
-                                className={`relative flex h-18 w-18 flex-shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-none p-2 bg-white transition-all ${isActive
+                                className={`relative flex h-18 w-18 flex-shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-none p-2 bg-white transition-all ${
+                                    isActive
                                         ? 'border-2 border-[#000000]'
                                         : 'border border-[#e5e7eb] opacity-60 hover:opacity-100 hover:border-[#000000]'
-                                    }`}
+                                }`}
                             >
                                 <img
                                     src={url || '/placeholder.svg'}
                                     alt={`${title} - Vignette ${index + 1}`}
+                                    width="72"
+                                    height="72"
+                                    loading="lazy"
+                                    decoding="async"
                                     className="h-full w-full object-contain"
                                 />
                             </button>
