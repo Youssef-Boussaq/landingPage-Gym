@@ -105,6 +105,10 @@ export default function StoreIndex({
                                         src="/images/4.webp"
                                         onError={(e) => { e.currentTarget.src = '/images/placeholder.png'; }}
                                         alt="Editorial Lookbook activewear"
+                                        width="800"
+                                        height="500"
+                                        loading="lazy"
+                                        decoding="async"
                                         className="h-full w-full object-cover rounded-none"
                                     />
                                     <div className="absolute inset-0 bg-black/10" />
@@ -118,6 +122,10 @@ export default function StoreIndex({
                                         src="/images/3.webp"
                                         onError={(e) => { e.currentTarget.src = '/images/placeholder.png'; }}
                                         alt="Editorial Lookbook lifestyle"
+                                        width="800"
+                                        height="500"
+                                        loading="lazy"
+                                        decoding="async"
                                         className="h-full w-full object-cover rounded-none"
                                     />
                                     <div className="absolute inset-0 bg-black/10" />

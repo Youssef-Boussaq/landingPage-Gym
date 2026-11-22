@@ -16,11 +16,22 @@ export default function FilterHeader({ isPending, onClose, onReset }) {
 
             <div className="flex items-center gap-1">
                 {onClose && (
-                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-900 rounded-lg lg:hidden">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        aria-label="Fermer les filtres"
+                        className="p-2 text-slate-400 hover:text-slate-900 rounded-lg lg:hidden"
+                    >
                         <X className="w-3.5 h-3.5" />
                     </button>
                 )}
-                <button onClick={onReset} disabled={isPending} className="p-2 text-slate-400 hover:text-slate-900 rounded-lg disabled:opacity-50">
+                <button
+                    type="button"
+                    onClick={onReset}
+                    disabled={isPending}
+                    aria-label="Réinitialiser les filtres"
+                    className="p-2 text-slate-400 hover:text-slate-900 rounded-lg disabled:opacity-50"
+                >
                     <RotateCcw className={`w-3.5 h-3.5 ${isPending ? 'animate-spin' : ''}`} />
                 </button>
             </div>

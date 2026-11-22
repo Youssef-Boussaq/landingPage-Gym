@@ -32,7 +32,7 @@ export default function Contact() {
                                 <a
                                     href={whatsappLink}
                                     target="_blank"
-                                    rel="noreferrer"
+                                    rel="noopener noreferrer"
                                     className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 hover:bg-[#25D366] hover:text-white hover:scale-110 hover:-translate-y-1 transition-all duration-300 shadow-sm"
                                     aria-label="WhatsApp"
                                 >
@@ -41,7 +41,7 @@ export default function Contact() {
                                 <a
                                     href="https://instagram.com"
                                     target="_blank"
-                                    rel="noreferrer"
+                                    rel="noopener noreferrer"
                                     className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 hover:bg-[#E1306C] hover:text-white hover:scale-110 hover:-translate-y-1 transition-all duration-300 shadow-sm"
                                     aria-label="Instagram"
                                 >
@@ -50,7 +50,7 @@ export default function Contact() {
                                 <a
                                     href="https://facebook.com"
                                     target="_blank"
-                                    rel="noreferrer"
+                                    rel="noopener noreferrer"
                                     className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 hover:bg-[#1877F2] hover:text-white hover:scale-110 hover:-translate-y-1 transition-all duration-300 shadow-sm"
                                     aria-label="Facebook"
                                 >
@@ -59,7 +59,7 @@ export default function Contact() {
                                 <a
                                     href="https://youtube.com"
                                     target="_blank"
-                                    rel="noreferrer"
+                                    rel="noopener noreferrer"
                                     className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 hover:bg-[#FF0000] hover:text-white hover:scale-110 hover:-translate-y-1 transition-all duration-300 shadow-sm"
                                     aria-label="YouTube"
                                 >

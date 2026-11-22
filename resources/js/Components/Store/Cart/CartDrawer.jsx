@@ -120,6 +120,7 @@ export default function CartDrawer({
                     <button
                         type="button"
                         onClick={onClose}
+                        aria-label="Fermer le panier"
                         className="flex h-8 w-8 items-center justify-center rounded-[4px] border border-[#e5e7eb] hover:border-[#000000] transition-colors"
                     >
                         <X className="h-4 w-4" strokeWidth={1.5} />

@@ -44,7 +44,7 @@ function ProgramCard({ program, whatsappPhone, popularLabel, className }) {
             <a
                 href={ctaLink}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className={cn(
                     "w-full flex items-center justify-center gap-2 py-3 rounded-[4px] font-medium text-[12px] uppercase tracking-[0.025em] transition-colors duration-200",
                     program.isPopular
