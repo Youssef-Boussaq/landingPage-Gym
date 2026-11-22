@@ -1,109 +1,156 @@
-import { Link } from '@inertiajs/react';
-import { ShoppingBag, ArrowUpRight, Star, MessageSquare } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, router } from '@inertiajs/react';
+import { Heart, Plus } from 'lucide-react';
 
-export default function ProductCard({ product, preview = false }) {
-    // Safe image fallback
+const DEFAULT_SWATCHES = [
+    { name: 'Black', color: '#000000' },
+    { name: 'Mist', color: '#e5e7eb' },
+    { name: 'Slate', color: '#2f3440' },
+    { name: 'Driftwood', color: '#dfccbe' },
+];
+
+export default function ProductCard({ product = {}, preview = false }) {
+    const [isWishlisted, setIsWishlisted] = useState(false);
+    const [activeSwatch, setActiveSwatch] = useState(0);
+
     const primaryImage =
-        product.images?.find((image) => image.is_primary) ??
+        product.images?.find((img) => img.is_primary) ??
         product.images?.[0];
 
     const imageUrl =
         primaryImage?.url ??
+        primaryImage?.path ??
         '/images/placeholder.png';
 
     const imageAlt =
         primaryImage?.alt_text ??
-        product.title;
+        product.title ??
+        'Product image';
 
-    // Format categories
-    const categoriesText = Array.isArray(product.categories)
-        ? product.categories.map((c) => c.name).join(' • ')
-        : 'Store';
+    const handleQuickAdd = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
 
-    const inner = (
-        <>
-            {/* FULL-WIDTH IMAGE CONTAINER (Matches card width) */}
-            <div className="relative w-full aspect-square overflow-hidden bg-slate-100">
+        if (product.type === 'digital') {
+            router.post(route('checkout.buy-now'), {
+                product_id: product.id,
+                quantity: 1,
+            });
+            return;
+        }
+
+        router.post(route('store.cart.add'), {
+            product_id: product.id,
+            quantity: 1,
+        }, {
+            preserveScroll: true,
+        });
+    };
+
+    const handleWishlistToggle = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsWishlisted((prev) => !prev);
+    };
+
+    const price = product.sale_price ?? product.price;
+
+    const content = (
+        <div className="group relative flex flex-col w-full bg-white rounded-none p-3 sm:p-4 transition-all duration-200">
+            {/* PRODUCT IMAGE: Full width, 0px border radius, no shadow */}
+            <div className="relative w-full aspect-[4/5] bg-stone-100 overflow-hidden rounded-none">
                 <img
                     src={imageUrl}
                     alt={imageAlt}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover rounded-none transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
                 />
 
-                {/* Floating Action Badge */}
-                <div className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-md text-slate-900 shadow-md transition-all duration-300 group-hover:bg-[var(--color-primary)] group-hover:scale-110">
-                    <ArrowUpRight className="w-4 h-4" />
-                </div>
+                {/* Wishlist Heart Icon: Outline stroke, floats top-right */}
+                <button
+                    type="button"
+                    onClick={handleWishlistToggle}
+                    aria-label="Sauvegarder dans les favoris"
+                    className="absolute top-2.5 right-2.5 p-1 text-black transition-colors hover:text-black z-10"
+                >
+                    <Heart
+                        className={`w-4 h-4 transition-colors ${
+                            isWishlisted
+                                ? 'fill-black stroke-black'
+                                : 'stroke-black fill-none stroke-[1.5]'
+                        }`}
+                    />
+                </button>
             </div>
 
-            {/* CARD CONTENT (Padded inside) */}
-            <div className="flex flex-col flex-1 p-5 justify-between bg-white">
+            {/* METADATA: Swatches, Title, Price, Quick Add */}
+            <div className="mt-3 flex flex-col flex-1 justify-between gap-2">
                 <div>
-                    {/* Category Tag */}
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                        {categoriesText}
-                    </span>
+                    {/* Color Swatch Row: 12x12px squares, 4px gap */}
+                    <div className="flex items-center gap-1 mb-2">
+                        {DEFAULT_SWATCHES.map((swatch, idx) => (
+                            <button
+                                key={swatch.name}
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setActiveSwatch(idx);
+                                }}
+                                title={swatch.name}
+                                className={`w-3 h-3 rounded-none transition-all ${
+                                    activeSwatch === idx
+                                        ? 'ring-1 ring-black ring-offset-1'
+                                        : 'opacity-80 hover:opacity-100'
+                                }`}
+                                style={{ backgroundColor: swatch.color }}
+                            />
+                        ))}
+                    </div>
 
-                    {/* Title */}
-                    <h3 className="text-base font-bold text-slate-900 transition-colors group-hover:text-slate-950 line-clamp-1">
+                    {/* Product Title in Favorit 12px weight 400 at #000000 */}
+                    <h3 className="text-[12px] font-normal leading-[1.3] text-black tracking-[0.025em] line-clamp-1">
                         {product.title}
                     </h3>
 
-                    {/* Ratings & Customer Feedback indicator (only when actual feedback exists) */}
-                    {product.ratings_count > 0 && product.average_rating > 0 ? (
-                        <div className="flex items-center gap-1.5 mt-1 text-xs">
-                            <span className="flex items-center text-amber-500 font-bold">
-                                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 mr-0.5" />
-                                {Number(product.average_rating).toFixed(1)}
-                            </span>
-                            <span className="text-slate-400">
-                                ({product.reviews_count})
-                            </span>
-                        </div>
-                    ) : product.reviews_count > 0 ? (
-                        <div className="flex items-center gap-1 mt-1 text-xs text-slate-500">
-                            <MessageSquare className="w-3 h-3 text-lime-600" />
-                            <span>{product.reviews_count} {product.reviews_count > 1 ? 'avis' : 'avis'}</span>
-                        </div>
-                    ) : null}
-                </div>
-
-                {/* Price & Cart CTA Row */}
-                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <div>
-                        <span className="text-[11px] text-slate-400 block font-medium uppercase tracking-wider">Prix</span>
-                        <span className="text-lg font-extrabold text-slate-900">
-                            {product.sale_price ?? product.price} <span className="text-sm font-semibold text-slate-600">MAD</span>
+                    {/* Price in Favorit 12px weight 400 at #000000 */}
+                    <div className="mt-0.5 flex items-baseline gap-2">
+                        <span className="text-[12px] font-normal text-black tracking-[0.025em]">
+                            {Number(price).toFixed(2)} MAD
                         </span>
                         {product.sale_price && (
-                            <span className="ml-2 text-sm text-slate-400 line-through">
-                                {product.price} MAD
+                            <span className="text-[11px] font-normal text-stone-400 line-through tracking-[0.025em]">
+                                {Number(product.price).toFixed(2)} MAD
                             </span>
                         )}
                     </div>
+                </div>
 
-                    {/* Icon CTA Button */}
-                    <div className="inline-flex items-center justify-center p-2.5 rounded-xl bg-slate-900 text-[var(--color-primary)] transition-colors duration-300 group-hover:bg-[var(--color-primary)] group-hover:text-slate-950 shadow-sm">
-                        <ShoppingBag className="w-4 h-4" />
-                    </div>
+                {/* Filled Quick Add Button: Solid #000000, white text 12px, 4px radius, 4px 10px padding */}
+                <div className="mt-2 flex items-center justify-end">
+                    <button
+                        type="button"
+                        onClick={handleQuickAdd}
+                        className="inline-flex items-center justify-center gap-1 rounded-[4px] bg-black px-2.5 py-1 text-[11px] font-medium tracking-[0.025em] text-white hover:bg-stone-800 transition-colors"
+                    >
+                        <Plus className="w-3 h-3 stroke-[2]" />
+                        <span>Quick Add</span>
+                    </button>
                 </div>
             </div>
-        </>
+        </div>
     );
 
-    const cardClassName =
-        'group flex flex-col w-full overflow-hidden rounded-2xl bg-white border border-slate-200/80 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-slate-200/60 hover:border-primary/60';
-
     if (preview) {
-        return <div className={cardClassName}>{inner}</div>;
+        return <div className="block">{content}</div>;
     }
 
     return (
         <Link
             href={route('store.products.show', product.id)}
-            className={cardClassName}
+            className="block text-inherit no-underline"
         >
-            {inner}
+            {content}
         </Link>
     );
 }

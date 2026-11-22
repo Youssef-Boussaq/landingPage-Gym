@@ -30,18 +30,16 @@ export default function ProductPrice({
         : 0;
 
     return (
-        <div className="mt-3 flex flex-wrap items-baseline gap-2.5 sm:gap-3">
+        <div className="mt-2 flex flex-wrap items-baseline gap-2.5 sm:gap-3 font-favorit">
 
             {/* Current price */}
             <span
                 className="
-                    font-archivo
-                    text-3xl
-                    font-black
-                    tracking-tight
-                    text-slate-900
-                    dark:text-white
-                    sm:text-4xl
+                    text-2xl
+                    font-normal
+                    tracking-[0.025em]
+                    text-[#000000]
+                    sm:text-3xl
                 "
             >
                 {formatPrice(currentPrice)}
@@ -52,12 +50,11 @@ export default function ProductPrice({
                 <>
                     <span
                         className="
-                            text-lg
-                            font-medium
-                            text-slate-400
+                            text-base
+                            font-normal
+                            text-[#999999]
                             line-through
-                            dark:text-slate-500
-                            sm:text-xl
+                            sm:text-lg
                         "
                     >
                         {formatPrice(originalPrice)}
@@ -68,19 +65,17 @@ export default function ProductPrice({
                         className="
                             inline-flex
                             items-center
-                            rounded-full
+                            rounded-none
                             border
-                            border-rose-500/20
-                            bg-rose-500/10
-                            px-2.5
+                            border-[#000000]
+                            bg-[#000000]
+                            px-2
                             py-0.5
-                            text-xs
-                            font-bold
-                            text-rose-600
-                            dark:border-rose-500/30
-                            dark:bg-rose-500/20
-                            dark:text-rose-400
-                            sm:text-sm
+                            text-[10px]
+                            font-medium
+                            uppercase
+                            tracking-[0.05em]
+                            text-white
                         "
                     >
                         -{discount}%

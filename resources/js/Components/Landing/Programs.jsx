@@ -8,36 +8,35 @@ function ProgramCard({ program, whatsappPhone, popularLabel, className }) {
 
     return (
         <div className={cn(
-            "relative bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 flex flex-col h-full",
-            "transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)]",
-            program.isPopular ? "shadow-[0_10px_30px_rgb(0,0,0,0.06)] border-[var(--color-primary-dark)]" : "shadow-sm",
+            "relative bg-white rounded-none p-8 flex flex-col h-full",
+            program.isPopular ? "border-2 border-[#000000]" : "border border-[#e5e7eb]",
             className
         )}>
             {program.isPopular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[var(--color-primary)] text-slate-900 text-[10px] sm:text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
+                <div className="absolute -top-3 left-6 bg-[#000000] text-white text-[10px] font-medium uppercase tracking-[0.05em] px-3 py-1 rounded-none">
                     {popularLabel || 'Best Value'}
                 </div>
             )}
 
-            <div className="mb-8 text-center pt-4">
-                <h4 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">{program.title}</h4>
-                <p className="text-slate-500 text-sm mb-6 h-10">{program.description}</p>
-                <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-4xl sm:text-5xl font-black text-slate-900 italic tracking-tighter">
+            <div className="mb-8 pt-2">
+                <h4 className="text-[18px] font-bold text-[#000000] mb-2 font-favorit uppercase tracking-[0.025em]">{program.title}</h4>
+                <p className="text-[#666666] text-[13px] mb-6 h-10 font-favorit leading-[1.33]">{program.description}</p>
+                <div className="flex items-baseline gap-1">
+                    <span className="text-3xl sm:text-4xl font-normal text-[#000000] tracking-[0.025em] font-favorit">
                         {program.price}
                     </span>
-                    <span className="text-slate-900 font-bold">{program.currency}</span>
+                    <span className="text-[#000000] font-medium text-sm font-favorit">{program.currency}</span>
+                    {program.period && (
+                        <span className="text-[#666666] text-xs font-favorit ml-1">{program.period}</span>
+                    )}
                 </div>
-                {program.period && (
-                    <span className="text-slate-500 text-sm">{program.period}</span>
-                )}
             </div>
 
-            <ul className="space-y-4 mb-8 flex-1">
+            <ul className="space-y-3 mb-8 flex-1 border-t border-[#e5e7eb] pt-6">
                 {(program.benefits || []).map((benefit, idx) => (
                     <li key={idx} className="flex items-start gap-3">
-                        <Check className="w-5 h-5 text-[var(--color-primary-dark)] shrink-0" aria-hidden="true" />
-                        <span className="text-slate-600 text-sm">{benefit}</span>
+                        <Check className="w-4 h-4 text-[#000000] shrink-0 mt-0.5" strokeWidth={1.5} aria-hidden="true" />
+                        <span className="text-[#333333] text-[13px] font-favorit tracking-[0.025em]">{benefit}</span>
                     </li>
                 ))}
             </ul>
@@ -47,14 +46,14 @@ function ProgramCard({ program, whatsappPhone, popularLabel, className }) {
                 target="_blank"
                 rel="noreferrer"
                 className={cn(
-                    "w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all duration-200 active:scale-95",
+                    "w-full flex items-center justify-center gap-2 py-3 rounded-[4px] font-medium text-[12px] uppercase tracking-[0.025em] transition-colors duration-200",
                     program.isPopular
-                        ? "bg-slate-900 text-white hover:bg-slate-800 shadow-lg"
-                        : "bg-slate-100 text-slate-900 hover:bg-slate-200"
+                        ? "bg-[#000000] text-white hover:bg-[#1d1d1d]"
+                        : "border border-[#000000] text-[#000000] bg-transparent hover:bg-[#000000] hover:text-white"
                 )}
             >
                 {program.ctaLabel || 'Choose Plan'}
-                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                <ArrowRight className="w-3.5 h-3.5" strokeWidth={1.5} aria-hidden="true" />
             </a>
         </div>
     );
@@ -99,14 +98,18 @@ export default function Programs({ programs = [], sectionConfig = {} }) {
     ];
 
     return (
-        <section id="programs" className="py-16 lg:py-28 bg-[#f9fbf6] relative">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="programs" className="py-20 lg:py-28 bg-[#f0efe7] relative">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
 
-                <div ref={titleRef} className="reveal-up text-center max-w-2xl mx-auto mb-16 lg:mb-24">
-                    <h2 className="text-sm font-bold text-[var(--color-primary-dark)] uppercase tracking-widest mb-2">
-                        {eyebrow}
-                    </h2>
-                    <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 uppercase italic tracking-tight">
+                <div ref={titleRef} className="reveal-up text-center max-w-2xl mx-auto mb-16 lg:mb-20">
+                    <div className="mb-3 flex items-center justify-center gap-3">
+                        <span className="h-px w-8 bg-[#000000]" />
+                        <h2 className="text-[12px] font-medium text-[#333333] uppercase tracking-[0.025em] font-favorit">
+                            {eyebrow}
+                        </h2>
+                        <span className="h-px w-8 bg-[#000000]" />
+                    </div>
+                    <h3 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-[#000000] uppercase tracking-[0.025em] font-favorit">
                         {heading}
                     </h3>
                 </div>

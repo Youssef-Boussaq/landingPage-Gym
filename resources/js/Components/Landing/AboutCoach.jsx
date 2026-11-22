@@ -60,9 +60,9 @@ const About = ({ config = {} }) => {
     return (
         <section
             id="about"
-            className="relative overflow-hidden bg-[#fbfdf7] text-[#0b0c0e]"
+            className="relative overflow-hidden bg-[#f0efe7] text-[#000000]"
         >
-            <div className="relative mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-12 lg:py-32">
+            <div className="relative mx-auto max-w-[1440px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
 
                 {/* =====================================================
                     HEADER
@@ -71,21 +71,21 @@ const About = ({ config = {} }) => {
                     ref={headerRef}
                     className="reveal mb-16 max-w-3xl lg:mb-24"
                 >
-                    <div className="mb-5 flex items-center gap-3">
-                        <span className="h-px w-10 bg-[var(--color-primary)]" />
-                        <span className="font-inter text-xs font-semibold uppercase tracking-[0.25em] text-black/50">
+                    <div className="mb-4 flex items-center gap-3">
+                        <span className="h-px w-8 bg-[#000000]" />
+                        <span className="font-favorit text-[12px] font-medium uppercase tracking-[0.025em] text-[#333333]">
                             {eyebrow}
                         </span>
                     </div>
 
-                    <h2 className="font-archivo text-5xl uppercase leading-[0.9] tracking-[-0.04em] sm:text-6xl lg:text-8xl">
-                        {heading}
-                        <span className="block text-[var(--color-primary)]">
+                    <h2 className="font-favorit text-3xl uppercase leading-[1.2] tracking-[0.025em] text-[#000000] sm:text-4xl lg:text-5xl">
+                        {heading}{" "}
+                        <span className="text-[#333333]">
                             {headingHighlight}
                         </span>
                     </h2>
 
-                    <p className="mt-7 max-w-xl font-inter text-base leading-7 text-black/60 sm:text-lg">
+                    <p className="mt-6 max-w-xl font-favorit text-[14px] leading-[1.4] tracking-[0.025em] text-[#333333]">
                         {description}
                     </p>
                 </div>
@@ -96,21 +96,18 @@ const About = ({ config = {} }) => {
                 <article className="grid items-center gap-12 lg:grid-cols-2 lg:gap-24">
 
                     {/* IMAGE */}
-                    <div ref={coachImageRef} className="reveal reveal-left relative mx-auto w-full max-w-[300px] sm:max-w-[320px] lg:max-w-[350px]">
-                        <div className="group relative aspect-[9/16]">
+                    <div ref={coachImageRef} className="reveal reveal-left relative mx-auto w-full max-w-[320px] sm:max-w-[360px] lg:max-w-[400px]">
+                        <div className="group relative aspect-[9/16] bg-white border border-[#e5e7eb] rounded-none overflow-hidden">
                             <img
                                 src={coachImageUrl}
                                 alt={coachImageAlt}
                                 loading="lazy"
                                 decoding="async"
-                                className="h-full w-full object-contain object-center transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform group-hover:-translate-y-1 group-hover:scale-[1.015]"
+                                className="h-full w-full object-contain object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
                             />
-                            <span className="absolute left-0 top-4 font-archivo text-4xl leading-none text-black/[0.06] transition-all duration-700 ease-out group-hover:-translate-x-1 group-hover:text-[var(--color-primary)]/30">
+                            <span className="absolute left-4 top-4 font-favorit text-3xl font-bold leading-none text-[#cccccc]">
                                 {coachNumber}
                             </span>
-                            <div className="absolute bottom-5 right-0 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-primary)] shadow-[0_8px_25px_color-mix(in_srgb,var(--color-primary)_18%,transparent)] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-6 group-hover:scale-105">
-                                <Dumbbell size={19} strokeWidth={2} />
-                            </div>
                         </div>
                     </div>
 
@@ -120,25 +117,25 @@ const About = ({ config = {} }) => {
                         className="reveal reveal-right max-w-xl"
                     >
                         <div className="mb-6 flex items-center gap-3">
-                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)]/15">
-                                <Dumbbell size={18} />
+                            <span className="flex h-8 w-8 items-center justify-center rounded-[4px] border border-[#000000] text-[#000000]">
+                                <Dumbbell size={16} strokeWidth={1.5} />
                             </span>
-                            <span className="font-inter text-xs font-bold uppercase tracking-[0.2em] text-black/45">
+                            <span className="font-favorit text-[12px] font-medium uppercase tracking-[0.025em] text-[#333333]">
                                 {coachLabel}
                             </span>
                         </div>
 
-                        <h3 className="font-archivo text-4xl uppercase leading-[0.95] tracking-[-0.03em] sm:text-5xl lg:text-6xl">
-                            {renderLines(coachHeading, "Results.", "text-black/25")}
+                        <h3 className="font-favorit text-2xl uppercase leading-[1.2] tracking-[0.025em] text-[#000000] sm:text-3xl lg:text-4xl">
+                            {renderLines(coachHeading, "Results.", "text-[#666666]")}
                         </h3>
 
-                        <p className="mt-7 max-w-lg font-inter text-base leading-8 text-black/60 sm:text-lg">
+                        <p className="mt-6 max-w-lg font-favorit text-[14px] leading-[1.4] tracking-[0.025em] text-[#333333]">
                             {coachDescription}
                         </p>
 
-                        <div className="mt-9 flex items-center gap-4">
-                            <span className="h-px w-14 bg-[var(--color-primary)]" />
-                            <span className="font-inter text-xs font-semibold uppercase tracking-[0.18em] text-black/40">
+                        <div className="mt-8 flex items-center gap-4">
+                            <span className="h-px w-10 bg-[#000000]" />
+                            <span className="font-favorit text-[12px] font-medium uppercase tracking-[0.025em] text-[#666666]">
                                 {coachStatement}
                             </span>
                         </div>
@@ -148,7 +145,7 @@ const About = ({ config = {} }) => {
                 {/* =====================================================
                     IFBB CERTIFICATE
                 ===================================================== */}
-                <article className="mt-28 grid items-center gap-12 lg:mt-40 lg:grid-cols-2 lg:gap-24">
+                <article className="mt-24 grid items-center gap-12 lg:mt-32 lg:grid-cols-2 lg:gap-24">
 
                     {/* CONTENT */}
                     <div
@@ -156,50 +153,47 @@ const About = ({ config = {} }) => {
                         className="reveal reveal-left order-2 max-w-xl lg:order-1"
                     >
                         <div className="mb-6 flex items-center gap-3">
-                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)]/15">
-                                <Award size={19} />
+                            <span className="flex h-8 w-8 items-center justify-center rounded-[4px] border border-[#000000] text-[#000000]">
+                                <Award size={16} strokeWidth={1.5} />
                             </span>
-                            <span className="font-inter text-xs font-bold uppercase tracking-[0.2em] text-black/45">
+                            <span className="font-favorit text-[12px] font-medium uppercase tracking-[0.025em] text-[#333333]">
                                 {certEyebrow}
                             </span>
                         </div>
 
-                        <h3 className="font-archivo text-4xl uppercase leading-[0.95] tracking-[-0.03em] sm:text-5xl lg:text-6xl">
+                        <h3 className="font-favorit text-2xl uppercase leading-[1.2] tracking-[0.025em] text-[#000000] sm:text-3xl lg:text-4xl">
                             {certHeading}
                             <br />
-                            <span className="text-[var(--color-primary)]">
+                            <span className="text-[#333333]">
                                 {certHeadingHighlight}
                             </span>
                         </h3>
 
-                        <p className="mt-7 max-w-lg font-inter text-base leading-8 text-black/60 sm:text-lg">
+                        <p className="mt-6 max-w-lg font-favorit text-[14px] leading-[1.4] tracking-[0.025em] text-[#333333]">
                             {certDescription}
                         </p>
 
-                        <div className="mt-9 inline-flex items-center gap-3">
-                            <span className="h-2 w-2 rounded-full bg-[var(--color-primary)]" />
-                            <span className="font-inter text-xs font-bold uppercase tracking-[0.15em] text-black/45">
+                        <div className="mt-8 inline-flex items-center gap-3">
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#000000]" />
+                            <span className="font-favorit text-[12px] font-medium uppercase tracking-[0.025em] text-[#666666]">
                                 {certStatement}
                             </span>
                         </div>
                     </div>
 
                     {/* CERTIFICATE IMAGE */}
-                    <div ref={certificateImageRef} className="reveal reveal-right order-1 relative mx-auto w-full max-w-[300px] sm:max-w-[320px] lg:max-w-[350px] lg:order-2">
-                        <div className="group relative aspect-[9/16]">
+                    <div ref={certificateImageRef} className="reveal reveal-right order-1 relative mx-auto w-full max-w-[320px] sm:max-w-[360px] lg:max-w-[400px] lg:order-2">
+                        <div className="group relative aspect-[9/16] bg-white border border-[#e5e7eb] rounded-none overflow-hidden">
                             <img
                                 src={certImageUrl}
                                 alt={certImageAlt}
                                 loading="lazy"
                                 decoding="async"
-                                className="h-full w-full object-contain object-center transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform group-hover:-translate-y-1 group-hover:scale-[1.015]"
+                                className="h-full w-full object-contain object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
                             />
-                            <span className="absolute right-0 top-4 font-archivo text-4xl leading-none text-black/[0.06] transition-all duration-700 ease-out group-hover:translate-x-1 group-hover:text-[var(--color-primary)]/30">
+                            <span className="absolute right-4 top-4 font-favorit text-3xl font-bold leading-none text-[#cccccc]">
                                 {certNumber}
                             </span>
-                            <div className="absolute bottom-5 left-0 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-primary)] shadow-[0_8px_25px_color-mix(in_srgb,var(--color-primary)_18%,transparent)] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-rotate-6 group-hover:scale-105">
-                                <Award size={20} strokeWidth={2} />
-                            </div>
                         </div>
                     </div>
                 </article>
@@ -207,21 +201,19 @@ const About = ({ config = {} }) => {
                 {/* =====================================================
                     BOTTOM STATEMENT
                 ===================================================== */}
-                <div className="mt-28 border-t border-black/10 pt-10 lg:mt-40 lg:pt-14">
+                <div className="mt-24 border-t border-[#000000] pt-10 lg:mt-32 lg:pt-12">
                     <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
 
-                        <p className="font-archivo text-2xl uppercase leading-tight tracking-[-0.02em] sm:text-3xl">
-                            {renderLines(bottomStatement, bottomHighlight, "text-black/25")}
+                        <p className="font-favorit text-xl uppercase leading-[1.2] tracking-[0.025em] text-[#000000] sm:text-2xl">
+                            {renderLines(bottomStatement, bottomHighlight, "text-[#666666]")}
                         </p>
 
                         <a
                             href={ctaHref}
-                            className="group inline-flex w-fit items-center gap-3 rounded-full bg-[#0b0c0e] px-6 py-3.5 font-inter text-sm font-semibold text-white transition-all duration-300 hover:bg-[var(--color-primary)] hover:text-[#0b0c0e]"
+                            className="ghost-cta-btn inline-flex items-center justify-center gap-2 hover:bg-[#000000] hover:text-white transition-colors"
                         >
-                            {ctaLabel}
-                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 transition-transform duration-300 group-hover:rotate-45 group-hover:bg-black/10">
-                                <ArrowUpRight size={16} />
-                            </span>
+                            <span>{ctaLabel}</span>
+                            <ArrowUpRight size={14} strokeWidth={1.5} />
                         </a>
                     </div>
                 </div>

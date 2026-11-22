@@ -34,8 +34,8 @@ export default function ProductGallery({
 
     return (
         <div className="flex w-full flex-col gap-4">
-            {/* Conteneur d'image principale - Sans fond ni bordure */}
-            <div className="group relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-3xl p-6 sm:p-10 transition-all duration-300">
+            {/* Conteneur d'image principale - Lookbook 0px */}
+            <div className="group relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-none border border-[#e5e7eb] bg-white p-6 sm:p-10 transition-colors">
                 <img
                     src={currentImageUrl}
                     alt={title}
@@ -44,8 +44,8 @@ export default function ProductGallery({
 
                 {/* Badge de compteur d'images */}
                 {images.length > 1 && (
-                    <div className="absolute bottom-4 right-4 rounded-full border border-slate-200/80 bg-white/80 px-3 py-1 text-[11px] font-bold text-slate-700 backdrop-blur-md shadow-sm dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-300">
-                        <span className="text-[var(--color-primary)]">{currentIndex + 1}</span> / {images.length}
+                    <div className="absolute bottom-4 right-4 rounded-none border border-[#000000] bg-white px-2 py-0.5 text-[10px] font-medium tracking-[0.05em] text-[#000000]">
+                        <span>{currentIndex + 1}</span> / {images.length}
                     </div>
                 )}
 
@@ -56,23 +56,23 @@ export default function ProductGallery({
                             type="button"
                             onClick={goPrev}
                             aria-label="Image précédente"
-                            className="absolute left-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-800 shadow-md backdrop-blur-md transition-all duration-200 hover:scale-110 hover:border-[var(--color-primary)] hover:bg-white active:scale-95 dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-200 dark:hover:border-[var(--color-primary)] dark:hover:bg-slate-900"
+                            className="absolute left-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-[4px] border border-[#000000] bg-white text-[#000000] transition-colors hover:bg-[#000000] hover:text-white"
                         >
-                            <ChevronLeft className="h-5 w-5" strokeWidth={2.25} />
+                            <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
                         </button>
                         <button
                             type="button"
                             onClick={goNext}
                             aria-label="Image suivante"
-                            className="absolute right-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-800 shadow-md backdrop-blur-md transition-all duration-200 hover:scale-110 hover:border-[var(--color-primary)] hover:bg-white active:scale-95 dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-200 dark:hover:border-[var(--color-primary)] dark:hover:bg-slate-900"
+                            className="absolute right-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-[4px] border border-[#000000] bg-white text-[#000000] transition-colors hover:bg-[#000000] hover:text-white"
                         >
-                            <ChevronRight className="h-5 w-5" strokeWidth={2.25} />
+                            <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
                         </button>
                     </>
                 )}
             </div>
 
-            {/* Galerie de vignettes (Thumbnails) - Sans fond ni bordures par défaut */}
+            {/* Galerie de vignettes (Thumbnails) */}
             {images.length > 1 && (
                 <div className="flex gap-3 overflow-x-auto pb-1 pt-0.5">
                     {images.map((image, index) => {
@@ -87,9 +87,9 @@ export default function ProductGallery({
                                 onClick={() => onImageClick(url)}
                                 aria-label={`Voir image ${index + 1}`}
                                 aria-current={isActive}
-                                className={`relative flex h-20 w-20 flex-shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-2xl p-2 transition-all duration-200 ${isActive
-                                        ? 'border-2 border-[var(--color-primary)] scale-95 opacity-100'
-                                        : 'border-2 border-transparent opacity-60 hover:opacity-100'
+                                className={`relative flex h-18 w-18 flex-shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-none p-2 bg-white transition-all ${isActive
+                                        ? 'border-2 border-[#000000]'
+                                        : 'border border-[#e5e7eb] opacity-60 hover:opacity-100 hover:border-[#000000]'
                                     }`}
                             >
                                 <img

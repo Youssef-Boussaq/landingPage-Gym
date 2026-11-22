@@ -55,11 +55,11 @@ export default function DesktopNavigation({ categories = [] }) {
                             aria-expanded={hasChildren ? active : undefined}
                             aria-haspopup={hasChildren ? 'true' : undefined}
                             className={`
-                                group relative flex h-full items-center gap-1.5 px-3.5 py-5
-                                text-sm font-semibold tracking-wide transition-colors duration-200
+                                group relative flex h-full items-center gap-1.5 px-3 py-3
+                                text-[12px] font-medium tracking-[0.025em] uppercase transition-opacity duration-150
                                 ${active
-                                    ? 'text-slate-950 font-bold'
-                                    : 'text-slate-600 hover:text-slate-950'
+                                    ? 'text-black font-bold'
+                                    : 'text-black hover:opacity-60'
                                 }
                             `}
                         >
@@ -68,20 +68,16 @@ export default function DesktopNavigation({ categories = [] }) {
                             {hasChildren && (
                                 <ChevronDown
                                     className={`
-                                        h-4 w-4 text-slate-400 transition-transform duration-200 ease-out
-                                        group-hover:text-slate-700
-                                        ${active
-                                            ? 'rotate-180 text-slate-950'
-                                            : ''
-                                        }
+                                        h-3.5 w-3.5 text-black transition-transform duration-200 ease-out
+                                        ${active ? 'rotate-180' : ''}
                                     `}
                                 />
                             )}
 
-                            {/* Ligne d'indication active au survol / sélection */}
+                            {/* Hairline indication line */}
                             <span
                                 className={`
-                                    absolute bottom-0 left-0 h-[2.5px] w-full rounded-full bg-[var(--color-primary)]
+                                    absolute bottom-0 left-0 h-[1.5px] w-full bg-black
                                     transition-all duration-200 ease-out
                                     ${active
                                         ? 'scale-x-100 opacity-100'

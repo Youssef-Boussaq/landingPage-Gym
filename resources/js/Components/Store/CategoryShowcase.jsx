@@ -28,9 +28,9 @@ export default function CategoryShowcase({
         <section className="relative w-full overflow-hidden bg-white">
 
             {/* =====================================================
-                FULL WIDTH VIDEO
+                FULL WIDTH VIDEO / HERO BANNER
             ====================================================== */}
-            <div className="relative w-full px-2 sm:px-3 lg:px-4">
+            <div className="relative w-full">
                 <div
                     className="
                         group
@@ -38,19 +38,11 @@ export default function CategoryShowcase({
                         isolate
                         w-full
                         overflow-hidden
-
-                        rounded-[18px]
-                        border
-                        border-black/[0.08]
-
+                        rounded-none
+                        border-y
+                        border-black
                         bg-neutral-100
-
-                        shadow-[0_20px_60px_rgba(0,0,0,0.08)]
-
-                        sm:rounded-[22px]
-                        lg:rounded-[28px]
-
-                        transform-gpu
+                        shadow-none
                     "
                 >
 
@@ -280,64 +272,34 @@ export default function CategoryShowcase({
                                     CTA
                                 ================================================== */}
                                 <a
-                                    href={`/store/category/${category.slug}`}
+                                    href={`/store?category=${category.slug}`}
                                     className="
                                         group/cta
-
                                         inline-flex
                                         w-fit
                                         shrink-0
                                         items-center
-                                        gap-3
-
-                                        rounded-full
-
-                                        bg-[var(--color-primary)]
-
-                                        px-5
-                                        py-3
-
-                                        text-xs
-                                        font-bold
+                                        gap-2
+                                        rounded-[4px]
+                                        border
+                                        border-white
+                                        bg-transparent
+                                        px-6
+                                        py-2.5
+                                        text-[12px]
+                                        font-medium
                                         uppercase
-                                        tracking-[0.12em]
-                                        text-black
-
-                                        transform-gpu
-
-                                        transition-transform
-                                        duration-300
-                                        ease-out
-
-                                        hover:scale-105
+                                        tracking-[0.025em]
+                                        text-white
+                                        transition-colors
+                                        hover:bg-white
+                                        hover:text-black
                                     "
                                 >
                                     <span>
-                                        Explore collection
+                                        EXPLORER LA COLLECTION
                                     </span>
-
-                                    <span
-                                        className="
-                                            flex
-                                            h-7
-                                            w-7
-                                            items-center
-                                            justify-center
-
-                                            rounded-full
-                                            bg-black
-                                            text-white
-
-                                            transform-gpu
-
-                                            transition-transform
-                                            duration-300
-
-                                            group-hover/cta:translate-x-1
-                                        "
-                                    >
-                                        <ArrowRight className="h-3.5 w-3.5" />
-                                    </span>
+                                    <ArrowRight className="h-3.5 w-3.5" />
                                 </a>
                             </div>
                         </div>

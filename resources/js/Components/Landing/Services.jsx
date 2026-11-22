@@ -26,50 +26,46 @@ function ServiceCard({ service, className }) {
 
     return (
         <div className={cn(
-            "group relative bg-slate-900 rounded-3xl overflow-hidden cursor-pointer",
-            "transform transition-transform duration-500 hover:-translate-y-2",
+            "group relative bg-white border border-[#e5e7eb] hover:border-[#000000] rounded-none overflow-hidden cursor-pointer",
+            "transition-colors duration-300 flex flex-col h-full",
             className
         )}>
-            {/* Background Image */}
-            <div className="absolute inset-0">
+            {/* Image */}
+            <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#f0efe7]">
                 {hasImage ? (
                     <img
                         src={service.image}
                         alt={service.imageAlt || service.title}
                         loading="lazy"
                         decoding="async"
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 group-hover:opacity-40"
+                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     />
                 ) : (
-                    /* Fallback gradient when no image */
-                    <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-900" />
+                    <div className="w-full h-full bg-[#f0efe7] flex items-center justify-center">
+                        <Icon className="w-8 h-8 text-[#cccccc]" strokeWidth={1.5} />
+                    </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
             </div>
 
             {/* Content */}
-            <div className="relative h-full min-h-[320px] p-6 sm:p-8 flex flex-col justify-end">
-                <div className="mb-4 bg-[var(--color-primary)] w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1">
-                    <Icon className="w-6 h-6 text-slate-900" aria-hidden="true" />
+            <div className="p-6 flex flex-col flex-1 justify-between bg-white">
+                <div>
+                    <div className="mb-4 w-9 h-9 rounded-[4px] border border-[#000000] flex items-center justify-center text-[#000000]">
+                        <Icon className="w-4 h-4" strokeWidth={1.5} aria-hidden="true" />
+                    </div>
+
+                    <h4 className="text-[16px] font-bold text-[#000000] uppercase tracking-[0.025em] mb-2 font-favorit">
+                        {service.title}
+                    </h4>
+
+                    <p className="text-[#666666] text-[13px] leading-[1.4] tracking-[0.025em] mb-6 font-favorit">
+                        {service.description}
+                    </p>
                 </div>
 
-                <h4 className="text-xl sm:text-2xl font-black text-white uppercase italic tracking-tight mb-2">
-                    {service.title}
-                </h4>
-
-                {/* Description: always visible on mobile/touch, hover-reveal on desktop */}
-                <p className="text-slate-300 text-sm leading-relaxed mb-6
-                               opacity-100 translate-y-0
-                               sm:opacity-0 sm:translate-y-4
-                               sm:transition-all sm:duration-300
-                               sm:group-hover:opacity-100 sm:group-hover:translate-y-0
-                               group-focus-within:opacity-100 group-focus-within:translate-y-0">
-                    {service.description}
-                </p>
-
-                <div className="flex items-center text-[var(--color-primary)] font-bold text-xs uppercase tracking-wider">
+                <div className="flex items-center text-[#000000] font-medium text-[12px] uppercase tracking-[0.025em]">
                     <span>{service.ctaLabel || 'Learn More'}</span>
-                    <ArrowRight className="w-4 h-4 ml-2 transform transition-transform group-hover:translate-x-2" aria-hidden="true" />
+                    <ArrowRight className="w-3.5 h-3.5 ml-2 transform transition-transform group-hover:translate-x-1" strokeWidth={1.5} aria-hidden="true" />
                 </div>
             </div>
         </div>
@@ -97,24 +93,27 @@ export default function Services({ services = [], sectionConfig = {} }) {
     ];
 
     return (
-        <section id="services" className="py-16 lg:py-28 bg-[#f9fbf6] relative">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="services" className="py-20 lg:py-28 bg-white relative">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
 
-                <div ref={titleRef} className="reveal-up flex flex-col lg:flex-row justify-between items-end gap-6 mb-12 lg:mb-20">
+                <div ref={titleRef} className="reveal-up flex flex-col lg:flex-row justify-between items-end gap-6 mb-16 lg:mb-20">
                     <div className="max-w-2xl">
-                        <h2 className="text-sm font-bold text-[var(--color-primary-dark)] uppercase tracking-widest mb-2">
-                            {eyebrow}
-                        </h2>
-                        <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 uppercase italic tracking-tight">
+                        <div className="mb-3 flex items-center gap-3">
+                            <span className="h-px w-8 bg-[#000000]" />
+                            <h2 className="text-[12px] font-medium text-[#333333] uppercase tracking-[0.025em] font-favorit">
+                                {eyebrow}
+                            </h2>
+                        </div>
+                        <h3 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-[#000000] uppercase tracking-[0.025em] font-favorit">
                             {heading}
                         </h3>
                     </div>
-                    <p className="text-slate-600 max-w-md lg:text-right text-sm sm:text-base">
+                    <p className="text-[#666666] max-w-md lg:text-right text-[14px] leading-[1.4] tracking-[0.025em] font-favorit">
                         {description}
                     </p>
                 </div>
 
-                <div ref={gridRef} className="reveal-group grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div ref={gridRef} className="reveal-group grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {items.map((service, idx) => (
                         <div key={service.id ?? service.slug ?? idx} className={`reveal-up reveal-item delay-${(idx + 1) * 100}`}>
                             <ServiceCard service={service} />

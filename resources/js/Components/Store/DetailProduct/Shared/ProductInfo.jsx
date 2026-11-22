@@ -13,14 +13,14 @@ export default function ProductInfo({
     ratingsCount = 0,
 }) {
     return (
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col space-y-4 font-favorit">
             <div>
                 {categoryName && (
-                    <span className="inline-block mb-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-[var(--color-primary)] font-inter">
+                    <span className="inline-block mb-1.5 text-[12px] font-medium uppercase tracking-[0.025em] text-[#666666]">
                         {categoryName}
                     </span>
                 )}
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black font-archivo text-slate-900 dark:text-white leading-tight tracking-tight">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-normal text-[#000000] leading-tight tracking-[0.025em] uppercase">
                     {title}
                 </h1>
             </div>
@@ -32,7 +32,7 @@ export default function ProductInfo({
                 salePrice={sale_price}
             />
             {description && (
-                <p className="pt-1 text-sm sm:text-base text-slate-600 dark:text-slate-300 font-inter leading-relaxed whitespace-pre-line">
+                <p className="pt-1 text-[14px] text-[#333333] leading-[1.4] tracking-[0.025em] whitespace-pre-line">
                     {description}
                 </p>
             )}

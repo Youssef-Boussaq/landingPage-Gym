@@ -100,30 +100,29 @@ export default function CartDrawer({
 
             {/* Drawer */}
             <aside
-                className={`fixed right-0 top-0 z-[100] flex h-screen w-full max-w-md flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out ${isOpen
+                className={`fixed right-0 top-0 z-[100] flex h-screen w-full max-w-md flex-col bg-white border-l border-[#000000] transition-transform duration-300 ease-in-out font-favorit ${isOpen
                     ? 'translate-x-0'
                     : 'translate-x-full'
                     }`}
             >
                 {/* Header */}
-                <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-6 py-5">
+                <div className="flex shrink-0 items-center justify-between border-b border-[#000000] px-6 py-4">
                     <div>
-                        <h2 className="font-archivo text-xl font-black text-slate-900">
+                        <h2 className="text-[16px] font-bold uppercase tracking-[0.025em] text-[#000000]">
                             Mon panier
                         </h2>
 
-                        <p className="mt-1 text-xs text-slate-500">
-                            {count} article
-                            {count > 1 ? 's' : ''}
+                        <p className="mt-0.5 text-[11px] text-[#666666]">
+                            {count} article{count > 1 ? 's' : ''}
                         </p>
                     </div>
 
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 transition hover:bg-slate-200"
+                        className="flex h-8 w-8 items-center justify-center rounded-[4px] border border-[#e5e7eb] hover:border-[#000000] transition-colors"
                     >
-                        <X className="h-5 w-5" />
+                        <X className="h-4 w-4" strokeWidth={1.5} />
                     </button>
                 </div>
 
@@ -131,9 +130,9 @@ export default function CartDrawer({
                 <div className="flex-1 overflow-y-auto">
                     {count === 0 ? (
                         <div className="flex h-full flex-col items-center justify-center px-8 text-center">
-                            <ShoppingBag className="h-12 w-12 text-slate-300" />
+                            <ShoppingBag className="h-10 w-10 text-[#cccccc]" strokeWidth={1.5} />
 
-                            <h3 className="mt-4 font-bold text-slate-900">
+                            <h3 className="mt-4 text-[14px] font-medium text-[#000000] uppercase tracking-[0.025em]">
                                 Votre panier est vide
                             </h3>
                         </div>

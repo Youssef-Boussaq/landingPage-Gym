@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from '@/Components/Store/ProductCard';
 
 export default function ProductCarousel({
@@ -9,19 +10,15 @@ export default function ProductCarousel({
 
     if (products.length === 0) {
         return (
-            <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600">
+            <div className="border border-stone-200 bg-white p-8 text-center text-xs text-stone-500 rounded-none tracking-[0.025em]">
                 Aucun produit à afficher pour l'instant.
             </div>
         );
     }
 
     const scroll = (direction) => {
-        if (!carouselRef.current) {
-            return;
-        }
-
+        if (!carouselRef.current) return;
         const container = carouselRef.current;
-
         const amount = container.clientWidth * 0.85;
 
         container.scrollBy({
@@ -31,151 +28,49 @@ export default function ProductCarousel({
     };
 
     return (
-        <div className="relative w-full">
-
-            {/* =====================================================
-                ARROW - PREVIOUS
-            ====================================================== */}
-
-            {products.length > 1 && (
+        <div className="relative w-full group/carousel">
+            {/* ARROW PREVIOUS */}
+            {products.length > 2 && (
                 <button
                     type="button"
                     onClick={() => scroll('prev')}
-                    aria-label="Previous products"
-                    className="
-                        absolute
-                        left-2
-                        top-1/2
-                        -translate-y-1/2
-                        z-10
-
-                        flex
-                        h-10
-                        w-10
-                        items-center
-                        justify-center
-
-                        rounded-full
-                        bg-white
-                        border
-                        border-slate-200
-                        shadow-lg
-
-                        text-slate-900
-
-                        transition-all
-                        duration-200
-
-                        hover:bg-slate-900
-                        hover:text-white
-                        hover:scale-105
-
-                        focus:outline-none
-                        focus:ring-2
-                        focus:ring-slate-300
-
-                        sm:left-3
-                    "
+                    aria-label="Produits précédents"
+                    className="absolute -left-3 top-1/3 -translate-y-1/2 z-10 hidden sm:flex h-9 w-9 items-center justify-center rounded-[4px] bg-white border border-black text-black transition-colors hover:bg-black hover:text-white"
                 >
-                    ←
+                    <ChevronLeft className="h-4 w-4 stroke-[2]" />
                 </button>
             )}
 
-            {/* =====================================================
-                CAROUSEL
-            ====================================================== */}
-
+            {/* CAROUSEL CONTAINER */}
             <div
                 ref={carouselRef}
-                className="
-                    flex
-                    w-full
-                    gap-4
-                    overflow-x-auto
-                    scroll-smooth
-                    snap-x
-                    snap-mandatory
-
-                    pb-4
-
-                    scrollbar-hide
-
-                    [&::-webkit-scrollbar]:hidden
-                    [-ms-overflow-style:none]
-                    [scrollbar-width:none]
-                "
+                className="flex w-full gap-4 sm:gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 no-scrollbar"
             >
-
                 {products.map((product) => (
                     <div
                         key={product.id}
-                        className={`
-                            flex-shrink-0
-                            snap-start
-
-                            w-[82%]
-                            sm:w-[48%]
-
-                            ${isFilterOpen
+                        className={`flex-shrink-0 snap-start w-[85%] sm:w-[48%] ${
+                            isFilterOpen
                                 ? 'lg:w-[31%]'
-                                : 'md:w-[31%] lg:w-[24%]'
-                            }
-                        `}
+                                : 'md:w-[31%] lg:w-[23.5%]'
+                        }`}
                     >
                         <ProductCard product={product} />
                     </div>
                 ))}
-
             </div>
 
-            {/* =====================================================
-                ARROW - NEXT
-            ====================================================== */}
-
-            {products.length > 1 && (
+            {/* ARROW NEXT */}
+            {products.length > 2 && (
                 <button
                     type="button"
                     onClick={() => scroll('next')}
-                    aria-label="Next products"
-                    className="
-                        absolute
-                        right-2
-                        top-1/2
-                        -translate-y-1/2
-                        z-10
-
-                        flex
-                        h-10
-                        w-10
-                        items-center
-                        justify-center
-
-                        rounded-full
-                        bg-white
-                        border
-                        border-slate-200
-                        shadow-lg
-
-                        text-slate-900
-
-                        transition-all
-                        duration-200
-
-                        hover:bg-slate-900
-                        hover:text-white
-                        hover:scale-105
-
-                        focus:outline-none
-                        focus:ring-2
-                        focus:ring-slate-300
-
-                        sm:right-3
-                    "
+                    aria-label="Produits suivants"
+                    className="absolute -right-3 top-1/3 -translate-y-1/2 z-10 hidden sm:flex h-9 w-9 items-center justify-center rounded-[4px] bg-white border border-black text-black transition-colors hover:bg-black hover:text-white"
                 >
-                    →
+                    <ChevronRight className="h-4 w-4 stroke-[2]" />
                 </button>
             )}
-
         </div>
     );
 }

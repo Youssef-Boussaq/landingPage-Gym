@@ -37,8 +37,8 @@ const STATIC_TRANSFORMATIONS = [
 ];
 
 // Shape cycle for dynamic items that don't specify a shape
-const SHAPES = ['fashion-card-shape-1', 'fashion-card-shape-2', 'fashion-card-shape-3'];
-const OFFSETS = ['', 'lg:translate-y-8', ''];
+const SHAPES = ['', '', ''];
+const OFFSETS = ['', '', ''];
 
 function TransformationCard({ data, className }) {
     return (
@@ -47,27 +47,26 @@ function TransformationCard({ data, className }) {
                 'group relative',
                 'flex flex-col',
                 'gap-4',
+                'bg-white border border-[#e5e7eb] p-4',
                 className
             )}
         >
             {/* =====================================================
-                IMAGE COLLAGE
+                IMAGE COLLAGE (Editorial Sharp Rectangles)
             ====================================================== */}
-            <div className="relative h-[430px] sm:h-[500px]">
+            <div className="relative h-[430px] sm:h-[480px] bg-[#f0efe7] overflow-hidden">
 
                 {/* BEFORE */}
                 <div
                     className={cn(
-                        'absolute left-0 bottom-0',
+                        'absolute left-3 bottom-3',
                         'z-10',
-                        'w-[43%] h-[67%]',
+                        'w-[46%] h-[68%]',
                         'overflow-hidden',
-                        'bg-slate-100',
-                        'shadow-lg',
-                        'fashion-card-shape-sub',
-                        'transition-[transform,z-index] duration-700 ease-out',
-                        'group-hover:z-30',
-                        'group-hover:-translate-y-2'
+                        'bg-white border border-[#e5e7eb]',
+                        'rounded-none',
+                        'transition-transform duration-500 ease-out',
+                        'group-hover:z-30'
                     )}
                 >
                     <img
@@ -78,10 +77,9 @@ function TransformationCard({ data, className }) {
                             h-full
                             object-cover
                             grayscale
-                            transition-all
-                            duration-700
+                            transition-transform
+                            duration-500
                             group-hover:scale-105
-                            group-hover:grayscale-0
                         "
                         onError={(e) => {
                             e.currentTarget.src =
@@ -92,18 +90,17 @@ function TransformationCard({ data, className }) {
                     <span
                         className="
                             absolute
-                            top-3
-                            left-3
-                            rounded-full
-                            bg-black/75
-                            px-2.5
+                            top-2
+                            left-2
+                            rounded-none
+                            bg-[#000000]
+                            px-2
                             py-1
-                            text-[8px]
-                            font-black
+                            text-[9px]
+                            font-medium
                             uppercase
-                            tracking-[0.16em]
+                            tracking-[0.05em]
                             text-white
-                            backdrop-blur-sm
                         "
                     >
                         Before
@@ -113,15 +110,13 @@ function TransformationCard({ data, className }) {
                 {/* AFTER / MAIN IMAGE */}
                 <div
                     className={cn(
-                        'absolute right-0 top-0',
+                        'absolute right-3 top-3',
                         'z-20',
-                        'w-[68%] h-[88%]',
+                        'w-[66%] h-[88%]',
                         'overflow-hidden',
-                        'bg-slate-100',
-                        'shadow-xl',
-                        data.shape,
-                        'transition-transform duration-700 ease-out',
-                        'group-hover:-translate-y-2'
+                        'bg-white border border-[#e5e7eb]',
+                        'rounded-none',
+                        'transition-transform duration-500 ease-out'
                     )}
                 >
                     <img
@@ -132,7 +127,7 @@ function TransformationCard({ data, className }) {
                             h-full
                             object-cover
                             transition-transform
-                            duration-700
+                            duration-500
                             group-hover:scale-105
                         "
                         onError={(e) => {
@@ -141,120 +136,68 @@ function TransformationCard({ data, className }) {
                         }}
                     />
 
-                    {/* subtle image overlay */}
-                    <div
-                        className="
-                            absolute
-                            inset-0
-                            bg-gradient-to-t
-                            from-black/35
-                            via-transparent
-                            to-transparent
-                        "
-                    />
-
                     {/* AFTER LABEL */}
                     <span
                         className="
                             absolute
-                            top-4
-                            right-4
-                            rounded-full
-                            bg-[var(--color-primary)]
-                            px-3
-                            py-1.5
-                            text-[8px]
-                            font-black
+                            top-2
+                            right-2
+                            rounded-none
+                            bg-[#000000]
+                            px-2.5
+                            py-1
+                            text-[9px]
+                            font-medium
                             uppercase
-                            tracking-[0.16em]
-                            text-black
-                            shadow-lg
+                            tracking-[0.05em]
+                            text-white
                         "
                     >
                         After
                     </span>
-
-                    {/* Arrow */}
-                    <div
-                        className="
-                            absolute
-                            bottom-4
-                            right-4
-                            flex
-                            h-9
-                            w-9
-                            items-center
-                            justify-center
-                            rounded-full
-                            bg-white
-                            text-black
-                            transition-all
-                            duration-500
-                            group-hover:rotate-[-45deg]
-                        "
-                    >
-                        <ArrowRight
-                            size={15}
-                            strokeWidth={2.5}
-                        />
-                    </div>
                 </div>
 
-                {/* =================================================
-                    SMALL FLOATING RESULT BADGE
-                ================================================== */}
+                {/* SMALL FLOATING RESULT BADGE */}
                 <div
                     className="
                         absolute
-                        bottom-[10%]
-                        left-[36%]
+                        bottom-4
+                        left-4
                         z-30
                         flex
-                        h-12
-                        w-12
-                        rotate-[-8deg]
                         items-center
                         justify-center
-                        rounded-full
-                        bg-[var(--color-primary)]
+                        rounded-none
+                        bg-[#000000]
+                        px-3
+                        py-1.5
                         text-center
-                        text-[7px]
-                        font-black
+                        text-[9px]
+                        font-medium
                         uppercase
-                        leading-[0.9]
-                        text-black
-                        shadow-xl
-                        transition-transform
-                        duration-500
-                        group-hover:rotate-0
+                        tracking-[0.05em]
+                        text-white
                     "
                 >
-                    {data.resultBadge
-                        ? data.resultBadge.split(' ').map((word, i) => (
-                              <span key={i}>
-                                  {word}
-                                  {i < data.resultBadge.split(' ').length - 1 && <br />}
-                              </span>
-                          ))
-                        : (<>Real<br />Result</>)
-                    }
+                    {data.resultBadge || 'Real Result'}
                 </div>
             </div>
 
             {/* =====================================================
                 CONTENT
             ====================================================== */}
-            <div className="px-1">
+            <div className="pt-2">
                 <div className="flex items-start justify-between gap-4">
                     <div>
                         <p
                             className="
                                 mb-1
-                                text-[9px]
-                                font-black
+                                text-[11px]
+                                font-medium
                                 uppercase
-                                tracking-[0.2em]
-                                text-[var(--color-primary-dark)]
+                                tracking-[0.025em]
+                                text-[#666666]
+                                font-favorit
                             "
                         >
                             {data.program}
@@ -262,14 +205,12 @@ function TransformationCard({ data, className }) {
 
                         <h3
                             className="
-                                text-lg
-                                sm:text-xl
-                                font-black
+                                text-[16px]
+                                font-bold
                                 uppercase
-                                italic
-                                leading-tight
-                                tracking-tight
-                                text-slate-950
+                                tracking-[0.025em]
+                                text-[#000000]
+                                font-favorit
                             "
                         >
                             {data.title}
@@ -279,10 +220,11 @@ function TransformationCard({ data, className }) {
                     <span
                         className="
                             pt-1
-                            text-[9px]
-                            font-black
-                            tracking-[0.15em]
-                            text-slate-300
+                            text-[11px]
+                            font-medium
+                            tracking-[0.05em]
+                            text-[#cccccc]
+                            font-favorit
                         "
                     >
                         0{data.id}
@@ -301,14 +243,14 @@ export default function Transformations({ transformations: dynamicItems, section
     const items = (Array.isArray(dynamicItems) && dynamicItems.length > 0)
         ? dynamicItems.map((item, index) => ({
               ...item,
-              shape:  item.shape  ?? SHAPES[index % SHAPES.length],
-              offset: item.offset ?? OFFSETS[index % OFFSETS.length],
+              shape:  '',
+              offset: '',
           }))
         : STATIC_TRANSFORMATIONS;
 
     // Section config (eyebrow / heading) — fall back to hardcoded values
     const eyebrow  = sectionConfig?.eyebrow ?? 'FIT YOUNESS';
-    const heading  = sectionConfig?.heading ?? 'Clients';
+    const heading  = sectionConfig?.heading ?? 'Clients Transformations';
 
     return (
         <section
@@ -318,68 +260,67 @@ export default function Transformations({ transformations: dynamicItems, section
                 overflow-hidden
                 bg-white
                 py-20
-                lg:py-32
+                lg:py-28
             "
         >
             <div
                 className="
                     mx-auto
-                    max-w-7xl
+                    max-w-[1440px]
                     px-4
                     sm:px-6
                     lg:px-8
                 "
             >
                 {/* =================================================
-                    FIT YOUNESS HEADER
+                    HEADER
                 ================================================== */}
                 <div
                     ref={titleRef}
                     className="
                         reveal-up
                         mx-auto
-                        mb-14
+                        mb-16
                         max-w-3xl
                         text-center
                         lg:mb-20
                     "
                 >
-                    <p
-                        className="
-                            mb-3
-                            text-[10px]
-                            font-black
-                            uppercase
-                            tracking-[0.3em]
-                            text-[var(--color-primary-dark)]
-                        "
-                    >
-                        {eyebrow}
-                    </p>
+                    <div className="mb-3 flex items-center justify-center gap-3">
+                        <span className="h-px w-8 bg-[#000000]" />
+                        <p
+                            className="
+                                text-[12px]
+                                font-medium
+                                uppercase
+                                tracking-[0.025em]
+                                text-[#333333]
+                                font-favorit
+                            "
+                        >
+                            {eyebrow}
+                        </p>
+                        <span className="h-px w-8 bg-[#000000]" />
+                    </div>
 
                     <h2
                         className="
-                            text-4xl
-                            font-black
+                            text-3xl
+                            sm:text-4xl
+                            lg:text-5xl
+                            font-normal
                             uppercase
-                            italic
-                            leading-[0.9]
-                            tracking-[-0.04em]
-                            text-slate-950
-                            sm:text-5xl
-                            lg:text-7xl
+                            tracking-[0.025em]
+                            text-[#000000]
+                            font-favorit
                         "
                     >
                         {heading}
-                        <br />
-                        <span className="text-slate-300">
-                            Transformations
-                        </span>
                     </h2>
                 </div>
 
                 {/* =================================================
-                    ASYMMETRIC CARD GRID
+                    CARD GRID
                 ================================================== */}
                 <div
                     ref={gridRef}
@@ -387,11 +328,10 @@ export default function Transformations({ transformations: dynamicItems, section
                         reveal-group
                         grid
                         grid-cols-1
-                        gap-14
+                        gap-8
                         sm:grid-cols-2
                         lg:grid-cols-3
                         lg:items-start
-                        lg:gap-8
                     "
                 >
                     {items.map((item, index) => (

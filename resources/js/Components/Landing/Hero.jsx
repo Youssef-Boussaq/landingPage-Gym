@@ -463,6 +463,12 @@ export default function Hero({ config = {}, isPreview = false }) {
                         </div>
                     )}
                 </div>
+
+                {/* ADANOLA SLIDE PAGINATION BARS (Thin horizontal bars 30px wide, 2px tall) */}
+                <div className="mt-12 flex items-center justify-center gap-2">
+                    <span className="w-8 h-[2px] bg-black" aria-label="Slide 1 active" />
+                    <span className="w-8 h-[2px] bg-[#cccccc]" aria-label="Slide 2" />
+                </div>
             </div>
         </section>
     );
