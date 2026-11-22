@@ -11,7 +11,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Admin user from .env
-        $adminEmail = config('store.admin_notification_email') ?? env('ADMIN_EMAIL', 'youseefchrat@gmail.com');
+        $adminEmail = config('store.admin_notification_email') ?? env('ADMIN_EMAIL', 'aminebaskad2005@gmail.com');
 
         User::updateOrCreate(
             ['email' => $adminEmail],

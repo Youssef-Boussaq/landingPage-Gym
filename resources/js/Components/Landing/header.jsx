@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Heart, User } from 'lucide-react';
+import { Search, User, Shield } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 import HeaderLogo from '../Logo';
 import CartButton from '../Store/Cart/CartButton';
@@ -59,7 +59,7 @@ export default function Header({ user, onOpenCart }) {
                     </div>
 
                     {/* RIGHT: Icon cluster */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
                         <Link
                             href="/store"
                             aria-label="Recherche"
@@ -68,23 +68,39 @@ export default function Header({ user, onOpenCart }) {
                             <Search className="h-4 w-4 stroke-[1.5]" />
                         </Link>
 
-                        <button
-                            type="button"
-                            aria-label="Favoris"
-                            className={actionIconClass}
-                        >
-                            <Heart className="h-4 w-4 stroke-[1.5]" />
-                        </button>
+                        {/* Admin or Profile Icon */}
+                        {currentUser?.role === 'admin' ? (
+                            <Link
+                                href="/admin"
+                                aria-label="Tableau de bord Admin"
+                                title="Administration Fit Youness"
+                                className="flex items-center gap-1.5 px-2 py-1 text-black bg-[#f0efe7] border border-black text-[11px] font-bold uppercase tracking-[0.05em] hover:bg-black hover:text-white transition-colors"
+                            >
+                                <Shield className="h-3.5 w-3.5 stroke-[2]" />
+                                <span className="hidden sm:inline">Admin</span>
+                            </Link>
+                        ) : currentUser ? (
+                            <Link
+                                href="/profile"
+                                aria-label="Mon Profil"
+                                title="Mon Profil Client"
+                                className={actionIconClass}
+                            >
+                                <User className="h-4 w-4 stroke-[1.5]" />
+                            </Link>
+                        ) : (
+                            <Link
+                                href="/login"
+                                aria-label="Connexion"
+                                title="Se connecter"
+                                className={actionIconClass}
+                            >
+                                <User className="h-4 w-4 stroke-[1.5]" />
+                            </Link>
+                        )}
 
-                        <Link
-                            href={currentUser ? '/profile' : '/login'}
-                            aria-label={currentUser ? 'Profil' : 'Connexion'}
-                            className={actionIconClass}
-                        >
-                            <User className="h-4 w-4 stroke-[1.5]" />
-                        </Link>
-
-                        <div className={actionIconClass}>
+                        {/* Notification Bell - solid container without hover opacity parent */}
+                        <div className="relative flex items-center justify-center">
                             <NotificationBell variant="light" />
                         </div>
 

@@ -77,44 +77,44 @@ export default function NotificationItem({ notification, onClose }) {
     });
 
     const itemClasses = isUnread
-        ? "relative block w-full px-4 py-4 text-left transition bg-slate-50/80 hover:bg-slate-100/60 border-l-4 border-l-[var(--color-primary)]"
-        : "relative block w-full px-4 py-4 text-left transition bg-white hover:bg-slate-50 border-l-4 border-l-transparent";
+        ? "relative block w-full px-4 py-4 text-left transition bg-[#f0efe7] hover:bg-[#e8e7df] border-l-4 border-l-[#000000]"
+        : "relative block w-full px-4 py-4 text-left transition bg-white hover:bg-[#fafafa] border-l-4 border-l-transparent";
 
     return (
-        <div className={itemClasses}>
+        <div className={itemClasses} onClick={notification.order_id ? handleOrderClick : undefined}>
             <div className="flex gap-3">
                 {/* Icon */}
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${bg} ${color}`}>
-                    <Icon className="h-5 w-5" />
+                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-none border border-black/10 ${bg} ${color}`}>
+                    <Icon className="h-4 w-4" />
                 </div>
 
                 {/* Content */}
                 <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
-                        <p className={`text-sm flex items-center gap-2 text-slate-900 ${isUnread ? 'font-bold' : 'font-medium'}`}>
+                        <p className={`text-[12px] flex items-center gap-2 text-black ${isUnread ? 'font-bold' : 'font-medium'}`}>
                             {notification.title}
                             {isUnread && (
-                                <span className="flex h-2 w-2 rounded-full bg-[var(--color-primary)] shrink-0"></span>
+                                <span className="flex h-1.5 w-1.5 rounded-full bg-black shrink-0"></span>
                             )}
                         </p>
                         {isUnread && (
-                            <span className="text-[10px] font-black text-slate-950 bg-[var(--color-primary)] px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
+                            <span className="text-[9px] font-bold text-white bg-black px-1.5 py-0.5 uppercase tracking-wider shrink-0">
                                 Nouveau
                             </span>
                         )}
                     </div>
 
-                    <p className={`mt-1 text-xs leading-relaxed ${isUnread ? 'text-slate-800 font-medium' : 'text-slate-500 font-regular'}`}>
+                    <p className={`mt-1 text-[11px] leading-relaxed tracking-[0.015em] ${isUnread ? 'text-[#000000] font-medium' : 'text-[#666666]'}`}>
                         {notification.message}
                     </p>
 
-                    <div className="mt-2.5 flex items-center justify-between text-xs">
+                    <div className="mt-2.5 flex items-center justify-between text-[10px]">
                         {notification.order_number ? (
-                            <span className="font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                            <span className="font-semibold text-black bg-white border border-[#e5e7eb] px-1.5 py-0.5">
                                 {notification.order_number}
                             </span>
                         ) : <span />}
-                        <span className="text-slate-400 font-regular">
+                        <span className="text-[#888888]">
                             {formattedDate}
                         </span>
                     </div>

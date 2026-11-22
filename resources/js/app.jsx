@@ -6,8 +6,9 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import AppearanceProvider from './Components/AppearanceProvider';
 import ErrorBoundary from './Components/ErrorBoundary';
+import SmoothScroll from './Components/SmoothScroll';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'Fit Youness';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -26,7 +27,9 @@ createInertiaApp({
                 <AppearanceProvider
                     appearance={props.initialPage.props.appearance}
                 >
-                    <App {...props} />
+                    <SmoothScroll>
+                        <App {...props} />
+                    </SmoothScroll>
                 </AppearanceProvider>
             </ErrorBoundary>
         );

@@ -13,10 +13,7 @@ export default function AdminLayout({ title, children }) {
             {title && <Head title={title} />}
 
             <div className="flex min-h-screen">
-                <aside className="hidden w-64 shrink-0 bg-slate-950 lg:sticky lg:top-0 lg:block lg:h-screen">
-                    <div className="px-5 py-5 text-xs font-black uppercase tracking-[0.2em] text-[var(--color-primary)]">
-                        Admin
-                    </div>
+                <aside className="hidden w-64 shrink-0 bg-slate-950 border-r border-white/10 lg:sticky lg:top-0 lg:block lg:h-screen">
                     <AdminSidebar />
                 </aside>
 
@@ -47,9 +44,6 @@ export default function AdminLayout({ title, children }) {
                                     className="h-full w-72 max-w-[85vw] overflow-y-auto bg-slate-950 shadow-xl"
                                 >
                                     <DialogTitle className="sr-only">Navigation admin</DialogTitle>
-                                    <div className="px-5 py-5 text-xs font-black uppercase tracking-[0.2em] text-[var(--color-primary)]">
-                                        Admin
-                                    </div>
                                     <AdminSidebar mobile onClose={() => setSidebarOpen(false)} onNavigate={() => setSidebarOpen(false)} />
                                 </DialogPanel>
                             </TransitionChild>

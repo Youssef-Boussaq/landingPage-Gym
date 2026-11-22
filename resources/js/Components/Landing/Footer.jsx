@@ -24,12 +24,12 @@ export default function Footer() {
                     {/* Brand Info */}
                     <div className="lg:col-span-5 space-y-4">
                         <div className="flex items-center gap-2">
-                            <span className="font-favorit text-2xl font-bold uppercase tracking-[0.075em] text-[#000000]">
-                                ADANOLA
+                            <span className="font-favorit text-2xl font-black uppercase tracking-[0.08em] text-[#000000]">
+                                FIT YOUNESS
                             </span>
                         </div>
                         <p className="max-w-md text-[13px] leading-[1.4] tracking-[0.025em] text-[#666666] font-favorit">
-                            Everyday activewear, designed for your lifestyle. High-performance essentials and tailored coaching.
+                            Coaching personnalisé haute performance, programmes d'entraînement sur-mesure et nutrition calibrée pour atteindre vos objectifs.
                         </p>
                     </div>
 
@@ -126,7 +126,7 @@ export default function Footer() {
 
                 {/* Bottom Bar & Credits */}
                 <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between text-[11px] text-[#666666] font-favorit">
-                    <p>© {new Date().getFullYear()} ADANOLA. All rights reserved.</p>
+                    <p>© {new Date().getFullYear()} Fit Youness. Tous droits réservés.</p>
 
                     <button
                         type="button"

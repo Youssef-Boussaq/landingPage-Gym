@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Search, Heart, User } from 'lucide-react';
+import { ShoppingBag, Search, User, Shield } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 import DesktopNavigation from '@/Components/Store/Navigation/DesktopNavigation';
 import MobileMenu from '@/Components/Store/Navigation/MobileMenu';
@@ -68,23 +68,39 @@ export default function Header({ onOpenCart }) {
                             <Search className="h-4 w-4 stroke-[1.5]" />
                         </Link>
 
-                        <button
-                            type="button"
-                            aria-label="Favoris"
-                            className="p-1.5 text-black hover:opacity-60 transition-opacity"
-                        >
-                            <Heart className="h-4 w-4 stroke-[1.5]" />
-                        </button>
+                        {/* Admin or Profile Icon */}
+                        {currentUser?.role === 'admin' ? (
+                            <Link
+                                href="/admin"
+                                aria-label="Tableau de bord Admin"
+                                title="Administration Fit Youness"
+                                className="flex items-center gap-1.5 px-2 py-1 text-black bg-[#f0efe7] border border-black text-[11px] font-bold uppercase tracking-[0.05em] hover:bg-black hover:text-white transition-colors"
+                            >
+                                <Shield className="h-3.5 w-3.5 stroke-[2]" />
+                                <span className="hidden sm:inline">Admin</span>
+                            </Link>
+                        ) : currentUser ? (
+                            <Link
+                                href="/profile"
+                                aria-label="Mon Profil"
+                                title="Mon Profil Client"
+                                className="p-1.5 text-black hover:opacity-60 transition-opacity"
+                            >
+                                <User className="h-4 w-4 stroke-[1.5]" />
+                            </Link>
+                        ) : (
+                            <Link
+                                href="/login"
+                                aria-label="Connexion"
+                                title="Se connecter"
+                                className="p-1.5 text-black hover:opacity-60 transition-opacity"
+                            >
+                                <User className="h-4 w-4 stroke-[1.5]" />
+                            </Link>
+                        )}
 
-                        <Link
-                            href={currentUser ? '/profile' : '/login'}
-                            aria-label={currentUser ? 'Profil' : 'Connexion'}
-                            className="p-1.5 text-black hover:opacity-60 transition-opacity"
-                        >
-                            <User className="h-4 w-4 stroke-[1.5]" />
-                        </Link>
-
-                        <div className="p-1.5 text-black hover:opacity-60 transition-opacity">
+                        {/* Notification Bell - solid container */}
+                        <div className="relative flex items-center justify-center">
                             <NotificationBell variant="light" />
                         </div>
 

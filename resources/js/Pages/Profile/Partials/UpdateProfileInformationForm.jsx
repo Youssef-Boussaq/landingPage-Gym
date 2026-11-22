@@ -1,9 +1,7 @@
 import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
+import { Check } from 'lucide-react';
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -20,91 +18,100 @@ export default function UpdateProfileInformation({
 
     const submit = (e) => {
         e.preventDefault();
-
         patch(route('profile.update'));
     };
 
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                    Profile Information
+        <section className={`font-favorit ${className}`}>
+            <header className="border-b border-black pb-4">
+                <h2 className="text-sm font-bold uppercase tracking-[0.05em] text-black">
+                    Informations Personnelles
                 </h2>
-
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    Update your account's profile information and email address.
+                <p className="mt-1 text-xs text-[#666666]">
+                    Mettez à jour vos coordonnées et votre adresse email de contact.
                 </p>
             </header>
 
-            <form onSubmit={submit} className="mt-6 space-y-6">
+            <form onSubmit={submit} className="mt-6 max-w-xl space-y-5">
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
-
-                    <TextInput
+                    <label
+                        htmlFor="name"
+                        className="block text-[11px] font-bold uppercase tracking-[0.05em] text-black"
+                    >
+                        Nom complet
+                    </label>
+                    <input
                         id="name"
-                        className="mt-1 block w-full"
+                        type="text"
+                        className="mt-1.5 block w-full rounded-[4px] border border-[#e5e7eb] px-3.5 py-2.5 text-sm text-black focus:border-black focus:outline-none focus:ring-0"
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
                         required
-                        isFocused
                         autoComplete="name"
                     />
-
-                    <InputError className="mt-2" message={errors.name} />
+                    <InputError className="mt-1.5" message={errors.name} />
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
+                    <label
+                        htmlFor="email"
+                        className="block text-[11px] font-bold uppercase tracking-[0.05em] text-black"
+                    >
+                        Adresse Email
+                    </label>
+                    <input
                         id="email"
                         type="email"
-                        className="mt-1 block w-full"
+                        className="mt-1.5 block w-full rounded-[4px] border border-[#e5e7eb] px-3.5 py-2.5 text-sm text-black focus:border-black focus:outline-none focus:ring-0"
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
                         required
                         autoComplete="username"
                     />
-
-                    <InputError className="mt-2" message={errors.email} />
+                    <InputError className="mt-1.5" message={errors.email} />
                 </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (
-                    <div>
-                        <p className="mt-2 text-sm text-gray-800 dark:text-gray-200">
-                            Your email address is unverified.
+                    <div className="border border-amber-200 bg-amber-50 p-4">
+                        <p className="text-xs text-amber-800">
+                            Votre adresse email n'est pas vérifiée.{' '}
                             <Link
                                 href={route('verification.send')}
                                 method="post"
                                 as="button"
-                                className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
+                                className="font-bold underline hover:text-black"
                             >
-                                Click here to re-send the verification email.
+                                Renvoyer l'email de vérification
                             </Link>
                         </p>
 
                         {status === 'verification-link-sent' && (
-                            <div className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
-                                A new verification link has been sent to your
-                                email address.
+                            <div className="mt-2 text-xs font-bold text-emerald-700">
+                                Un nouveau lien de vérification vous a été envoyé.
                             </div>
                         )}
                     </div>
                 )}
 
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                <div className="flex items-center gap-4 pt-2">
+                    <button
+                        type="submit"
+                        disabled={processing}
+                        className="bg-black px-6 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition disabled:opacity-50"
+                    >
+                        {processing ? 'Enregistrement...' : 'Enregistrer les modifications'}
+                    </button>
 
                     <Transition
                         show={recentlySuccessful}
-                        enter="transition ease-in-out"
+                        enter="transition ease-in-out duration-300"
                         enterFrom="opacity-0"
-                        leave="transition ease-in-out"
+                        leave="transition ease-in-out duration-500"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Saved.
-                        </p>
+                        <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+                            <Check className="h-4 w-4" /> Enregistré avec succès.
+                        </span>
                     </Transition>
                 </div>
             </form>

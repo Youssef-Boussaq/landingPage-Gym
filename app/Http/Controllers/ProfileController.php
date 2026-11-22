@@ -18,9 +18,20 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $user = $request->user();
+
+        $orders = $user->orders()
+            ->with([
+                'items.product.primaryImage',
+                'items.product.images',
+            ])
+            ->latest()
+            ->get();
+
         return Inertia::render('Profile/Edit', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => session('status'),
+            'orders' => $orders,
         ]);
     }
 
@@ -29,15 +40,23 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        try {
+            $request->user()->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+            if ($request->user()->isDirty('email')) {
+                $request->user()->email_verified_at = null;
+            }
+
+            $request->user()->save();
+
+            return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('[PROFILE] Error updating profile: ' . $e->getMessage(), [
+                'user_id' => $request->user()->id,
+            ]);
+
+            return back()->withErrors(['error' => 'Une erreur est survenue lors de la mise à jour de votre profil.']);
         }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit');
     }
 
     /**
@@ -49,15 +68,21 @@ class ProfileController extends Controller
             'password' => ['required', 'current_password'],
         ]);
 
-        $user = $request->user();
+        try {
+            $user = $request->user();
 
-        Auth::logout();
+            Auth::logout();
 
-        $user->delete();
+            $user->delete();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+            return Redirect::to('/');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('[PROFILE] Error deleting account: ' . $e->getMessage());
+
+            return back()->withErrors(['error' => 'Une erreur est survenue lors de la suppression de votre compte.']);
+        }
     }
 }

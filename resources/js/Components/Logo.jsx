@@ -7,8 +7,8 @@ export default function HeaderLogo() {
             href="/"
             className="inline-flex items-center py-1 transition-opacity duration-200 hover:opacity-75"
         >
-            <span className="font-sans text-xl sm:text-2xl font-bold uppercase tracking-[0.075em] text-black">
-                ADANOLA
+            <span className="font-sans text-xl sm:text-2xl font-black uppercase tracking-[0.08em] text-black">
+                FIT YOUNESS
             </span>
         </Link>
     );

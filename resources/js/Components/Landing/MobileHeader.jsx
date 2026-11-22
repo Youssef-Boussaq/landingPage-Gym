@@ -11,8 +11,8 @@ export default function MobileHeader({
     cartCount = 0,
     onOpenCart,
 }) {
-    const profileHref = user ? '/profile' : '/login';
-    const profileLabel = user ? 'Profile' : 'Login';
+    const profileHref = user?.role === 'admin' ? '/admin' : (user ? '/profile' : '/login');
+    const profileLabel = user?.role === 'admin' ? 'Administration' : (user ? 'Profile' : 'Login');
 
     return (
         <header

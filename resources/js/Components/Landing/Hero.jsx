@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import SplitText from '@/Components/ui/SplitText';
+import HeroAnimatedBackground from '@/Components/ui/HeroAnimatedBackground';
 import {
     ArrowRight,
     Award,
@@ -200,6 +202,9 @@ export default function Hero({ config = {}, isPreview = false }) {
             className={`fy-hero ${bgClass} ${alignClass} ${isPreview ? 'fy-hero--preview' : ''} ${isVisible ? 'fy-hero--visible' : ''}`}
             aria-label="Présentation du Coach Fit Youness"
         >
+            {/* React Bits Ambient Animated Background */}
+            <HeroAnimatedBackground />
+
             {/* Ambient Background Glow Layer */}
             <div className="fy-hero__ambient" aria-hidden="true" />
 
@@ -227,28 +232,26 @@ export default function Hero({ config = {}, isPreview = false }) {
                             </div>
                         )}
 
-                        {/* 2. Main Editorial Headline */}
+                        {/* 2. Main Editorial Headline with React Bits SplitText */}
                         {hero.showTitle && (
                             <h1 className="fy-hero__title fy-hero__enter fy-hero__enter--1" dir="auto">
                                 {hero.titleLine1 && (
                                     <span className="fy-hero__title-line1">
-                                        {hero.titleLine1}{' '}
+                                        <SplitText text={hero.titleLine1} delay={0.1} stagger={0.015} />{' '}
                                     </span>
                                 )}
 
                                 {hero.titleHighlight && (
                                     <span className="fy-hero__highlight">
-                                        {hero.titleHighlight}
+                                        <SplitText text={hero.titleHighlight} delay={0.35} stagger={0.02} />{' '}
                                     </span>
                                 )}
 
                                 {hero.titleLine2 && (
                                     <span className="fy-hero__title-line2">
-                                        {hero.titleLine2}
+                                        <SplitText text={hero.titleLine2} delay={0.55} stagger={0.015} />
                                     </span>
                                 )}
-
-
                             </h1>
                         )}
 
